@@ -221,12 +221,14 @@ $list-row-min: 40rem;
   .card__media {
     grid-area: media;
     flex: none;
-    inline-size: clamp(5.5rem, 26cqi, 7.5rem);
+    // About 40% of the card: large enough to recognise the product at a
+    // glance, while the name beside it keeps a 160px+ reading column.
+    inline-size: clamp(7.5rem, 40cqi, 11rem);
     border-inline-end: 1px solid var(--border-hairline);
     border-inline-start: 0;
 
     img {
-      padding: var(--sp-3);
+      padding: var(--sp-2);
     }
   }
 

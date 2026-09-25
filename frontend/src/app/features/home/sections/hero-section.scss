@@ -259,6 +259,20 @@
     color var(--d-fast) var(--ease-out);
 }
 
+// Below 768px the frame is only 200–400px tall, and the availability card laid
+// over it covered most of the footage. It sits under the frame instead, so the
+// film is seen whole; from 768px up there is room for it to float inside.
+@include bp-down(md) {
+  .hero__availability {
+    position: static;
+    max-inline-size: none;
+    margin-block-start: var(--sp-3);
+    background: rgb(var(--c-dark-rgb) / 0.42);
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+
 @include bp-down(sm) {
   .hero {
     padding-block-start: calc(var(--header-h) + var(--sp-8));
