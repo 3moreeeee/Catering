@@ -1,0 +1,15 @@
+# Only pom.xml and src/ are needed to build the image.
+target/
+out/
+data/
+.idea/
+.vscode/
+.mvn/
+mvnw.cmd
+*.iml
+*.log
+.env
+.env.*
+.git/
+.DS_Store
+Thumbs.db

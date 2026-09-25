@@ -1,0 +1,9 @@
+# Production overrides, activated with SPRING_PROFILES_ACTIVE=prod.
+# Everything else is inherited from application.yml. ProductionConfigurationGuard
+# refuses to start this profile without PostgreSQL or a stable JWT secret.
+
+app:
+  jwt:
+    # Production is served over HTTPS only, so the session cookie is Secure
+    # unless explicitly overridden.
+    secure-cookie: ${APP_SECURE_COOKIE:true}
