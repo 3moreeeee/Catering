@@ -204,8 +204,19 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  flex: none;
+  // Shrinkable so the search field inside it can give way (see .header__search).
+  // With `flex: none` here the field's own `flex-shrink` never came into play,
+  // and at 1280px the French bar ran 85px past the edge of the screen.
+  flex: 0 1 auto;
+  min-inline-size: 0;
   margin-left: auto;
+
+  // Every control keeps its size; only the search field is allowed to
+  // shrink. Without this the call to action took the squeeze and wrapped
+  // "Nous contacter" onto two lines.
+  > :not(.header__search) {
+    flex-shrink: 0;
+  }
 
   @include bp(sm) {
     gap: var(--sp-2);
@@ -379,6 +390,17 @@
 
   @include bp(md) {
     display: inline-flex;
+  }
+
+  // From 1024px to 1279px the desktop navigation is on screen with its own
+  // "Contact" link, and there is no flexible element left in the bar: logo,
+  // five links and this button needed 1075px in French. The duplicate button
+  // steps aside there instead of pushing the bar off the screen; from 1280px
+  // the search field gives way and the button returns.
+  @include bp(lg) {
+    @include bp-down(xl) {
+      display: none;
+    }
   }
 }
 

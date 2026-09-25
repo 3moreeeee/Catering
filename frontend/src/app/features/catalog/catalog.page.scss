@@ -136,18 +136,22 @@
   padding: 0;
   grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
   grid-auto-rows: 1fr;
+  // Product cards switch to their single-column shelf row by this grid's width
+  // (see product-card.scss), so the grid is their size container.
+  container: product-grid / inline-size;
 
   li {
     block-size: 100%;
   }
 
+  // No forced two-column override on phones: two 170px tracks squeezed the
+  // card's name to a 19px column. The auto-fill tracks already fall to one
+  // column below 31.25rem, and the card becomes a shelf row there.
   @include bp-down(sm) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-3);
-  }
-
-  @media (max-width: 359px) {
-    grid-template-columns: 1fr;
+    // One column: equal-height rows would only pad every card to the
+    // tallest one on the page.
+    grid-auto-rows: auto;
   }
 }
 

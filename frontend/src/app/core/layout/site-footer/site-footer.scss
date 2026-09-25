@@ -7,7 +7,10 @@
 }
 
 .footer__inner {
-  padding-block: clamp(var(--sp-10), 8vw, var(--sp-16)) var(--sp-8);
+  // The bottom padding keeps the last row, whose "back to top" link sits in
+  // the corner the assistant launcher floats over, clear of that launcher.
+  padding-block: clamp(var(--sp-10), 8vw, var(--sp-16))
+    calc(max(var(--sp-8), var(--assistant-clearance, 0px)) + env(safe-area-inset-bottom, 0px));
 }
 
 .footer__grid {

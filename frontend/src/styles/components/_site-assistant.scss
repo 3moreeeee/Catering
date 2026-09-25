@@ -1,8 +1,26 @@
 @use '../abstracts/mixins' as *;
 
+// The space the floating launcher occupies at the foot of the screen: its 56px
+// height plus the same offset again above it. Anything that must stay
+// reachable at the very end of the page (the footer's "back to top") reserves
+// this much room so the launcher can never sit on top of it.
+:root {
+  --assistant-clearance: calc(56px + 2 * var(--sp-5));
+
+  @include bp-down(sm) {
+    --assistant-clearance: calc(56px + 2 * var(--sp-3));
+  }
+}
+
 fk-site-assistant {
   position: relative;
   z-index: var(--z-modal);
+}
+
+// A drawer that covers the page owns the screen: the launcher would otherwise
+// float above the menu's last links and the filter sheet's actions.
+body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
+  visibility: hidden;
 }
 
 .assistant__launcher {
@@ -447,11 +465,14 @@ fk-site-assistant {
     inline-size: 100%;
     block-size: min(760px, calc(100svh - var(--sp-4)));
     border-radius: var(--r-lg) var(--r-lg) 0 0;
+    padding-block-end: env(safe-area-inset-bottom, 0px);
   }
 
   .assistant__launcher {
-    inset-inline-end: var(--sp-3);
-    inset-block-end: var(--sp-3);
+    // Clear of the home indicator and rounded corners when the page is
+    // rendered edge to edge; the plain offset otherwise.
+    inset-inline-end: max(var(--sp-3), env(safe-area-inset-right, 0px));
+    inset-block-end: max(var(--sp-3), env(safe-area-inset-bottom, 0px));
 
     > span:last-of-type {
       @include visually-hidden;

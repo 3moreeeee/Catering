@@ -28,8 +28,12 @@
   display: flex;
   flex-direction: column;
   background-color: var(--c-ivory-50);
-  // svh, not vh — avoids the iOS toolbar jump.
+  // The visible viewport, whichever state the mobile toolbars are in: dvh
+  // tracks them, so the last links are never parked behind a toolbar. svh is
+  // the fallback for engines without dvh — never vh, which is the largest
+  // viewport and hides the bottom of the sheet.
   block-size: 100svh;
+  block-size: 100dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
 
@@ -138,7 +142,7 @@
 }
 
 .mnav__foot {
-  padding: var(--sp-6) var(--gutter) var(--sp-8);
+  padding: var(--sp-6) var(--gutter) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--c-ivory-200);
   display: grid;
   gap: var(--sp-5);

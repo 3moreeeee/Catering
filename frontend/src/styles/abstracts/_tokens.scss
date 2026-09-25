@@ -163,7 +163,9 @@
   --sp-32: 8rem;
 
   --section-y: clamp(3.25rem, 9vw, 9rem);
-  --gutter: 1.5rem;
+  // 16px on a 320px phone, reaching 24px by ~530px; tablet and desktop set
+  // their own below. A fixed 24px spent 15% of the smallest screens on margins.
+  --gutter: clamp(1rem, 4.5vw, 1.5rem);
 
   // ---------------------------------------------------------------------------
   // RADIUS — deliberately restrained; nothing reads as an app icon

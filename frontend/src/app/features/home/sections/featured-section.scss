@@ -79,6 +79,9 @@
   // Every card in the grid gets the same height, so a one-line and a two-line
   // product name do not produce two different frames.
   grid-auto-rows: 1fr;
+  // Product cards switch to their single-column shelf row by this grid's width
+  // (see product-card.scss), so the grid is their size container.
+  container: product-grid / inline-size;
 
   li {
     block-size: 100%;
@@ -92,6 +95,7 @@
   @media (max-width: 519.98px) {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--sp-3);
+    grid-auto-rows: auto;
 
     // Three on a phone. Five stacked shelf rows is most of a screen spent on a
     // sample of a catalogue the visitor has not asked for yet; three makes the
