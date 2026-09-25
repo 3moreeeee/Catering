@@ -157,6 +157,36 @@
   }
 }
 
+// Placeholder while the live price loads: same line box as the price, so the
+// card keeps its height and nothing shifts when the figure arrives.
+.card__price--pending span {
+  display: block;
+  inline-size: 5.5em;
+  block-size: 1.3em;
+  border-radius: var(--r-xs);
+  background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--surface-card) 70%, white),
+      transparent
+    )
+    var(--surface-alt);
+  background-size: 200% 100%;
+
+  @include motion-safe {
+    animation: card-price-pending 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes card-price-pending {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
 .card__offer {
   display: inline-block;
   margin-inline-end: var(--sp-2);

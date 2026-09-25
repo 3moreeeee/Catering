@@ -13,6 +13,7 @@ import {
   switchMap,
 } from 'rxjs';
 import { IDENTITY_API_URL } from '../../core/auth/identity-api.token';
+import { retryWhileWaking } from '../../core/http/retry-while-waking';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
 import {
   CategoryId,
@@ -96,13 +97,16 @@ export class ApiProductRepository implements ProductRepository {
           .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
             params: { page: 0, pageSize: 100 },
           })
+          .pipe(retryWhileWaking())
           .pipe(
             switchMap((first) => {
               if (first.totalPages <= 1) return of(first.items);
               const remaining = Array.from({ length: first.totalPages - 1 }, (_, index) =>
-                this.http.get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
-                  params: { page: index + 1, pageSize: 100 },
-                }),
+                this.http
+                  .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
+                    params: { page: index + 1, pageSize: 100 },
+                  })
+                  .pipe(retryWhileWaking()),
               );
               return forkJoin(remaining).pipe(
                 map((pages) => [first.items, ...pages.map((page) => page.items)].flat()),

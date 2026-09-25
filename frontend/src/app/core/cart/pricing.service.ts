@@ -4,6 +4,7 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { IDENTITY_API_URL } from '../auth/identity-api.token';
 import { ProductPricePoint } from './cart.models';
+import { retryWhileWaking } from '../http/retry-while-waking';
 
 /**
  * Looks catalogue prices up from the API for products the page is rendering.
@@ -14,7 +15,9 @@ import { ProductPricePoint } from './cart.models';
  * runtime, in one batched request per rendered page, and cached for the session.
  *
  * On the server during SSR nothing is fetched: prerendered HTML must not embed a
- * price that may since have changed, so the price appears on hydration.
+ * price that may since have changed, so the price appears on hydration. Until it
+ * does, `isPending` is true — on the server too, so the prerendered card and the
+ * hydrating one show the same placeholder.
  */
 @Injectable({ providedIn: 'root' })
 export class PricingService {
@@ -25,6 +28,8 @@ export class PricingService {
   /** sourceId -> price point. Null marks an id the API does not know. */
   private readonly cache = new Map<string, ProductPricePoint | null>();
   private readonly inFlight = new Map<string, Promise<void>>();
+  /** Ids whose load failed after every retry; they stop showing as pending. */
+  private readonly failed = new Set<string>();
 
   /** Bumped after every load so templates reading `priceOf` re-evaluate. */
   readonly revision = signal(0);
@@ -39,6 +44,7 @@ export class PricingService {
    */
   request(sourceId: string): void {
     if (!isPlatformBrowser(this.platformId) || this.cache.has(sourceId)) return;
+    this.failed.delete(sourceId);
     this.pending.add(sourceId);
     if (this.flushScheduled) return;
     this.flushScheduled = true;
@@ -53,6 +59,16 @@ export class PricingService {
   priceOf(sourceId: string): ProductPricePoint | null {
     this.revision();
     return this.cache.get(sourceId) ?? null;
+  }
+
+  /**
+   * True while a price is still to come: not yet answered and not given up on.
+   * An id the API answered without a price is not pending — it has no price.
+   */
+  isPending(sourceId: string): boolean {
+    this.revision();
+    if (!isPlatformBrowser(this.platformId)) return true;
+    return !this.cache.has(sourceId) && !this.failed.has(sourceId);
   }
 
   /** Drops a back-office-edited price so the next catalogue render reloads it. */
@@ -95,16 +111,21 @@ export class PricingService {
   private async load(sourceIds: string[]): Promise<void> {
     try {
       const points = await firstValueFrom(
-        this.http.get<ProductPricePoint[]>(`${this.apiUrl}/products/prices`, {
-          params: new HttpParams().set('sourceIds', sourceIds.join(',')),
-        }),
+        this.http
+          .get<ProductPricePoint[]>(`${this.apiUrl}/products/prices`, {
+            params: new HttpParams().set('sourceIds', sourceIds.join(',')),
+          })
+          .pipe(retryWhileWaking()),
       );
       points.forEach((point) => this.cache.set(point.sourceId, point));
       // Remember the misses too, so an id the catalogue has but the API does not
       // is asked for once rather than on every render.
       sourceIds.filter((id) => !this.cache.has(id)).forEach((id) => this.cache.set(id, null));
     } catch {
-      // Leave the ids uncached so a later navigation can retry.
+      // Given up after the bounded retries. The ids stay uncached, so the next
+      // render that asks for them tries again; until then they are not shown as
+      // pending, which would be a placeholder that never resolves.
+      sourceIds.forEach((id) => this.failed.add(id));
     }
   }
 }

@@ -89,6 +89,8 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
               }
               <strong>{{ displayPrice(point.price, point.currency) }}</strong>
             </p>
+          } @else if (pricePending()) {
+            <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
           }
         </div>
 
@@ -140,6 +142,8 @@ export class ProductCard {
 
   readonly addState = signal<'idle' | 'adding' | 'added' | 'error'>('idle');
   readonly pricePoint = computed(() => this.pricing.priceOf(this.product().id));
+  /** Holds the price's place while it loads, so the card does not jump when it lands. */
+  readonly pricePending = computed(() => this.pricing.isPending(this.product().id));
   readonly loginLink = computed(() => this.links.path('login'));
 
   constructor() {
