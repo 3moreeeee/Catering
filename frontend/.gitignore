@@ -1,0 +1,48 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+
+# Angular and tooling caches
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# Playwright
+/test-results
+/playwright-report
+/blob-report
+
+# Vercel local link state
+.vercel
+
+# Pristine copies of migrated product photography — not served, not deployed.
+public/img/products/_original/
+
+# Heavy media hosted on ImageKit. angular.json already excludes these from the
+# build, so they are never deployed; the database stores only their URLs.
+public/img/products/
+public/img/chapters/
+public/video/
+public/videos-claude-prompt/

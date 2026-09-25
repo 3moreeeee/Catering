@@ -11,9 +11,22 @@ Angular 22 · SSR + hydration · 324 prerendered pages · bilingual FR/EN · 150
 
 ---
 
+## Repository layout
+
+```
+frontend/   Angular 22 SSR application (public site, panier and /admin UI)
+backend/    Spring Boot 3 API (identity, catalogue, panier, devis) on Neon Postgres
+```
+
+Each folder is self-contained, with its own dependencies, build and `.gitignore`,
+so a host is pointed at one folder as its root directory: `frontend/` for the
+Node/SSR host, `backend/` for the Java host. Unless stated otherwise, the `npm`
+and `node scripts/...` commands below run from `frontend/`.
+
 ## Quick start
 
 ```bash
+cd frontend
 npm install
 npm run assets          # generate placeholder logos, imagery, robots.txt
 npm run fetch:images    # pull the referenced recoverable legacy photographs
@@ -190,7 +203,7 @@ The map is defined once in `src/app/core/config/site.config.ts` and handled at r
 
 ### Accounts and Spring Boot API
 
-The identity API lives in `backend-SpringBoot/` and exposes registration, login,
+The identity API lives in `backend/` and exposes registration, login,
 self-service profile/security controls, and administrator-only person CRUD.
 Public registration always creates a `CLIENT`; a client is either `PHYSIQUE`
 (first and last name) or `MORALE` (company name and tax identifier).
@@ -198,7 +211,7 @@ Public registration always creates a `CLIENT`; a client is either `PHYSIQUE`
 For local development, open two PowerShell terminals:
 
 ```powershell
-cd backend-SpringBoot
+cd backend
 $env:APP_ADMIN_EMAIL = 'admin@example.tn'
 $env:APP_ADMIN_PASSWORD = 'replace-with-a-long-unique-password'
 $env:APP_JWT_SECRET = 'replace-with-at-least-32-random-characters'
@@ -206,13 +219,14 @@ $env:APP_JWT_SECRET = 'replace-with-at-least-32-random-characters'
 ```
 
 ```powershell
+cd frontend
 npm start
 ```
 
 The frontend runs on `http://localhost:4200`, and the API runs on
 `http://localhost:8081` (`8080` is already used by Oracle XML DB on this
 workstation). H2 file storage is used locally. For Neon, copy
-`backend-SpringBoot/.env.example` and set `NEON_DATABASE_URL_DIRECT` (preferred
+`backend/.env.example` and set `NEON_DATABASE_URL_DIRECT` (preferred
 for migrations and catalogue imports) and optionally `NEON_DATABASE_URL` for a
 pooled connection. The backend also accepts the traditional `DB_URL`,
 `DB_USERNAME`, `DB_PASSWORD`, and `DB_DRIVER=org.postgresql.Driver` variables.
@@ -263,22 +277,22 @@ JavaScript bundle, and an edit in the back office needs no rebuild.
 #### Seeding the catalogue
 
 On first start, with an empty product table, `CatalogSeeder` loads
-`backend-SpringBoot/src/main/resources/seed/catalog-seed.json` (247 products, 31
+`backend/src/main/resources/seed/catalog-seed.json` (247 products, 31
 categories, 7 brands). Regenerate that file after any catalogue change:
 
 ```powershell
 node scripts/export-backend-seed.mjs
 ```
 
-The script joins the curated bilingual catalogue in `src/app/data/` with the Vinto
-crawl snapshot in `tmp/vinto-import/raw-products.json`, matching on the numeric
+The script joins the curated bilingual catalogue in `frontend/src/app/data/` with the Vinto
+crawl snapshot in `frontend/tmp/vinto-import/raw-products.json`, matching on the numeric
 Vinto listing id embedded in each product id, and takes only price, stock quantity
 and supplier reference from the crawl. It makes no network request — the crawl is
 already on disk. A product with no matching crawl record is exported with
 `price: null` and renders as "prix sur demande".
 
 Set `APP_CATALOG_SEED=false` to disable seeding. To reseed from scratch, stop the
-application and delete `backend-SpringBoot/data/`.
+application and delete `backend/data/`.
 
 ---
 
