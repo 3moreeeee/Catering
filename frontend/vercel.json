@@ -8,5 +8,9 @@
       "includeFiles": "dist/fk-catering/server/**"
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/ssr" }]
+  "routes": [
+    { "src": "/", "dest": "/api/ssr" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/api/ssr" }
+  ]
 }
