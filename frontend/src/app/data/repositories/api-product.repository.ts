@@ -1,7 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, REQUEST, inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { Observable, catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  catchError,
+  concat,
+  forkJoin,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+} from 'rxjs';
 import { IDENTITY_API_URL } from '../../core/auth/identity-api.token';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
 import {
@@ -69,28 +79,39 @@ export class ApiProductRepository implements ProductRepository {
   private readonly apiUrl = inject(IDENTITY_API_URL);
   private readonly prerendering = isPlatformServer(inject(PLATFORM_ID)) && inject(REQUEST) === null;
 
+  private readonly bundled = PRODUCTS.map(withHostedImages);
+
+  /**
+   * The bundled snapshot first, synchronously, then the live catalogue once the
+   * API answers. The synchronous first value is what the prerendered HTML was
+   * built from, so the browser's first render matches it and hydration has
+   * nothing to reconcile; the API value then replaces it. If the API fails the
+   * snapshot simply stays.
+   */
   private readonly catalogue$ = this.prerendering
-    ? of(PRODUCTS.map(withHostedImages))
-    : this.http
-        .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
-          params: { page: 0, pageSize: 100 },
-        })
-        .pipe(
-          switchMap((first) => {
-            if (first.totalPages <= 1) return of(first.items);
-            const remaining = Array.from({ length: first.totalPages - 1 }, (_, index) =>
-              this.http.get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
-                params: { page: index + 1, pageSize: 100 },
-              }),
-            );
-            return forkJoin(remaining).pipe(
-              map((pages) => [first.items, ...pages.map((page) => page.items)].flat()),
-            );
-          }),
-          map((products) => products.map(toProduct)),
-          catchError(() => of(PRODUCTS.map(withHostedImages))),
-          shareReplay({ bufferSize: 1, refCount: false }),
-        );
+    ? of(this.bundled)
+    : concat(
+        of(this.bundled),
+        this.http
+          .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
+            params: { page: 0, pageSize: 100 },
+          })
+          .pipe(
+            switchMap((first) => {
+              if (first.totalPages <= 1) return of(first.items);
+              const remaining = Array.from({ length: first.totalPages - 1 }, (_, index) =>
+                this.http.get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
+                  params: { page: index + 1, pageSize: 100 },
+                }),
+              );
+              return forkJoin(remaining).pipe(
+                map((pages) => [first.items, ...pages.map((page) => page.items)].flat()),
+              );
+            }),
+            map((products) => products.map(toProduct)),
+            catchError(() => EMPTY),
+          ),
+      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
 
   all(): Observable<readonly Product[]> {
     return this.catalogue$;

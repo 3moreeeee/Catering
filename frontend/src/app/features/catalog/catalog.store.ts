@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Observable, map, switchMap } from 'rxjs';
 import {
   CategoryId,
   FacetSet,
@@ -88,20 +88,26 @@ export class CatalogStore {
     };
   });
 
-  private readonly result = computed<Paginated<Product>>(() => {
-    let value: Paginated<Product> = this.emptyPage();
-    // The in-memory repository emits synchronously, so this resolves before the
-    // computed returns. An HTTP implementation would surface through explicit
-    // `loading`/`error` signals instead — see docs/05 §5.2.
-    this.repo.list(this.query()).subscribe((page) => (value = page));
-    return value;
-  });
+  // The repository answers synchronously with the bundled catalogue and later
+  // with the live one from the API. Reading only the synchronous value — as
+  // this store used to — froze the page on whatever was there at first read:
+  // with the API catalogue arriving over HTTP, that was an empty page, and the
+  // catalogue showed "0 produits". So the store follows the stream, and falls
+  // back to the synchronous read only until the stream's first value, which is
+  // what server rendering and the hydrating first render see.
+  private readonly liveResult = toSignal(
+    toObservable(this.query).pipe(switchMap((query) => this.repo.list(query))),
+  );
+  private readonly result = computed<Paginated<Product>>(
+    () => this.liveResult() ?? firstSync(this.repo.list(this.query()), this.emptyPage()),
+  );
 
-  private readonly facetSet = computed<FacetSet>(() => {
-    let value: FacetSet = this.emptyFacets();
-    this.repo.facets(this.query()).subscribe((facets) => (value = facets));
-    return value;
-  });
+  private readonly liveFacets = toSignal(
+    toObservable(this.query).pipe(switchMap((query) => this.repo.facets(query))),
+  );
+  private readonly facetSet = computed<FacetSet>(
+    () => this.liveFacets() ?? firstSync(this.repo.facets(this.query()), this.emptyFacets()),
+  );
 
   readonly products = computed(() => this.result().items);
   readonly total = computed(() => this.result().total);
@@ -232,4 +238,11 @@ export class CatalogStore {
   private emptyFacets(): FacetSet {
     return { categories: [], subcategories: [], brands: [], industries: [], sizes: [] };
   }
+}
+
+/** The value a source emits synchronously on subscription, or `fallback`. */
+function firstSync<T>(source: Observable<T>, fallback: T): T {
+  let value = fallback;
+  source.subscribe((next) => (value = next)).unsubscribe();
+  return value;
 }
