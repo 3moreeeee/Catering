@@ -1,0 +1,411 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: block;
+}
+
+.header__bar {
+  background-color: var(--c-ivory-50);
+  border-bottom: 1px solid var(--c-ivory-200);
+  backdrop-filter: blur(18px) saturate(1.2);
+  transition:
+    background-color var(--d-base) var(--ease-out),
+    border-color var(--d-base) var(--ease-out);
+}
+
+// Over the dark hero, before any scroll.
+:host(.is-transparent) .header__bar {
+  background-color: transparent;
+  border-bottom-color: transparent;
+
+  .header__nav-link,
+  .header__lang,
+  .header__action,
+  .header__search-link,
+  .header__account,
+  .header__cart,
+  .header__burger {
+    color: var(--c-ivory-50);
+  }
+
+  // The bars are painted from currentColor rather than a token so they follow
+  // the button, whichever ground it is on.
+  .header__burger-lines span {
+    background-color: currentcolor;
+  }
+
+  // Over the dark hero the field is a tinted well rather than a light box, so
+  // it reads as part of the photograph instead of a control pasted onto it.
+  .header__search {
+    border-color: rgb(255 255 255 / 0.28);
+    background-color: rgb(255 255 255 / 0.08);
+    color: var(--c-ivory-50);
+
+    &:focus-within {
+      border-color: var(--c-ivory-50);
+      background-color: rgb(255 255 255 / 0.14);
+    }
+  }
+  .header__search-input::placeholder {
+    color: rgb(255 255 255 / 0.66);
+  }
+  // Over the hero the ivory wordmark shows and the dark one steps back. The
+  // coloured mark is identical in both files, so only the name cross-fades.
+  .header__logo-mark {
+    opacity: 0;
+  }
+  .header__logo-mark--dark {
+    opacity: 1;
+  }
+  .header__lang {
+    border-color: rgb(255 255 255 / 0.32);
+  }
+  .btn--primary {
+    --btn-bg: var(--c-ivory-50);
+    --btn-fg: var(--c-forest-900);
+    --btn-border: var(--c-ivory-50);
+  }
+}
+
+:host(.is-scrolled) .header__bar {
+  background-color: color-mix(in oklab, var(--c-ivory-50) 92%, transparent);
+  box-shadow: var(--e-2);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: var(--header-h);
+
+  @include bp(md) {
+    gap: var(--sp-4);
+  }
+
+  @include bp(xl) {
+    gap: var(--sp-6);
+  }
+}
+
+// Default (solid bar): the dark wordmark shows, the ivory one is hidden.
+.header__logo-mark--dark {
+  opacity: 0;
+}
+
+.header__logo {
+  // The logo no longer shrinks to make room. It used to carry `flex: 0 1 auto`
+  // with no floor, and at 1024px — where the desktop navigation, the search
+  // field, the language switch and the call to action all appear at once — it
+  // was squeezed to 24px wide: an unreadable sliver, and a link below the
+  // minimum target size. The search field is the flexible element instead
+  // (see .header__search), because a text input is designed to be resized and
+  // a wordmark is not.
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+
+  // The two variants are stacked, so the dark-header version is already
+  // decoded when the user scrolls and there is never a moment without a logo.
+  display: grid;
+
+  img {
+    grid-area: 1 / 1;
+    // Scales with the viewport rather than jumping at a breakpoint, so the
+    // lockup always fits beside the actions — 30px at 320, 50px from 640 up.
+    block-size: clamp(30px, 6.5vw, 50px);
+    inline-size: auto;
+    background: none;
+    transition: opacity var(--d-base) var(--ease-out);
+
+    @include bp(sm) {
+      block-size: clamp(38px, 4.4vw, 50px);
+    }
+
+    @include bp(xl) {
+      block-size: 50px;
+    }
+  }
+}
+
+.header__nav {
+  display: none;
+  margin-inline: auto;
+
+  @include bp(lg) {
+    display: block;
+  }
+}
+
+.header__nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header__nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-2);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+
+  @include bp(xl) {
+    padding-inline: var(--sp-4);
+  }
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--d-fast) var(--ease-out);
+
+  @include focusable;
+
+  // Animated underline — the header's only decorative motion.
+  &::after {
+    content: '';
+    position: absolute;
+    left: var(--sp-4);
+    right: var(--sp-4);
+    bottom: var(--sp-2);
+    block-size: 1px;
+    background-color: currentcolor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  &:hover,
+  &.is-active,
+  &[aria-expanded='true'] {
+    color: var(--text-primary);
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.header__chevron {
+  transition: transform var(--d-fast) var(--ease-out);
+
+  [aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  margin-left: auto;
+
+  @include bp(sm) {
+    gap: var(--sp-2);
+  }
+
+  @include bp(lg) {
+    margin-left: 0;
+  }
+}
+
+.header__action {
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.header__cart {
+  color: var(--text-primary);
+  position: relative;
+
+  // Same reasoning as .header__account: below 480px the bar cannot carry
+  // another 44px target without pushing the burger off the edge, and the drawer
+  // already links to the panier.
+  display: none;
+
+  @include bp(sm) {
+    display: inline-flex;
+  }
+}
+
+// The count rides the icon rather than sitting beside it, so adding it does not
+// widen the bar. It is aria-hidden because the link's own label already states
+// the count.
+.header__cart-count {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-end: 2px;
+  min-width: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background-color: var(--c-accent, var(--c-forest-600));
+  color: var(--c-ivory-50, #fff);
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.header__account {
+  color: var(--text-primary);
+
+  // Below 480px the bar carries the logo plus four 44px targets and runs 33px
+  // past a 320px screen, taking the burger with it. The drawer already offers
+  // the account and sign-in links, so the icon stands down on the narrowest
+  // screens rather than pushing navigation off the edge.
+  display: none;
+
+  @include bp(sm) {
+    display: inline-flex;
+  }
+}
+
+.header__lang {
+  display: grid;
+  place-items: center;
+  min-inline-size: var(--tap-min);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-pill);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition:
+    border-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out);
+
+  @include focusable;
+
+  &:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SEARCH
+//
+// A first-class control rather than an icon: on a 150-reference B2B catalogue,
+// a buyer who knows what they want should never have to find search first.
+// The field appears where the desktop navigation does; below that the same
+// destination stays reachable as an icon link, so the control is never dead.
+// -----------------------------------------------------------------------------
+
+.header__search {
+  display: none;
+
+  @include bp(xl) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    // Allowed to give way before anything else in the bar does.
+    flex: 0 1 15.5rem;
+    min-inline-size: 0;
+    min-block-size: 40px;
+    padding-inline: var(--sp-3);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--r-pill);
+    background-color: var(--surface-card);
+    color: var(--text-secondary);
+    transition:
+      inline-size var(--d-base) var(--ease-out),
+      border-color var(--d-fast) var(--ease-out),
+      background-color var(--d-fast) var(--ease-out);
+
+    &:focus-within {
+      inline-size: 17rem;
+      border-color: var(--text-primary);
+    }
+  }
+
+  @include motion-reduce {
+    transition: none;
+  }
+}
+
+.header__search-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.header__search-input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  // Fills the field so the whole 40px well is clickable. Left at its intrinsic
+  // height the actual target was a 20px band inside a control that looked twice
+  // that size, which is both a pointer-accuracy problem and a WCAG 2.2 target
+  // failure on the one control that has no other affordance.
+  block-size: 40px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  line-height: 1.2;
+
+  &:focus {
+    outline: none;
+  }
+
+  // The UA clear affordance collides with the pill's right padding.
+  &::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+.header__search-link {
+  color: var(--text-primary);
+
+  @include bp(xl) {
+    display: none;
+  }
+}
+
+.header__cta {
+  display: none;
+
+  @include bp(md) {
+    display: inline-flex;
+  }
+}
+
+.header__burger {
+  color: var(--text-primary);
+
+  @include bp(lg) {
+    display: none;
+  }
+}
+
+.header__burger-lines {
+  display: grid;
+  gap: 5px;
+  inline-size: 20px;
+
+  span {
+    display: block;
+    block-size: 1.5px;
+    background-color: currentcolor;
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  &.is-open span:first-child {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+  &.is-open span:last-child {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+}

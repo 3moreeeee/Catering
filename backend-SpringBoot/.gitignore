@@ -1,0 +1,9 @@
+# Real secrets. .env.example carries the documented, valueless template.
+.env
+
+target/
+.idea/
+*.iml
+
+# Local H2 fallback database, used only when no Neon URL is configured.
+data/

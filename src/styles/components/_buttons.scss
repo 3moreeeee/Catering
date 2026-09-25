@@ -1,0 +1,244 @@
+// =============================================================================
+// BUTTONS — every documented state: default, hover, focus, active, disabled,
+// loading. Used by the <fk-button> component and by bare <a>/<button> elements
+// that need the same treatment without the component overhead.
+// =============================================================================
+@use '../abstracts/mixins' as *;
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--text-primary);
+  --btn-border: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-6);
+  // A button must never be able to widen its container past the viewport.
+  // These two lines are load-bearing: without them a grid or flex track sizes
+  // to the button's min-content, and a long French label such as "Demander une
+  // offre professionnelle" pushed the entire hero 53px off the side of a 320px
+  // screen. The overflow was invisible because an ancestor clipped it, which is
+  // worse than seeing it.
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-pill);
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  // Deliberately NOT `nowrap`. Shortening the label or letting it overflow are
+  // both worse than a two-line button: the complete call to action has to stay
+  // readable at 320px. `balance` keeps a wrapped label evenly split rather than
+  // leaving one word stranded on the second line.
+  text-wrap: balance;
+  cursor: pointer;
+  transition:
+    background-color var(--d-fast) var(--ease-out),
+    border-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out),
+    transform var(--d-fast) var(--ease-out),
+    box-shadow var(--d-fast) var(--ease-out);
+
+  @include focusable;
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+  }
+
+  // Loading: the label stays in flow so the button never changes width.
+  &[data-loading='true'] {
+    cursor: progress;
+    pointer-events: none;
+
+    .btn__label {
+      opacity: 0;
+    }
+    .btn__spinner {
+      display: block;
+    }
+  }
+}
+
+.btn__spinner {
+  display: none;
+  position: absolute;
+  inline-size: 1.125em;
+  block-size: 1.125em;
+  border: 2px solid currentcolor;
+  border-top-color: transparent;
+  border-radius: 50%;
+
+  @include motion-safe {
+    animation: btn-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// --- Variants ---------------------------------------------------------------
+
+.btn--primary {
+  --btn-bg: var(--c-forest-600);
+  --btn-fg: var(--c-ivory-50);
+  --btn-border: var(--c-forest-600);
+
+  &:hover:not(:disabled) {
+    --btn-bg: var(--c-forest-700);
+    --btn-border: var(--c-forest-700);
+    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--c-forest-600) 70%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .on-dark & {
+    --btn-bg: var(--c-ivory-50);
+    --btn-fg: var(--c-forest-900);
+    --btn-border: var(--c-ivory-50);
+
+    &:hover:not(:disabled) {
+      --btn-bg: var(--c-white);
+      --btn-border: var(--c-white);
+    }
+  }
+}
+
+.btn--secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-forest-700);
+  --btn-border: var(--c-forest-600);
+
+  &:hover:not(:disabled) {
+    --btn-bg: color-mix(in oklab, var(--c-forest-300) 22%, var(--surface-card));
+    --btn-border: var(--c-forest-700);
+  }
+
+  .on-dark &:hover:not(:disabled) {
+    --btn-bg: rgb(255 255 255 / 0.08);
+  }
+}
+
+.btn--accent {
+  --btn-bg: var(--c-copper-500);
+  --btn-fg: var(--c-white);
+  --btn-border: var(--c-copper-500);
+
+  &:hover:not(:disabled) {
+    --btn-bg: var(--c-copper-600);
+    --btn-border: var(--c-copper-600);
+    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--c-copper-600) 70%, transparent);
+    transform: translateY(-1px);
+  }
+}
+
+.btn--ghost {
+  --btn-fg: var(--text-secondary);
+  padding-inline: var(--sp-3);
+
+  &:hover:not(:disabled) {
+    --btn-bg: var(--surface-inset);
+    --btn-fg: var(--text-primary);
+  }
+}
+
+// --- Sizes ------------------------------------------------------------------
+
+.btn--sm {
+  min-height: 36px;
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-xs);
+  @include tap-target;
+}
+
+.btn--lg {
+  min-height: 52px;
+  // 32px of inline padding on each side is a third of a 320px screen. The
+  // large button keeps its presence where there is room and gives the padding
+  // back to the label where there is not.
+  padding: var(--sp-4) clamp(var(--sp-5), 4vw, var(--sp-8));
+  font-size: var(--fs-body);
+}
+
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+/// Square icon-only button. Always requires an aria-label.
+.btn--icon {
+  padding: 0;
+  inline-size: var(--tap-min);
+  block-size: var(--tap-min);
+  border-radius: var(--r-sm);
+}
+
+// --- Text link with the animated underline ----------------------------------
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  position: relative;
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+
+  @include focusable;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    inline-size: 100%;
+    block-size: 1px;
+    background-color: currentcolor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  @include motion-reduce {
+    &::after {
+      transition: none;
+    }
+    &:hover::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.link--accent {
+  color: var(--text-accent);
+}
+
+/// Arrow that nudges forward on hover — used on "Explore" affordances.
+.link__arrow {
+  transition: transform var(--d-fast) var(--ease-out);
+
+  .link:hover & {
+    transform: translateX(3px);
+  }
+}

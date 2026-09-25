@@ -1,0 +1,289 @@
+<ng-container *transloco="let t">
+  <section class="cart-page">
+    <div class="cart-shell">
+      <header class="cart-heading">
+        <p class="u-eyebrow">{{ t('cart.eyebrow') }}</p>
+        <h1>{{ t('cart.title') }}</h1>
+        <p>{{ t('cart.lead') }}</p>
+      </header>
+
+      @if (!auth.loaded()) {
+        <p class="cart-status">{{ t('common.loading') }}</p>
+      } @else if (!auth.authenticated()) {
+        <div class="cart-card cart-empty">
+          <h2>{{ t('cart.signInTitle') }}</h2>
+          <p>{{ t('cart.signInLead') }}</p>
+          <a class="btn btn--primary" [routerLink]="loginUrl">{{ t('nav.login') }}</a>
+        </div>
+      } @else if (submitted(); as quote) {
+        <div class="cart-card cart-confirmation" role="status">
+          <span class="cart-confirmation__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          @if (quote.kind === 'ORDER') {
+            <h2>{{ t('cart.order.submittedTitle') }}</h2>
+            <p>{{ t('cart.order.submittedLead', { reference: quote.reference }) }}</p>
+          } @else {
+            <h2>{{ t('cart.submittedTitle') }}</h2>
+            <p>{{ t('cart.submittedLead', { reference: quote.reference }) }}</p>
+            @if (quote.hasUnpricedLines) {
+              <p class="cart-note">{{ t('cart.submittedPartial') }}</p>
+            }
+          }
+          <a class="btn btn--primary" [routerLink]="catalogUrl">{{ t('cart.backToCatalog') }}</a>
+        </div>
+      } @else {
+        @if (error()) {
+          <p class="cart-status is-error" role="alert">{{ error() }}</p>
+        }
+
+        @if (isEmpty()) {
+          <div class="cart-card cart-empty">
+            <h2>{{ t('cart.emptyTitle') }}</h2>
+            <p>{{ t('cart.emptyLead') }}</p>
+            <a class="btn btn--primary" [routerLink]="catalogUrl">{{ t('cart.browseCatalog') }}</a>
+          </div>
+        } @else {
+          <div class="cart-grid">
+            <div class="cart-card">
+              <div class="cart-card__head">
+                <h2>{{ t('cart.linesTitle', { count: lines().length }) }}</h2>
+                <button
+                  type="button"
+                  class="cart-link"
+                  [disabled]="busy() || mode() !== 'choose'"
+                  (click)="clear()"
+                >
+                  {{ t('cart.clear') }}
+                </button>
+              </div>
+
+              <ul class="cart-lines">
+                @for (line of lines(); track line.id) {
+                  <li class="cart-line">
+                    @if (line.images[0]; as image) {
+                      <img
+                        class="cart-line__image"
+                        [src]="image.src"
+                        [alt]="image.alt.fr"
+                        [width]="image.width"
+                        [height]="image.height"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <span class="cart-line__image" aria-hidden="true"></span>
+                    }
+
+                    <div class="cart-line__body">
+                      <strong>{{ line.productName.fr }}</strong>
+                      @if (line.reference) {
+                        <small>{{ t('cart.reference', { reference: line.reference }) }}</small>
+                      }
+                      @if (line.formatValue) {
+                        <small>{{ line.formatValue }}</small>
+                      }
+                      <span class="cart-line__unit">{{
+                        t('cart.unitPrice', {
+                          price: price(line.unitPrice, line.currency ?? 'TND'),
+                        })
+                      }}</span>
+                    </div>
+
+                    <div class="cart-line__quantity">
+                      <fk-quantity-stepper
+                        [inputId]="'qty-' + line.id"
+                        [value]="line.quantity"
+                        [disabled]="busy() || mode() !== 'choose'"
+                        [label]="t('cart.quantity')"
+                        [decreaseLabel]="t('cart.decrease')"
+                        [increaseLabel]="t('cart.increase')"
+                        (valueChange)="changeQuantity(line.id, $event)"
+                      />
+                    </div>
+
+                    <div class="cart-line__total u-nums">
+                      {{ price(line.lineTotal, line.currency ?? 'TND') }}
+                    </div>
+
+                    <button
+                      type="button"
+                      class="cart-line__remove"
+                      [disabled]="busy() || mode() !== 'choose'"
+                      [attr.aria-label]="t('cart.removeAbout', { name: line.productName.fr })"
+                      (click)="remove(line.id)"
+                    >
+                      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path
+                          d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+                        />
+                      </svg>
+                      <span>{{ t('cart.remove') }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <!-- The next step stays folded until the buyer chooses between a
+                 direct purchase and a quote, so the page never opens on a
+                 form that only one of the two paths needs. -->
+            <aside class="cart-card cart-checkout">
+              @if (mode() === 'choose') {
+                <h2>{{ t('cart.summaryTitle') }}</h2>
+                <dl class="cart-totals u-nums">
+                  <div>
+                    <dt>{{ t('cart.units') }}</dt>
+                    <dd>{{ cart()!.totalQuantity }}</dd>
+                  </div>
+                  <div class="cart-totals__grand">
+                    <dt>{{ t('cart.total') }}</dt>
+                    <dd>{{ price(cart()!.total, cart()!.currency) }}</dd>
+                  </div>
+                </dl>
+                @if (cart()!.hasUnpricedItems) {
+                  <p class="cart-note">{{ t('cart.partialTotal') }}</p>
+                }
+
+                <button
+                  type="button"
+                  class="btn btn--primary btn--lg btn--block"
+                  [disabled]="busy() || cart()!.hasUnpricedItems"
+                  (click)="choose('ORDER')"
+                >
+                  {{ t('cart.order.cta') }}
+                </button>
+                @if (cart()!.hasUnpricedItems) {
+                  <p class="cart-note">{{ t('cart.order.unpriced') }}</p>
+                }
+
+                <div class="cart-bulk">
+                  <strong>{{ t('cart.bulk.title') }}</strong>
+                  <p>{{ t('cart.bulk.lead') }}</p>
+                  <button
+                    type="button"
+                    class="btn btn--secondary btn--block"
+                    [disabled]="busy()"
+                    (click)="choose('QUOTE')"
+                  >
+                    {{ t('cart.bulk.cta') }}
+                  </button>
+                </div>
+              } @else {
+                <button type="button" class="cart-back" (click)="back()">
+                  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <path d="M15 6l-6 6 6 6" />
+                  </svg>
+                  {{ t('cart.back') }}
+                </button>
+
+                @if (mode() === 'ORDER') {
+                  <h2>{{ t('cart.order.title') }}</h2>
+                  <p class="cart-lead">{{ t('cart.order.lead') }}</p>
+                } @else {
+                  <h2>{{ t('cart.requestTitle') }}</h2>
+                  <p class="cart-lead">{{ t('cart.requestLead') }}</p>
+                }
+
+                <form class="cart-form" [formGroup]="quoteForm" (ngSubmit)="submit()">
+                  <div class="field">
+                    <label class="field__label" for="cart-name">{{
+                      t('cart.fields.contactName')
+                    }}</label>
+                    <input
+                      id="cart-name"
+                      class="control"
+                      type="text"
+                      formControlName="contactName"
+                      autocomplete="name"
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="cart-company">{{
+                      t('cart.fields.companyName')
+                    }}</label>
+                    <input
+                      id="cart-company"
+                      class="control"
+                      type="text"
+                      formControlName="companyName"
+                      autocomplete="organization"
+                    />
+                  </div>
+                  <div class="cart-form__pair">
+                    <div class="field">
+                      <label class="field__label" for="cart-phone"
+                        >{{ t('cart.fields.contactPhone') }}
+                        @if (mode() === 'ORDER') {
+                          <span class="field__required" aria-hidden="true">*</span>
+                        }
+                      </label>
+                      <input
+                        id="cart-phone"
+                        class="control"
+                        type="tel"
+                        formControlName="contactPhone"
+                        autocomplete="tel"
+                        [attr.aria-required]="mode() === 'ORDER'"
+                      />
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="cart-city"
+                        >{{ t('cart.fields.deliveryCity') }}
+                        @if (mode() === 'ORDER') {
+                          <span class="field__required" aria-hidden="true">*</span>
+                        }
+                      </label>
+                      <input
+                        id="cart-city"
+                        class="control"
+                        type="text"
+                        formControlName="deliveryCity"
+                        autocomplete="address-level2"
+                        [attr.aria-required]="mode() === 'ORDER'"
+                      />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="cart-message">{{
+                      mode() === 'ORDER' ? t('cart.order.message') : t('cart.fields.message')
+                    }}</label>
+                    <textarea
+                      id="cart-message"
+                      class="control"
+                      formControlName="message"
+                      rows="3"
+                    ></textarea>
+                  </div>
+
+                  <p class="cart-note">
+                    {{
+                      mode() === 'ORDER' ? t('cart.order.noPaymentNote') : t('cart.noPaymentNote')
+                    }}
+                  </p>
+
+                  <button
+                    type="submit"
+                    class="btn btn--primary btn--lg btn--block"
+                    [disabled]="busy() || quoteForm.invalid"
+                  >
+                    @if (busy()) {
+                      {{ t('cart.submitting') }}
+                    } @else if (mode() === 'ORDER') {
+                      {{
+                        t('cart.order.submit', { total: price(cart()!.total, cart()!.currency) })
+                      }}
+                    } @else {
+                      {{ t('cart.submit') }}
+                    }
+                  </button>
+                </form>
+              }
+            </aside>
+          </div>
+        }
+      }
+    </div>
+  </section>
+</ng-container>

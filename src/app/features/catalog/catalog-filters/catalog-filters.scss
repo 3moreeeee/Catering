@@ -1,0 +1,138 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: contents;
+}
+
+.filters {
+  // Mobile: off-canvas drawer.
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: var(--z-drawer);
+  inline-size: min(22rem, 88vw);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-page);
+  border-right: 1px solid var(--border-hairline);
+  transform: translateX(-100%);
+  transition: transform var(--d-base) var(--ease-out);
+  overscroll-behavior: contain;
+
+  &.is-open {
+    transform: translateX(0);
+    box-shadow: var(--e-4);
+  }
+
+  // Desktop: a plain sticky sidebar, no dialog behaviour at all.
+  @include bp(lg) {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+    inline-size: auto;
+    max-block-size: calc(100svh - var(--header-h) - var(--sp-8));
+    transform: none;
+    border-right: none;
+    box-shadow: none;
+    background: none;
+  }
+}
+
+@include motion-reduce {
+  .filters {
+    transition: none;
+  }
+}
+
+.filters__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-drawer) - 1);
+  background-color: rgb(var(--c-dark-rgb) / 0.4);
+
+  @include bp(lg) {
+    display: none;
+  }
+}
+
+.filters__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border-bottom: 1px solid var(--border-hairline);
+
+  @include bp(lg) {
+    padding-inline: 0;
+  }
+}
+
+.filters__title {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.filters__close {
+  @include bp(lg) {
+    display: none;
+  }
+}
+
+.filters__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-5);
+
+  @include bp(lg) {
+    padding-inline: 0;
+  }
+}
+
+.filters__group {
+  border: 0;
+  margin: 0 0 var(--sp-6);
+  padding: 0;
+
+  legend {
+    padding: 0;
+    margin-bottom: var(--sp-2);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+}
+
+.filters__count {
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.filters__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5) var(--sp-6);
+  border-top: 1px solid var(--border-hairline);
+
+  @include bp(lg) {
+    padding-inline: 0;
+  }
+}
+
+.filters__apply {
+  flex: 1;
+
+  // On desktop the list updates live; there is nothing to "apply".
+  @include bp(lg) {
+    display: none;
+  }
+}

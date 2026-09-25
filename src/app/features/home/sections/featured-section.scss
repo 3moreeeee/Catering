@@ -1,0 +1,119 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+  background-color: var(--surface-alt);
+  padding-block: var(--section-y);
+}
+
+.featured__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(var(--sp-4), 2vw, var(--sp-6));
+  margin-bottom: clamp(var(--sp-6), 4vw, var(--sp-10));
+}
+
+.featured__title {
+  margin: var(--sp-3) 0 0;
+}
+
+.featured__tabs {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+  // Never let the tab strip create page-level horizontal scroll.
+  max-inline-size: 100%;
+  scrollbar-width: thin;
+
+  // At 320px the third division sat half outside the screen inside a scroller
+  // nobody could see was scrollable. Three short words wrap onto two rows
+  // perfectly well, and all three are then visible without a gesture.
+  @include bp-down(sm) {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.featured__tab {
+  flex: none;
+
+  &:nth-child(1) {
+    --tab-accent: var(--c-cat-food);
+  }
+
+  &:nth-child(2) {
+    --tab-accent: var(--c-cat-monin);
+  }
+
+  &:nth-child(3) {
+    --tab-accent: var(--c-cat-packaging);
+  }
+
+  &:nth-child(4) {
+    --tab-accent: var(--c-cat-hygiene);
+  }
+
+  &.chip--active {
+    border-color: var(--tab-accent);
+    color: var(--c-white);
+    background-color: var(--tab-accent);
+
+    &:hover {
+      border-color: var(--tab-accent);
+      color: var(--c-white);
+      background-color: var(--tab-accent);
+    }
+  }
+}
+
+.featured__grid {
+  display: grid;
+  gap: var(--sp-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  // Every card in the grid gets the same height, so a one-line and a two-line
+  // product name do not produce two different frames.
+  grid-auto-rows: 1fr;
+
+  li {
+    block-size: 100%;
+  }
+
+  // No two-column override below 480px. Two columns gave each card 168px, and
+  // the enquiry button needs 198px — the grid was the cause of the CTA hanging
+  // off the side of the screen. Below 520px the card itself becomes a shelf row
+  // (see product-card.scss), which is both narrower-friendly and shorter, so a
+  // single column is the right and only track count down there.
+  @media (max-width: 519.98px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-3);
+
+    // Three on a phone. Five stacked shelf rows is most of a screen spent on a
+    // sample of a catalogue the visitor has not asked for yet; three makes the
+    // point and the button underneath opens all 150. All five stay in the
+    // markup so the server and the client render the same tree and a crawler
+    // still sees the full selection.
+    li:nth-child(n + 4) {
+      display: none;
+    }
+  }
+}
+
+// Panels are focusable containers; the focus ring belongs on the cards inside.
+[role='tabpanel']:focus {
+  outline: none;
+}
+[role='tabpanel']:focus-visible {
+  @include focus-ring;
+}
+
+.featured__foot {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(var(--sp-6), 4vw, var(--sp-10));
+}

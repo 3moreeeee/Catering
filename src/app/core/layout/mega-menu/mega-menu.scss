@@ -1,0 +1,145 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: none;
+
+  @include bp(lg) {
+    display: block;
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    z-index: var(--z-megamenu);
+  }
+}
+
+.mega__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(var(--c-dark-rgb) / 0.28);
+}
+
+.mega__panel {
+  position: relative;
+  background-color: var(--c-ivory-50);
+  border-bottom: 1px solid var(--c-ivory-200);
+  box-shadow: var(--e-3);
+
+  @include motion-safe {
+    animation: mega-in var(--d-base) var(--ease-out);
+  }
+}
+
+@keyframes mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.mega__inner {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 3fr;
+  gap: var(--sp-12);
+  padding-block: var(--sp-10);
+}
+
+.mega__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+
+.mega__hint {
+  margin: 0;
+}
+
+.mega__all {
+  margin-top: auto;
+}
+
+.mega__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-8);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @include bp('2xl') {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mega__card {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-5);
+  border: 1px solid var(--c-ivory-200);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-1);
+  background-color: var(--c-white);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition:
+    border-color var(--d-fast) var(--ease-out),
+    transform var(--d-fast) var(--ease-out);
+
+  @include focusable;
+
+  &:hover {
+    border-color: var(--cat-accent, var(--border-strong));
+    transform: translateY(-2px);
+    box-shadow: var(--e-2);
+  }
+}
+
+.mega__icon {
+  inline-size: 28px;
+  block-size: 3px;
+  border-radius: var(--r-pill);
+  background-color: var(--cat-accent, var(--text-accent));
+  margin-bottom: var(--sp-2);
+}
+
+.mega__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
+}
+
+.mega__desc {
+  color: var(--text-muted);
+  line-height: var(--lh-snug);
+}
+
+.mega__subs {
+  list-style: none;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.mega__sub {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  @include focusable;
+
+  &:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+}
+
+.mega__sub--more {
+  color: var(--text-accent);
+  font-weight: var(--fw-medium);
+}

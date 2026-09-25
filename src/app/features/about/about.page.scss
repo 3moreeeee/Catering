@@ -1,0 +1,207 @@
+@use '../../../styles/abstracts/mixins' as *;
+
+.about__hero {
+  background-color: var(--c-forest-900);
+  // Same reason as the homepage hero: slide under the in-flow sticky header
+  // so its transparent-over-dark variant has dark ground to sit on.
+  margin-block-start: calc(var(--header-h) * -1);
+  padding-block: calc(var(--header-h) + var(--sp-12)) var(--sp-16);
+}
+
+.about__title {
+  margin: var(--sp-4) 0 var(--sp-5);
+  max-width: 16ch;
+}
+
+.about__lead {
+  max-width: 52ch;
+}
+
+.about__president {
+  display: grid;
+  gap: var(--sp-8);
+
+  @include bp(lg) {
+    grid-template-columns: 4fr 8fr;
+    gap: var(--sp-16);
+    align-items: start;
+  }
+}
+
+.about__president-aside {
+  @include bp(lg) {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+  }
+
+  h2 {
+    margin: 0 0 var(--sp-3);
+  }
+}
+
+.about__role {
+  color: var(--text-muted);
+}
+
+.about__quote {
+  margin: 0;
+  border-left: 2px solid var(--c-copper-500);
+  padding-left: var(--sp-6);
+  color: var(--text-secondary);
+
+  p:first-child {
+    font-size: var(--fs-lead);
+    color: var(--text-primary);
+  }
+}
+
+.about__timeline {
+  list-style: none;
+  margin: var(--sp-8) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.about__milestone {
+  display: grid;
+  gap: var(--sp-2) var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border-hairline);
+
+  @include bp(md) {
+    grid-template-columns: 8rem minmax(0, 1fr);
+  }
+
+  h3 {
+    margin: 0 0 var(--sp-2);
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.about__milestone.is-pending {
+  opacity: 0.72;
+  border-top-style: dashed;
+}
+
+.about__year {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.03em;
+  color: var(--text-accent);
+  line-height: 1;
+}
+
+.about__values {
+  list-style: none;
+  margin: var(--sp-8) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-8);
+
+  @include bp(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-10) var(--sp-12);
+  }
+
+  li {
+    padding-top: var(--sp-5);
+    border-top: 1px solid var(--border-hairline);
+  }
+  h3 {
+    margin: 0 0 var(--sp-2);
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.about__divisions {
+  list-style: none;
+  margin: var(--sp-8) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+
+  @include bp(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.about__division {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  block-size: 100%;
+  padding: var(--sp-6);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-1);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--d-base) var(--ease-out);
+
+  @include focusable;
+
+  &:hover {
+    border-color: var(--cat-accent);
+    box-shadow: var(--e-2);
+  }
+
+  h3 {
+    margin: 0;
+  }
+  p {
+    margin: 0;
+  }
+
+  .tile__rule {
+    background-color: var(--cat-accent);
+  }
+}
+
+.about__pair {
+  display: grid;
+  gap: var(--sp-10);
+
+  @include bp(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-12);
+  }
+
+  h2 {
+    margin: 0 0 var(--sp-3);
+  }
+}
+
+.about__note {
+  display: inline-block;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px dashed var(--border-neutral);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  margin: var(--sp-6) 0 0;
+}
+
+.about__cta {
+  background-color: var(--c-forest-900);
+  padding-block: var(--section-y);
+
+  h2 {
+    margin: 0 0 var(--sp-4);
+  }
+  p {
+    margin: 0 0 var(--sp-6);
+  }
+}
+
+/// Single-column sourcing block. Held to a reading measure so it does not run
+/// the full container width now that it no longer shares a two-column pair.
+.about__sourcing {
+  max-inline-size: 62ch;
+}

@@ -1,0 +1,13 @@
+// =============================================================================
+// GLOBAL STYLESHEET
+// Order matters: tokens must resolve before anything consumes them.
+// Angular component styles are scoped and always win over these globals.
+// =============================================================================
+@use 'styles/abstracts/tokens';
+@use 'styles/base/reset';
+@use 'styles/base/typography';
+@use 'styles/base/layout';
+@use 'styles/components/buttons';
+@use 'styles/components/forms';
+@use 'styles/components/site-assistant';
+@use 'styles/components/account';

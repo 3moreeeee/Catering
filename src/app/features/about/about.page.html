@@ -1,0 +1,103 @@
+<ng-container *transloco="let t">
+  <!-- Intro -->
+  <header class="about__hero on-dark">
+    <div class="container">
+      <p class="u-eyebrow">{{ t('home.hero.eyebrow') }}</p>
+      <h1 class="about__title u-display">{{ t('about.title') }}</h1>
+      <p class="u-lead about__lead">{{ t('about.lead') }}</p>
+    </div>
+  </header>
+
+  <!-- Founder's message, in full -->
+  <section class="section container" aria-labelledby="president-heading">
+    <div class="about__president">
+      <div class="about__president-aside" fkReveal>
+        <h2 class="h2" id="president-heading">{{ t('about.presidentTitle') }}</h2>
+        <p class="u-label about__role">{{ t('about.presidentRole') }}</p>
+      </div>
+
+      <blockquote class="prose about__quote" fkReveal="stagger" revealChildren="p">
+        @for (paragraph of message; track $index) {
+          <p>{{ paragraph | localized }}</p>
+        }
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="section section--alt" aria-labelledby="timeline-heading">
+    <div class="container">
+      <h2 class="h2" id="timeline-heading">{{ t('about.timelineTitle') }}</h2>
+
+      <ol class="about__timeline" fkReveal="stagger" revealChildren="li">
+        @for (milestone of milestones; track $index) {
+          <li class="about__milestone">
+            <span class="about__year u-nums">{{ milestone.year ?? '—' }}</span>
+            <div>
+              <h3 class="h4">{{ milestone.title | localized }}</h3>
+              <p class="u-sm u-muted">{{ milestone.body | localized }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="section container" aria-labelledby="values-heading">
+    <h2 class="h2" id="values-heading">{{ t('about.valuesTitle') }}</h2>
+    <ul class="about__values" fkReveal="stagger" revealChildren="li">
+      @for (value of values; track value.id) {
+        <li>
+          <h3 class="h4">{{ value.title | localized }}</h3>
+          <p class="u-sm u-muted">{{ value.body | localized }}</p>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- Divisions -->
+  <section class="section section--alt" aria-labelledby="divisions-heading">
+    <div class="container">
+      <h2 class="h2" id="divisions-heading">{{ t('about.divisionsTitle') }}</h2>
+      <ul class="about__divisions">
+        @for (category of categories(); track category.id) {
+          <li>
+            <a class="about__division" [routerLink]="to('products/' + category.slug)"
+               [style.--cat-accent]="category.accent">
+              <span class="tile__rule" aria-hidden="true"></span>
+              <h3 class="h4">{{ category.name | localized }}</h3>
+              <p class="u-sm u-muted">{{ category.longDescription | localized }}</p>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Sourcing.
+       This was the left half of a two-column pair whose right half held a
+       leadership placeholder. With the placeholder gone the grid would have
+       left an empty column, so the section is now a single measured block —
+       deliberate width, not a missing sibling. -->
+  <section class="section container">
+    <div class="about__sourcing">
+      <h2 class="h3">{{ t('about.sourcingTitle') }}</h2>
+      <p class="u-body u-muted">{{ t('about.sourcingBody') }}</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="about__cta on-dark">
+    <div class="container">
+      <h2 class="h2">{{ t('about.ctaTitle') }}</h2>
+      <p class="u-lead">{{ t('about.ctaLead') }}</p>
+      <div class="cluster">
+        <a class="btn btn--primary btn--lg" [routerLink]="to('contact')">{{ t('nav.cta') }}</a>
+        <a class="btn btn--secondary btn--lg" [routerLink]="to('products')">{{
+          t('home.hero.primaryCta')
+        }}</a>
+      </div>
+    </div>
+  </section>
+</ng-container>

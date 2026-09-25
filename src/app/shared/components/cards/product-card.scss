@@ -1,0 +1,287 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+// The grid item is the <li>; the card must fill it for equal-height rows to
+// have any visible effect.
+:host-context(li) {
+  block-size: 100%;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-1);
+  overflow: hidden;
+  transition:
+    border-color var(--d-base) var(--ease-out),
+    transform var(--d-base) var(--ease-out),
+    box-shadow var(--d-base) var(--ease-out);
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--c-copper-500) 35%, var(--border-neutral));
+    box-shadow: var(--e-3);
+
+    @include fine-pointer {
+      transform: translateY(-4px);
+    }
+  }
+
+  // Focus ring is drawn on the card, driven by the overlay link's focus.
+  &:has(.card__link:focus-visible) {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+@include motion-reduce {
+  .card:hover {
+    transform: none;
+  }
+}
+
+/// Full-card overlay link. Sits below the action buttons in the stacking order
+/// so they remain clickable.
+.card__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.card__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(
+      circle at 50% 44%,
+      color-mix(in oklab, var(--surface-card) 86%, white),
+      transparent 66%
+    ),
+    var(--surface-alt);
+  overflow: hidden;
+
+  img {
+    // Absolutely positioned, NOT in flow. An in-flow child sized at 100% of an
+    // aspect-ratio height is a cyclic dependency: the browser falls back to the
+    // image's intrinsic height and the container stretches to match. That made
+    // every portrait product photo blow its card out to 4x its neighbours.
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: var(--sp-5);
+    object-fit: contain;
+    background: none;
+    // White studio canvases retained by the safety check disappear into the
+    // warm card surface, while pale products keep all of their original detail.
+    mix-blend-mode: multiply;
+    transition: transform var(--d-slow) var(--ease-out);
+  }
+
+  .card:hover & img {
+    @include fine-pointer {
+      transform: scale(1.04);
+    }
+  }
+}
+
+.card__body {
+  flex: 1;
+  // A column rather than a grid so the price can take the leftover space above
+  // it (see .card__price). Cards in a row share one height, so this is what
+  // puts every price on the same line whatever the length of the name above.
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-4) var(--sp-5) var(--sp-2);
+  border-top: 1px solid var(--border-hairline);
+}
+
+.card__brand {
+  color: var(--text-accent);
+  margin: 0;
+  font-weight: var(--fw-semibold);
+}
+
+.card__brand--none {
+  color: var(--text-muted);
+}
+
+.card__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.01em;
+  margin: 0;
+  // Vinto uses descriptive trade names that include dimensions and pack sizes.
+  // Four lines preserve that buying information in the narrow homepage grid.
+  @include clamp-lines(4);
+}
+
+.card__format {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.card__price {
+  // Pushed to the bottom of the body: names wrap to one to four lines, and a
+  // price that followed the name would sit at a different height on each card.
+  margin: auto 0 0;
+  padding-block-start: var(--sp-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+
+  strong {
+    display: block;
+  }
+  del {
+    margin-inline-end: var(--sp-2);
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-regular);
+  }
+}
+
+.card__offer {
+  display: inline-block;
+  margin-inline-end: var(--sp-2);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  color: white;
+  background: var(--c-copper-600);
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+.card__desc {
+  color: var(--text-secondary);
+  margin: var(--sp-2) 0 0;
+  @include clamp-lines(2);
+}
+
+.card__actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5) var(--sp-5);
+}
+
+.card__action {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+// --- Narrow screens: a shelf row, not a squeezed tile ------------------------
+//
+// Below 520px a square-image tile is the wrong object. Two of them side by side
+// gave each column 168px, and "Demander une information" needs 198px — so the
+// enquiry button, the one thing on the card that converts, hung 45px off the
+// side of the screen where an ancestor's `overflow` quietly swallowed it. One
+// column of square tiles would have fixed that and made the catalogue preview
+// roughly 360px tall per product.
+//
+// So the phone gets a different object: a shelf row. The photograph holds a
+// fixed square at the leading edge, the identity sits beside it, and the
+// actions run full width underneath with room for their complete labels. It is
+// about a third the height of a stacked tile and it reads like a line in a
+// trade catalogue, which is what a professional buyer is actually scanning.
+@media (max-width: 519.98px) {
+  .card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'media body'
+      'actions actions';
+    align-items: start;
+  }
+
+  .card__media {
+    grid-area: media;
+    inline-size: clamp(6rem, 27vw, 7.5rem);
+    border-inline-end: 1px solid var(--border-hairline);
+
+    img {
+      padding: var(--sp-3);
+    }
+  }
+
+  .card__body {
+    grid-area: body;
+    border-block-start: 0;
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+    min-inline-size: 0;
+  }
+
+  .card__name {
+    font-size: var(--fs-body);
+  }
+
+  .card__actions {
+    grid-area: actions;
+    padding: 0 var(--sp-4) var(--sp-4);
+  }
+
+  .card__action {
+    // One row, both actions, full labels. `1 1 0` rather than `1 1 auto` so the
+    // buttons share the row evenly instead of being sized by their text.
+    flex: 1 1 0;
+  }
+}
+
+// --- List view --------------------------------------------------------------
+
+.card--list {
+  @include bp(sm) {
+    flex-direction: row;
+    align-items: stretch;
+
+    .card__media {
+      flex: 0 0 clamp(7rem, 22%, 11rem);
+      aspect-ratio: 1 / 1;
+      border-right: 1px solid var(--border-hairline);
+
+      img {
+        padding: var(--sp-3);
+      }
+    }
+
+    .card__body {
+      border-top: none;
+      padding-block: var(--sp-4);
+    }
+
+    .card__actions {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      flex: 0 0 auto;
+      padding-block: var(--sp-4);
+    }
+
+    // In a column, the grid rule's `flex: 1 1 auto` grows the buttons'
+    // height, not their width: they stretched to fill the row and became
+    // 110px pills. Here they keep their natural height and share the width
+    // of the widest label.
+    .card__action {
+      flex: 0 0 auto;
+    }
+  }
+}

@@ -1,0 +1,846 @@
+{
+  "meta": {
+    "siteName": "Société Ferid Khemakhem",
+    "tagline": "Des produits professionnels. Des partenariats durables.",
+    "defaultDescription": "Importateur et distributeur de produits agro-alimentaires, d'emballage et d'hygiène pour les professionnels en Tunisie. Depuis 1985."
+  },
+  "nav": {
+    "home": "Accueil",
+    "company": "Entreprise",
+    "products": "Produits",
+    "brands": "Marques",
+    "industries": "Secteurs",
+    "contact": "Contact",
+    "skipToContent": "Aller au contenu principal",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "openSearch": "Ouvrir la recherche",
+    "mainNavigation": "Navigation principale",
+    "footerNavigation": "Navigation du pied de page",
+    "breadcrumb": "Fil d'Ariane",
+    "backToTop": "Retour en haut",
+    "cta": "Nous contacter",
+    "login": "Connexion",
+    "account": "Mon compte",
+    "adminUsers": "Gestion des utilisateurs",
+    "megaMenuHint": "Quatre univers produits, {{count}} références",
+    "cart": "Panier",
+    "cartCount": "Panier ({{count}})",
+    "adminDashboard": "Tableau de bord"
+  },
+  "language": {
+    "label": "Langue",
+    "en": "English",
+    "fr": "Français",
+    "switchTo": "Passer en {{language}}"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Depuis 1985",
+      "title": "Solutions professionnelles pour la restauration et l'industrie.",
+      "lead": "Importateur et distributeur de solutions alimentaires, MONIN, emballage et hygiène pour les professionnels partout en Tunisie.",
+      "primaryCta": "Découvrir nos solutions",
+      "secondaryCta": "Demander une offre professionnelle",
+      "scrollHint": "Faire défiler",
+      "sceneAlt": "Composition abstraite de trois formes représentant les divisions agro-alimentaire, emballage et hygiène de l'entreprise.",
+      "divisionsLabel": "Nos quatre univers produits",
+      "mediaAlt": "Une sélection animée de produits professionnels du catalogue Catering.",
+      "professionalBadge": "Fourniture professionnelle",
+      "coverage": "Au service des entreprises partout en Tunisie",
+      "proofLabel": "Repères de l'entreprise"
+    },
+    "showcase": {
+      "eyebrow": "Tout ce dont votre exploitation a besoin",
+      "title": "Quatre univers experts. Un seul fournisseur de confiance.",
+      "lead": "Passez directement des produits recherchés aux bons formats, aux disponibilités et à votre offre professionnelle."
+    },
+    "benefits": {
+      "eyebrow": "Pourquoi travailler avec nous",
+      "title": "Pensé pour les achats professionnels.",
+      "lead": "Un partenaire pratique pour les produits que vos équipes utilisent chaque jour.",
+      "items": {
+        "range": {
+          "title": "Une gamme multi-catégories",
+          "body": "Alimentation, boissons, emballage et hygiène auprès d'un seul interlocuteur professionnel."
+        },
+        "formats": {
+          "title": "Des formats adaptés au service",
+          "body": "Des conditionnements professionnels pour la restauration, l'hôtellerie, la distribution et l'industrie."
+        },
+        "advice": {
+          "title": "Un conseil produit humain",
+          "body": "Expliquez-nous votre usage : notre équipe vous aide à identifier la gamme, le format et l'alternative adaptés."
+        },
+        "distribution": {
+          "title": "Un suivi commercial local",
+          "body": "Une équipe basée en Tunisie pour les disponibilités, les devis et les détails pratiques de votre commande."
+        }
+      }
+    },
+    "featured": {
+      "eyebrow": "Références sélectionnées",
+      "title": "Extrait de notre catalogue.",
+      "viewAll": "Voir les {{count}} références",
+      "tabsLabel": "Filtrer les produits en vedette par division"
+    },
+    "offers": {
+      "eyebrow": "Prix promotionnels",
+      "title": "Nos offres du moment.",
+      "lead": "Retrouvez ici les promotions actives et les offres qui arrivent prochainement.",
+      "live": "Offre en ligne",
+      "scheduled": "Bientôt disponible",
+      "starts": "Commence le {{date}}",
+      "ends": "Se termine le {{date}}",
+      "viewProduct": "Voir le produit",
+      "previous": "Offres précédentes",
+      "next": "Offres suivantes"
+    },
+    "industries": {
+      "eyebrow": "Qui nous fournissons",
+      "title": "Conçu pour les acheteurs professionnels.",
+      "lead": "Nos clients opèrent dans la restauration, la distribution, la santé et l'industrie. Chaque secteur a ses exigences et puise dans une partie différente de notre gamme.",
+      "learnMore": "Notre accompagnement dans ce secteur",
+      "allSectors": "Voir tous les secteurs"
+    },
+    "brands": {
+      "eyebrow": "Les marques que nous représentons",
+      "title": "Un sourcing international.",
+      "lead": "Nous représentons en Tunisie des fabricants internationaux sélectionnés.",
+      "viewAll": "Voir toutes les marques",
+      "marqueeLabel": "Marques partenaires"
+    },
+    "contact": {
+      "eyebrow": "Demande d'offre professionnelle",
+      "title": "Dites-nous ce dont votre exploitation a besoin.",
+      "lead": "Indiquez-nous votre besoin et nous reviendrons vers vous avec les disponibilités, les formats et les tarifs."
+    },
+    "chapters": {
+      "food": {
+        "eyebrow": "Agro-alimentaire",
+        "title": "Des sauces qui tiennent la cuisson.",
+        "body": "Ketchup, sauces barbecue et condiments en formats professionnels. Sélectionnés pour rester réguliers du premier au dernier couvert d'un service.",
+        "ctaLabel": "Voir la gamme agro-alimentaire",
+        "mediaAlt": "Burger gourmand accompagné d’un pot de mayonnaise au format professionnel."
+      },
+      "monin": {
+        "eyebrow": "Boissons",
+        "title": "Une carte de boissons qui tient toute l’année.",
+        "body": "Sirops MONIN, bases frappé et ingrédients de bar. De quoi construire une carte que votre équipe exécute de la même façon à chaque service.",
+        "ctaLabel": "Voir les sirops et bases boissons",
+        "mediaAlt": "Sirop MONIN versé dans un verre glacé garni de citron vert et de menthe."
+      },
+      "packaging": {
+        "eyebrow": "Emballage",
+        "title": "Votre produit mérite sa présentation.",
+        "body": "Verrines, gobelets, barquettes et verrerie polycarbonate. L'emballage décide de ce que le client voit avant même de goûter.",
+        "ctaLabel": "Voir la gamme emballage",
+        "mediaAlt": "Dessert en couches servi dans une verrine transparente, sur une pierre sombre."
+      },
+      "hygiene": {
+        "eyebrow": "Hygiène",
+        "title": "Le protocole commence avant le service.",
+        "body": "Blouses, charlottes, masques, gants et surchaussures. La gamme jetable qu'une cuisine professionnelle consomme chaque jour.",
+        "ctaLabel": "Voir la gamme hygiène",
+        "mediaAlt": "Blouse professionnelle jetable translucide, suspendue dans une lumière claire."
+      }
+    },
+    "seams": {
+      "maison": "La maison",
+      "divisions": "Les divisions",
+      "cuisine": "En cuisine",
+      "catalogue": "Le catalogue",
+      "metiers": "Par métier",
+      "partners": "Nos partenaires",
+      "enquiry": "Votre demande"
+    },
+    "statement": {
+      "thesis": "Nous ne fabriquons pas. Nous sélectionnons.",
+      "body": "Depuis 1985, la Société Ferid Khemakhem importe et distribue les produits agro-alimentaires, d'emballage et d'hygiène dont vivent les cuisines professionnelles tunisiennes. Notre métier est le choix : trouver, vérifier et référencer les produits sur lesquels une cuisine peut compter.",
+      "founded": "1985",
+      "foundedLabel": "Année de création",
+      "divisionsLabel": "Divisions",
+      "referencesLabel": "Références au catalogue"
+    },
+    "divisions": {
+      "referenceCount": "{{count}} références"
+    },
+    "sectors": {
+      "title": "Dites-nous ce que vous faites. Nous savons ce que vous consommez.",
+      "listLabel": "Choisir un secteur professionnel",
+      "draws": "Puise dans nos divisions"
+    }
+  },
+  "about": {
+    "title": "Notre entreprise",
+    "lead": "La Société Ferid Khemakhem importe et distribue pour les professionnels tunisiens depuis 1985.",
+    "presidentTitle": "Mot du Président",
+    "presidentRole": "Président, Société Ferid Khemakhem",
+    "timelineTitle": "Notre histoire",
+    "missionTitle": "Notre activité",
+    "valuesTitle": "Notre façon de travailler",
+    "divisionsTitle": "Nos familles de produits",
+    "sourcingTitle": "Sourcing international",
+    "sourcingBody": "Nous sélectionnons des fournisseurs dont les produits répondent aux normes européennes et internationales, et enrichissons notre gamme en suivant l'évolution du marché.",
+    "qualityTitle": "Engagement qualité",
+    "teamTitle": "Direction",
+    "teamPlaceholder": "Les informations sur la direction et l'équipe restent à fournir par l'entreprise.",
+    "ctaTitle": "Travailler avec nous",
+    "ctaLead": "Présentez-nous vos besoins et nous les mettrons en regard de notre gamme.",
+    "milestonePending": "Étapes complémentaires à fournir par l'entreprise."
+  },
+  "catalog": {
+    "title": "Produits",
+    "lead": "{{count}} références en agro-alimentaire, emballage et hygiène.",
+    "searchLabel": "Rechercher un produit",
+    "searchPlaceholder": "Rechercher par nom, format ou marque…",
+    "filters": "Filtres",
+    "openFilters": "Ouvrir les filtres",
+    "closeFilters": "Fermer les filtres",
+    "applyFilters": "Afficher {{count}} résultats",
+    "clearAll": "Effacer tous les filtres",
+    "clearFilter": "Retirer le filtre : {{label}}",
+    "activeFilters": "Filtres actifs",
+    "resultCount": "{{count}} produits",
+    "resultCountOne": "1 produit",
+    "resultCountFiltered": "{{count}} produits sur {{total}}",
+    "sortLabel": "Trier par",
+    "sort": {
+      "relevance": "Plus pertinents",
+      "name-asc": "Nom (A–Z)",
+      "name-desc": "Nom (Z–A)",
+      "category": "Division"
+    },
+    "viewLabel": "Affichage",
+    "viewGrid": "Affichage en grille",
+    "viewList": "Affichage en liste",
+    "loadMore": "Afficher plus de produits",
+    "showingOf": "{{shown}} sur {{total}} affichés",
+    "facet": {
+      "categories": "Division",
+      "subcategories": "Famille de produits",
+      "brands": "Marque",
+      "industries": "Secteur",
+      "sizes": "Format"
+    },
+    "empty": {
+      "title": "Aucun produit ne correspond à ces filtres.",
+      "body": "Essayez de retirer un filtre ou de rechercher un autre terme.",
+      "action": "Effacer tous les filtres"
+    },
+    "error": {
+      "title": "Le catalogue n'a pas pu être chargé.",
+      "body": "Une erreur est survenue de notre côté. Merci de réessayer.",
+      "action": "Réessayer"
+    },
+    "loading": "Chargement des produits…"
+  },
+  "product": {
+    "brand": "Marque",
+    "category": "Division",
+    "family": "Famille de produits",
+    "formats": "Formats disponibles",
+    "formatsPending": "Formats à confirmer — contactez-nous pour les conditionnements.",
+    "description": "Description",
+    "technical": "Informations techniques",
+    "technicalPending": "Les spécifications techniques complètes sont disponibles auprès de notre équipe commerciale sur demande.",
+    "useCases": "Utilisations courantes",
+    "industries": "Secteurs concernés",
+    "datasheet": "Fiche technique",
+    "datasheetPending": "Fiche technique non encore disponible",
+    "related": "Produits associés",
+    "requestInfo": "Demander une information",
+    "requestInfoAbout": "Demander une information sur {{name}}",
+    "quickView": "Aperçu rapide",
+    "quickViewOf": "Aperçu rapide : {{name}}",
+    "share": "Partager",
+    "shareCopied": "Lien copié",
+    "previous": "Produit précédent",
+    "next": "Produit suivant",
+    "zoomHint": "Cliquez sur l'image pour l'agrandir",
+    "verificationNote": "Certains détails de cette référence restent à confirmer par notre équipe.",
+    "noPriceNote": "Les tarifs sont communiqués sur demande. Contactez-nous avec vos volumes.",
+    "addToCart": "Ajouter au panier",
+    "offer": "Offre",
+    "adding": "Ajout…",
+    "added": "Ajouté au panier",
+    "viewCart": "Voir le panier",
+    "signInToOrder": "Se connecter pour commander",
+    "addToCartAbout": "Ajouter {{name}} au panier",
+    "addFailed": "Échec, réessayer",
+    "subtotal": "Sous-total pour {{quantity}} unités : {{price}}"
+  },
+  "brands": {
+    "title": "Marques",
+    "lead": "Nous représentons en Tunisie des fabricants internationaux sélectionnés.",
+    "searchLabel": "Rechercher une marque",
+    "searchPlaceholder": "Rechercher une marque…",
+    "filterLabel": "Filtrer par division",
+    "all": "Toutes les divisions",
+    "viewProducts": "Voir les produits",
+    "productCount": "{{count}} références",
+    "website": "Visiter le site",
+    "origin": "Origine",
+    "empty": "Aucune marque ne correspond à cette recherche.",
+    "incompleteNote": "Ce répertoire liste les partenaires publiés par l'entreprise. D'autres relations de marque restent à confirmer."
+  },
+  "industries": {
+    "title": "Les secteurs que nous servons",
+    "lead": "Chaque secteur puise dans une partie différente de notre gamme. Voici notre accompagnement pour chacun.",
+    "howWeSupport": "Notre accompagnement dans ce secteur",
+    "relevantProducts": "Familles de produits concernées",
+    "viewProducts": "Voir les produits pour ce secteur",
+    "verifiedNote": "Secteur cité par l'entreprise.",
+    "unverifiedNote": "Couverture du secteur à confirmer par l'entreprise."
+  },
+  "contact": {
+    "title": "Nous contacter",
+    "lead": "Indiquez-nous votre besoin. Nous vous répondrons avec les disponibilités, les formats et les tarifs.",
+    "detailsTitle": "Nos coordonnées",
+    "address": "Adresse",
+    "telephone": "Téléphone",
+    "fax": "Fax",
+    "email": "E-mail",
+    "hours": "Horaires d'ouverture",
+    "hoursPending": "Horaires à confirmer",
+    "mapTitle": "Nous trouver",
+    "mapPlaceholder": "Carte basée sur l'adresse postale publiée par l'entreprise.",
+    "viewOnMap": "Voir sur Google Maps",
+    "loadMap": "Afficher la carte interactive",
+    "mapConsent": "La carte est fournie par Google et n'est chargée qu'à votre demande.",
+    "formTitle": "Envoyez-nous un message",
+    "form": {
+      "name": "Nom complet",
+      "company": "Société",
+      "email": "E-mail professionnel",
+      "phone": "Téléphone",
+      "jobTitle": "Fonction",
+      "industry": "Votre secteur",
+      "category": "Catégorie de produits concernée",
+      "department": "Service",
+      "subject": "Objet",
+      "message": "Message",
+      "consent": "J'accepte que mes coordonnées soient utilisées pour répondre à cette demande.",
+      "consentDetail": "Nous ne transmettons pas vos coordonnées à des tiers. Voir notre politique de confidentialité.",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi en cours…",
+      "optional": "facultatif",
+      "required": "obligatoire",
+      "selectPlaceholder": "Veuillez choisir…",
+      "productContext": "Demande concernant : {{name}}",
+      "removeProductContext": "Retirer ce produit de la demande"
+    },
+    "department": {
+      "sales": "Commercial",
+      "logistics": "Logistique et livraisons",
+      "accounts": "Comptabilité",
+      "general": "Demande générale"
+    },
+    "validation": {
+      "required": "Le champ « {{field}} » est obligatoire.",
+      "email": "Saisissez une adresse e-mail valide, par exemple nom@societe.tn.",
+      "minlength": "Le champ « {{field}} » doit contenir au moins {{min}} caractères.",
+      "maxlength": "Le champ « {{field}} » ne doit pas dépasser {{max}} caractères.",
+      "phone": "Saisissez un numéro de téléphone valide.",
+      "consent": "Merci de confirmer votre accord avant l'envoi.",
+      "summaryTitle": "Le formulaire comporte une erreur",
+      "summaryIntro": "Merci de corriger les points suivants :"
+    },
+    "success": {
+      "title": "Merci — votre demande a bien été envoyée.",
+      "body": "Un membre de notre équipe vous recontactera. Votre référence est {{reference}}.",
+      "again": "Envoyer une autre demande"
+    },
+    "failure": {
+      "title": "Votre message n'a pas pu être envoyé.",
+      "body": "Merci de réessayer, ou contactez-nous directement par téléphone ou e-mail. Vos saisies ont été conservées.",
+      "retry": "Réessayer"
+    },
+    "errorUnavailable": "Nous ne pouvons pas transmettre votre demande pour le moment. Votre message est conservé ci-dessous — réessayez dans un instant, ou appelez-nous au +216 71 557 548."
+  },
+  "search": {
+    "title": "Recherche",
+    "open": "Ouvrir la recherche",
+    "close": "Fermer la recherche",
+    "label": "Rechercher sur le site",
+    "placeholder": "Rechercher un produit, une marque, un secteur…",
+    "hint": "Appuyez sur / pour rechercher",
+    "recent": "Recherches récentes",
+    "clearRecent": "Effacer les recherches récentes",
+    "groups": {
+      "products": "Produits",
+      "categories": "Catégories",
+      "brands": "Marques",
+      "industries": "Secteurs",
+      "pages": "Pages"
+    },
+    "resultsAnnounce": "{{count}} résultats pour {{query}}",
+    "noResultsAnnounce": "Aucun résultat pour {{query}}",
+    "empty": {
+      "title": "Aucun résultat.",
+      "body": "Vérifiez l'orthographe ou essayez un terme plus large, comme « gants » ou « verrine »."
+    },
+    "initial": {
+      "title": "Que recherchez-vous ?",
+      "body": "Recherchez parmi {{count}} références produits, marques et secteurs."
+    },
+    "viewAll": "Voir tous les résultats pour « {{query}} »",
+    "keyboardHint": "Utilisez les flèches pour naviguer, Entrée pour valider, Échap pour fermer.",
+    "headerPlaceholder": "Rechercher un produit…"
+  },
+  "assistant": {
+    "eyebrow": "Assistant catalogue",
+    "title": "Comment pouvons-nous vous aider ?",
+    "name": "Assistant Catering",
+    "you": "Vous",
+    "open": "Ouvrir l’assistant",
+    "close": "Fermer l’assistant",
+    "launcher": "Besoin d’aide ?",
+    "welcome": "Bonjour ! Je connais le catalogue, les marques et les solutions Catering. Écrivez-moi en français, anglais, tunisien ou dans votre langue.",
+    "suggestionsLabel": "Questions suggérées",
+    "suggestionProducts": "Quels produits proposez-vous ?",
+    "suggestionQuote": "Comment demander un devis ?",
+    "suggestionTunisian": "3andkom produits lel restaurants ?",
+    "inputLabel": "Votre question",
+    "placeholder": "Posez votre question…",
+    "send": "Envoyer la question",
+    "thinking": "L’assistant prépare sa réponse",
+    "error": "Je n’arrive pas à répondre pour le moment. Réessayez ou contactez-nous directement.",
+    "rateLimited": "Vous avez envoyé beaucoup de messages. Patientez quelques minutes avant de réessayer.",
+    "disclaimer": "Les disponibilités, prix et spécifications sont confirmés par notre équipe commerciale."
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "lead": "Restez informés. Actualités produits et évolutions de la gamme par e-mail.",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "nom@societe.tn",
+    "submit": "S'inscrire",
+    "consent": "J'accepte de recevoir des e-mails et peux me désinscrire à tout moment.",
+    "success": "Merci — consultez votre boîte de réception pour confirmer.",
+    "error": "Votre inscription n'a pas pu aboutir. Merci de réessayer."
+  },
+  "footer": {
+    "description": "Importateur et distributeur de produits agro-alimentaires, d'emballage et d'hygiène pour les professionnels tunisiens depuis 1985.",
+    "productsTitle": "Produits",
+    "companyTitle": "Entreprise",
+    "contactTitle": "Contact",
+    "allProducts": "Tous les produits",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions et mentions légales",
+    "copyright": "© {{year}} Société Ferid Khemakhem. Tous droits réservés.",
+    "legalPending": "Mentions d'immatriculation à fournir.",
+    "followUs": "Nous suivre"
+  },
+  "sticky": {
+    "call": "Appeler",
+    "email": "E-mail",
+    "enquire": "Demander"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Cette page est introuvable.",
+    "lead": "La page a peut-être été déplacée, ou l'adresse comporte une erreur.",
+    "home": "Aller à l'accueil",
+    "products": "Parcourir les produits",
+    "search": "Rechercher sur le site"
+  },
+  "error": {
+    "title": "Une erreur est survenue.",
+    "body": "Ce contenu n'a pas pu être chargé. Merci de réessayer.",
+    "retry": "Réessayer"
+  },
+  "auth": {
+    "secureArea": "Espace client sécurisé",
+    "login": {
+      "title": "Heureux de vous revoir.",
+      "lead": "Connectez-vous pour gérer votre compte professionnel.",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "noAccount": "Pas encore de compte ?",
+      "link": "Se connecter"
+    },
+    "register": {
+      "title": "Créez votre compte professionnel.",
+      "lead": "Choisissez le profil qui correspond à votre activité.",
+      "submit": "Créer mon compte",
+      "submitting": "Création du compte…",
+      "hasAccount": "Déjà inscrit ?",
+      "link": "Créer un compte",
+      "consent": "Je confirme l’exactitude des informations fournies et j’accepte la politique de confidentialité."
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "clientType": "Type de client",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "companyName": "Raison sociale",
+      "taxIdentifier": "Matricule fiscal",
+      "phone": "Téléphone"
+    },
+    "types": {
+      "physique": "Personne physique",
+      "physiqueHint": "Professionnel achetant en son nom",
+      "morale": "Personne morale",
+      "moraleHint": "Société ou organisation enregistrée"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "client": "Client"
+    },
+    "validation": {
+      "email": "Saisissez une adresse e-mail valide.",
+      "required": "Ce champ est obligatoire.",
+      "passwordHint": "Au moins 10 caractères."
+    },
+    "errors": {
+      "invalid_credentials": "E-mail ou mot de passe incorrect.",
+      "email_exists": "Un compte utilise déjà cet e-mail.",
+      "offline": "Le service des comptes est indisponible. Vérifiez que le serveur Spring est lancé.",
+      "unknown": "Une erreur inattendue est survenue.",
+      "password_mismatch": "Les mots de passe ne correspondent pas.",
+      "wrong_password": "Le mot de passe actuel est incorrect.",
+      "password_unchanged": "Choisissez un mot de passe différent de l’actuel.",
+      "cannot_demote_self": "Vous ne pouvez pas retirer vos propres droits administrateur.",
+      "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre compte administrateur ici.",
+      "last_admin": "Le dernier administrateur actif ne peut pas être désactivé ou supprimé.",
+      "admin_self_delete_forbidden": "Un compte administrateur ne peut pas se supprimer lui-même.",
+      "client_type_required": "Choisissez un type de client.",
+      "first_name_required": "Le prénom est obligatoire.",
+      "last_name_required": "Le nom est obligatoire.",
+      "company_name_required": "La raison sociale est obligatoire.",
+      "tax_identifier_required": "Le matricule fiscal est obligatoire.",
+      "forbidden": "Vous n’avez pas l’autorisation d’effectuer cette action.",
+      "unauthorized": "Votre session a expiré. Reconnectez-vous.",
+      "validation_failed": "Vérifiez les informations saisies."
+    }
+  },
+  "account": {
+    "eyebrow": "Votre espace",
+    "lead": "Gérez votre identité et la sécurité de votre compte.",
+    "profileTitle": "Profil professionnel",
+    "saved": "Vos modifications ont été enregistrées.",
+    "saving": "Enregistrement…",
+    "save": "Enregistrer",
+    "adminTitle": "Compte d’administration",
+    "adminLead": "Votre compte permet de gérer les utilisateurs et leurs accès.",
+    "manageUsers": "Gérer les utilisateurs",
+    "passwordTitle": "Sécurité",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "passwordChanged": "Votre mot de passe a été modifié.",
+    "changePassword": "Modifier le mot de passe",
+    "summaryTitle": "Résumé du compte",
+    "role": "Rôle",
+    "logout": "Se déconnecter",
+    "deleteTitle": "Supprimer le compte",
+    "deleteLead": "Cette action supprime définitivement votre profil client.",
+    "deleteAction": "Supprimer mon compte",
+    "deleteConfirm": "Supprimer définitivement votre compte ? Cette action est irréversible.",
+    "tabs": {
+      "profile": "Informations",
+      "security": "Sécurité"
+    },
+    "profileLead": "Ces informations sont reprises sur vos commandes et vos demandes de devis.",
+    "typeHint": "Détermine les informations demandées pour vous identifier.",
+    "identityLabel": "Identité",
+    "identityHint": "Le nom qui figure sur vos commandes et devis.",
+    "contactLabel": "Coordonnées",
+    "contactHint": "Pour vous joindre au sujet de vos demandes.",
+    "passwordLead": "Modifiez le mot de passe utilisé pour vous connecter.",
+    "passwordLabel": "Mot de passe",
+    "passwordHint": "10 caractères minimum. Choisissez un mot de passe que vous n’utilisez pas ailleurs.",
+    "memberSince": "Client depuis {{date}}",
+    "cartCta": "Mon panier"
+  },
+  "admin": {
+    "eyebrow": "Administration",
+    "title": "Gestion des utilisateurs",
+    "lead": "Créez et gérez les accès administrateur et client depuis un espace contrôlé.",
+    "search": "Rechercher des utilisateurs",
+    "searchPlaceholder": "Nom, société ou e-mail",
+    "searchAction": "Rechercher",
+    "create": "Ajouter un utilisateur",
+    "back": "Mon compte",
+    "editTitle": "Modifier l’utilisateur",
+    "createTitle": "Créer un utilisateur",
+    "role": "Rôle",
+    "enabled": "Compte actif",
+    "saving": "Enregistrement…",
+    "save": "Enregistrer",
+    "empty": "Aucun utilisateur ne correspond à cette recherche.",
+    "person": "Utilisateur",
+    "type": "Type",
+    "status": "Statut",
+    "actions": "Actions",
+    "active": "Actif",
+    "disabled": "Désactivé",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer définitivement {{name}} ?",
+    "success": {
+      "created": "Utilisateur créé.",
+      "updated": "Utilisateur mis à jour.",
+      "deleted": "Utilisateur supprimé."
+    }
+  },
+  "legal": {
+    "privacyTitle": "Politique de confidentialité",
+    "termsTitle": "Conditions et mentions légales",
+    "lastUpdated": "Dernière mise à jour",
+    "placeholderNotice": "Ce document est un texte provisoire. La rédaction définitive doit être fournie et validée par l'entreprise au regard de la loi tunisienne nº 2004-63 relative à la protection des données à caractère personnel avant la mise en ligne."
+  },
+  "common": {
+    "loading": "Chargement…",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "page": "Page",
+    "pageOf": "Page {{current}} sur {{total}}",
+    "pagination": "Pagination",
+    "readMore": "Lire la suite",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "verificationPending": "À confirmer",
+    "placeholder": "À fournir"
+  },
+  "cart": {
+    "eyebrow": "Demande professionnelle",
+    "title": "Mon panier",
+    "lead": "Rassemblez les références qui vous intéressent, puis transmettez-les à notre équipe commerciale sous forme de demande de devis.",
+    "signInTitle": "Connectez-vous pour composer votre panier",
+    "signInLead": "Le panier est rattaché à votre compte professionnel, afin que votre demande de devis nous parvienne avec vos coordonnées.",
+    "emptyTitle": "Votre panier est vide",
+    "emptyLead": "Parcourez le catalogue et ajoutez les références sur lesquelles vous souhaitez une offre.",
+    "browseCatalog": "Parcourir le catalogue",
+    "backToCatalog": "Retour au catalogue",
+    "linesTitle": "Références sélectionnées ({{count}})",
+    "reference": "Réf. {{reference}}",
+    "unitPrice": "Prix unitaire : {{price}}",
+    "quantity": "Quantité",
+    "remove": "Retirer",
+    "clear": "Vider le panier",
+    "total": "Total estimé",
+    "partialTotal": "Certaines références n'ont pas de prix publié : le total ci-dessus est partiel et sera complété dans notre offre.",
+    "priceOnRequest": "Prix sur demande",
+    "requestTitle": "Demander une offre",
+    "requestLead": "Complétez si besoin vos coordonnées ; nous reprenons celles de votre compte par défaut.",
+    "noPaymentNote": "Aucun paiement n'est effectué sur le site : votre demande est transmise à notre équipe commerciale, qui vous répond avec une offre chiffrée.",
+    "submit": "Envoyer la demande de devis",
+    "submitting": "Envoi en cours…",
+    "submittedTitle": "Demande transmise",
+    "submittedLead": "Votre demande porte la référence {{reference}}. Notre équipe commerciale revient vers vous avec une offre.",
+    "submittedPartial": "Certaines références demandées n'ont pas de prix publié : elles seront chiffrées dans notre réponse.",
+    "errorGeneric": "L'opération n'a pas abouti. Veuillez réessayer.",
+    "errorSubmit": "L'envoi de la demande a échoué. Veuillez réessayer.",
+    "fields": {
+      "contactName": "Nom du contact",
+      "companyName": "Société",
+      "contactPhone": "Téléphone",
+      "deliveryCity": "Ville de livraison",
+      "message": "Précisions (délais, quantités, conditionnement…)"
+    },
+    "decrease": "Diminuer la quantité",
+    "increase": "Augmenter la quantité",
+    "removeAbout": "Retirer {{name}} du panier",
+    "summaryTitle": "Récapitulatif",
+    "units": "Unités",
+    "back": "Retour au récapitulatif",
+    "order": {
+      "cta": "Acheter",
+      "title": "Finaliser la commande",
+      "lead": "Vérifiez vos coordonnées de livraison ; nous reprenons celles de votre compte par défaut.",
+      "message": "Adresse et instructions de livraison",
+      "noPaymentNote": "Aucun paiement en ligne : notre équipe vous contacte pour confirmer la commande, la livraison et le règlement.",
+      "submit": "Confirmer la commande · {{total}}",
+      "unpriced": "Certaines références n’ont pas de prix publié : pour les commander, demandez un devis.",
+      "submittedTitle": "Commande transmise",
+      "submittedLead": "Votre commande porte la référence {{reference}}. Notre équipe vous contacte pour confirmer la livraison et le règlement.",
+      "errors": {
+        "order_unpriced": "Certaines références n’ont pas de prix publié : demandez un devis pour ce panier.",
+        "order_contact_required": "Indiquez un téléphone et une ville de livraison pour commander."
+      }
+    },
+    "bulk": {
+      "title": "Achat en grande quantité ?",
+      "lead": "Pour des volumes importants, demandez une offre sur mesure à notre équipe commerciale.",
+      "cta": "Demander un devis"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "lead": "Bonjour {{name}}. Gérez le catalogue, les demandes de devis et les comptes.",
+    "navigation": "Sections de l'administration",
+    "loadError": "Les données n'ont pas pu être chargées. Vérifiez que l'API est démarrée, puis réessayez.",
+    "recentQuotes": "Dernières demandes de devis",
+    "seeAll": "Tout voir",
+    "viewSite": "Voir le site",
+    "pipeline": {
+      "eyebrow": "Activité commerciale",
+      "title": "Suivi des demandes"
+    },
+    "charts": {
+      "activity": "Demandes de devis",
+      "activityHint": "30 derniers jours",
+      "activityEmpty": "Aucune demande reçue sur les 30 derniers jours.",
+      "activityAria": "{{count}} demandes de devis sur {{days}} jours",
+      "catalogue": "Catalogue par division",
+      "catalogueHint": "{{count}} produits en ligne dans {{divisions}} divisions",
+      "division": "Division",
+      "products": "Produits",
+      "day": "Jour",
+      "requests": "Demandes",
+      "others": "{{count}} autres divisions",
+      "showTable": "Afficher les données"
+    },
+    "quick": {
+      "eyebrow": "Raccourcis",
+      "title": "Actions rapides",
+      "productHint": "Créer une nouvelle référence",
+      "offerHint": "Programmer une promotion",
+      "userHint": "Ajouter un compte"
+    },
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "products": "Produits",
+      "offers": "Offres",
+      "quotes": "Demandes de devis",
+      "users": "Utilisateurs"
+    },
+    "stats": {
+      "newQuotes": "Nouvelles demandes",
+      "inReview": "{{count}} en cours de traitement",
+      "products": "Produits en ligne",
+      "inactive": "{{count}} désactivés",
+      "unpriced": "Produits sans prix",
+      "priced": "{{count}} produits avec prix",
+      "clients": "Clients",
+      "admins": "{{count}} administrateurs",
+      "offers": "Offres produits",
+      "manageOffers": "Créer et programmer des promotions"
+    },
+    "quoteStatus": {
+      "SUBMITTED": "Nouvelle",
+      "IN_REVIEW": "En traitement",
+      "ANSWERED": "Offre envoyée",
+      "CLOSED": "Clôturée"
+    },
+    "quotes": {
+      "reference": "Référence",
+      "client": "Client",
+      "date": "Date",
+      "total": "Total",
+      "unitPrice": "Prix unitaire",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "empty": "Aucune demande de devis pour le moment.",
+      "note": "Note interne",
+      "partial": "Certaines lignes n'avaient pas de prix publié : le total est partiel."
+    },
+    "products": {
+      "create": "Ajouter un produit",
+      "createTitle": "Nouveau produit",
+      "editTitle": "Modifier le produit",
+      "search": "Rechercher des produits",
+      "searchPlaceholder": "Nom, référence ou slug",
+      "allCategories": "Toutes les divisions",
+      "allStatuses": "Tous les statuts",
+      "allPrices": "Avec ou sans prix",
+      "pricedYes": "Avec prix",
+      "pricedNo": "Sans prix",
+      "statusActive": "En ligne",
+      "statusInactive": "Désactivé",
+      "product": "Produit",
+      "searchProduct": "Rechercher le produit à mettre en offre",
+      "count": "{{count}} produits",
+      "empty": "Aucun produit ne correspond à ces filtres.",
+      "deactivate": "Désactiver",
+      "reactivate": "Réactiver",
+      "deactivateConfirm": "Retirer « {{name}} » du catalogue ? Il restera visible ici et pourra être réactivé.",
+      "priceOf": "Prix de {{name}}",
+      "priceSaved": "Enregistré",
+      "choose": "Choisir…",
+      "success": {
+        "created": "Produit créé.",
+        "updated": "Produit mis à jour.",
+        "deactivated": "Produit retiré du catalogue.",
+        "reactivated": "Produit remis en ligne."
+      },
+      "fields": {
+        "nameFr": "Nom (français)",
+        "nameEn": "Nom (anglais)",
+        "sourceId": "Référence interne",
+        "sourceIdHint": "Générée automatiquement à partir du nom du produit.",
+        "slug": "Slug (adresse de la page)",
+        "slugHint": "Adresse générée automatiquement à partir du nom.",
+        "category": "Division",
+        "subcategory": "Famille",
+        "brand": "Marque",
+        "reference": "Référence fournisseur",
+        "price": "Prix (TND)",
+        "priceHint": "Laisser vide pour afficher « Prix sur demande ».",
+        "stock": "Stock",
+        "shortFr": "Description courte (français)",
+        "shortEn": "Description courte (anglais)",
+        "image": "Image principale",
+        "imageAlt": "Texte alternatif de l'image",
+        "imageHint": "JPEG, PNG, WebP, GIF ou AVIF — 10 Mo maximum. L'image sera envoyée vers ImageKit.",
+        "imageUploading": "Envoi de l'image vers ImageKit…",
+        "featured": "Mettre en avant sur le site"
+      },
+      "validation": {
+        "required": "« {{field}} » est obligatoire.",
+        "slug": "Le permalien ne peut contenir que des minuscules, des chiffres et des tirets (ex. essuie-tout-jumbo).",
+        "price": "Le prix doit être un nombre, avec au plus trois décimales (ex. 12,500).",
+        "stock": "Le stock doit être un nombre entier.",
+        "maxlength": "« {{field}} » ne peut dépasser {{max}} caractères.",
+        "summary": "Corrigez les {{count}} champs signalés avant d’enregistrer.",
+        "summaryOne": "Corrigez le champ signalé avant d’enregistrer."
+      }
+    },
+    "offers": {
+      "create": "Créer une offre produit",
+      "lead": "Choisissez un produit avec un prix normal, définissez son prix promotionnel et sa période de validité.",
+      "product": "Produit",
+      "normalPrice": "Prix normal",
+      "offerPrice": "Prix de l'offre",
+      "discount": "Remise",
+      "startsAt": "Début de l'offre",
+      "endsAt": "Fin de l'offre",
+      "active": "Publier cette offre",
+      "list": "Offres configurées",
+      "period": "Période",
+      "live": "En ligne",
+      "inactive": "Inactive ou programmée",
+      "status": {
+        "ACTIVE": "En ligne",
+        "SCHEDULED": "Programmée",
+        "EXPIRED": "Terminée",
+        "INACTIVE": "Inactive"
+      },
+      "empty": "Aucune offre n'est configurée.",
+      "saved": "L'offre a été enregistrée et sera appliquée automatiquement au catalogue et au panier."
+    },
+    "errors": {
+      "unknown": "L'opération n'a pas abouti.",
+      "invalid_price": "Le prix doit être un nombre positif, avec au plus trois décimales.",
+      "offer_requires_price": "Ajoutez d'abord un prix normal au produit.",
+      "offer_price_not_lower": "Le prix de l'offre doit être inférieur au prix normal.",
+      "offer_dates_invalid": "La date de fin doit être postérieure à la date de début.",
+      "product_slug_exists": "Un autre produit utilise déjà ce slug.",
+      "product_source_id_exists": "Un autre produit utilise déjà cette référence interne.",
+      "product_not_found": "Ce produit n'existe plus.",
+      "validation_failed": "Certains champs sont invalides.",
+      "image_invalid": "Choisissez une image JPEG, PNG, WebP, GIF ou AVIF de moins de 10 Mo.",
+      "image_upload_failed": "L'image n'a pas pu être envoyée vers ImageKit. Réessayez.",
+      "forbidden": "Action réservée aux administrateurs.",
+      "unauthorized": "Votre session a expiré. Reconnectez-vous."
+    },
+    "quoteKind": {
+      "ORDER": "Commande",
+      "QUOTE": "Devis"
+    }
+  }
+}

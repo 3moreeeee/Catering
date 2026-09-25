@@ -1,0 +1,112 @@
+@use '../../../styles/abstracts/mixins' as *;
+
+.brands {
+  padding-block: var(--sp-12) var(--sp-20);
+}
+
+.brands__head {
+  max-width: 46rem;
+  margin-bottom: var(--sp-8);
+
+  h1 {
+    margin: 0 0 var(--sp-3);
+  }
+}
+
+.brands__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--border-hairline);
+  margin-bottom: var(--sp-8);
+}
+
+.brands__search {
+  flex: 1 1 16rem;
+}
+
+.brands__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.brands__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+  grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+}
+
+.brands__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  block-size: 100%;
+  padding: var(--sp-6);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-sm);
+  transition:
+    transform var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard);
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-neutral);
+  }
+}
+
+.brands__logo {
+  block-size: 64px;
+  inline-size: min(180px, 100%);
+  object-fit: contain;
+  object-position: left center;
+  background: none;
+  margin-bottom: var(--sp-2);
+}
+
+.brands__name {
+  margin: 0;
+}
+
+.brands__desc {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.brands__pending {
+  padding: 2px var(--sp-2);
+  border: 1px dashed var(--border-neutral);
+  border-radius: var(--r-xs);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.brands__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-4);
+}
+
+.brands__empty {
+  padding: var(--sp-16) 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.brands__note {
+  margin-top: var(--sp-10);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+  max-width: 60ch;
+}

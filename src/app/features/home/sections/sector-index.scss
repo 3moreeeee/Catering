@@ -1,0 +1,228 @@
+// =============================================================================
+// SECTOR INDEX — "which of these is you?"
+//
+// A contents page, not a card grid. The six sectors are set as a list in
+// display type with hairlines between them, the way a catalogue's index is set;
+// the selected one is the only line at full strength, and its account opens
+// beside it. The visual weight is carried entirely by type, rule and space, so
+// the section reads as the quiet, exact half of the page — the counter — after
+// the films.
+// =============================================================================
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  padding-block: clamp(2.75rem, 8vw, 7rem);
+}
+
+.sector__head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--sp-2), 1.5vw, var(--sp-4));
+  max-inline-size: 52rem;
+  margin-block-end: clamp(1.75rem, 5vw, 4rem);
+}
+
+.sector__title {
+  @include display(clamp(1.75rem, 1.2rem + 1.9vw, 2.875rem));
+  margin: 0;
+  max-inline-size: 20ch;
+}
+
+.sector__lead {
+  margin: 0;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  max-inline-size: 56ch;
+}
+
+.sector__body {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+
+  @include bp(lg) {
+    // The index holds a little over half. The panel is narrower than the list
+    // on purpose: it is a paragraph, and a paragraph wants a measure.
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// THE INDEX
+// -----------------------------------------------------------------------------
+
+.sector__list {
+  display: flex;
+  flex-direction: column;
+  border-block-start: 1px solid var(--border-hairline);
+}
+
+.sector__row {
+  @include focusable;
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  inline-size: 100%;
+  min-block-size: var(--tap-min);
+  padding-block: clamp(0.75rem, 1.6vw, 1.1rem);
+  border: 0;
+  border-block-end: 1px solid var(--border-hairline);
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color var(--d-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--text-secondary);
+  }
+
+  &.is-active {
+    color: var(--text-primary);
+  }
+}
+
+.sector__num {
+  flex: none;
+  @include label;
+  font-size: var(--fs-label);
+  color: inherit;
+  opacity: 0.6;
+  // Holds the numerals on one optical column regardless of the name beside them.
+  inline-size: 2.5ch;
+
+  .sector__row.is-active & {
+    color: var(--text-accent);
+    opacity: 1;
+  }
+}
+
+.sector__name {
+  @include heading(clamp(1.375rem, 1rem + 1.5vw, 2.375rem));
+  color: inherit;
+  // The names are long in French ("Industrie agro-alimentaire"); the index must
+  // never wrap into two lines at desktop or the numerals lose their column.
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include bp-down(md) {
+    text-wrap: balance;
+    white-space: normal;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// THE ACCOUNT
+// -----------------------------------------------------------------------------
+
+.sector__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+
+  &:focus {
+    outline: none;
+  }
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include bp(lg) {
+    // Aligns the panel's first line with the first row of the index rather than
+    // with the rule above it.
+    padding-block-start: clamp(0.75rem, 1.6vw, 1.1rem);
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 2rem);
+  }
+}
+
+.sector__scope {
+  @include heading(var(--fs-h4));
+  margin: 0;
+  color: var(--text-primary);
+  max-inline-size: 34ch;
+}
+
+.sector__support {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  max-inline-size: 46ch;
+}
+
+.sector__draws {
+  margin: var(--sp-3) 0 0;
+}
+
+.sector__divisions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sector__division {
+  @include focusable;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-block-end: 1px solid transparent;
+  transition: border-color var(--d-fast) var(--ease-out);
+
+  &:hover {
+    border-block-end-color: var(--cat-accent, var(--text-accent));
+  }
+}
+
+.sector__division-dot {
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  border-radius: var(--r-pill);
+  background-color: var(--cat-accent, var(--text-accent));
+}
+
+.sector__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-5);
+  margin-block-start: var(--sp-2);
+}
+
+// A sector the company has not itself named. Marked, never dressed up.
+.sector__pending {
+  margin: 0;
+  padding: 2px var(--sp-2);
+  border: 1px dashed var(--border-neutral);
+  border-radius: var(--r-xs);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+@include motion-reduce {
+  .sector__row,
+  .sector__division {
+    transition: none;
+  }
+}
+
+// Existing restaurant/cafe and hotel/catering sectors are HoReCa.
+:is(#sector-tab-restaurants, #sector-tab-hotels, #sector-panel-restaurants, #sector-panel-hotels) {
+  --text-accent: var(--c-cat-horeca);
+}
+:is(#sector-tab-restaurants, #sector-tab-hotels).is-active { color: var(--c-cat-horeca); }

@@ -1,0 +1,307 @@
+// =============================================================================
+// SENSORY CHAPTER
+//
+// Three techniques do all the work here, and none of them is an effect:
+//
+//  1. GRADED GROUND. The section is painted `--film-ground`, sampled from this
+//     chapter's own poster. A film's edge then meets its own darkness instead of
+//     a green-black token, which is what stopped it reading as a rectangle.
+//  2. DISSOLVE. With the grounds matched, the boundary can go: a mask feathers
+//     the media on whichever edges face the page, so the frame ends by fading
+//     out rather than by stopping.
+//  3. ENVIRONMENTAL LIGHT. A very low-opacity radial wash in `--film-glow`
+//     spills past the frame, so the film lights the section around it.
+//
+// Both chapters read copy-left / film-right, because the product sits on the
+// right of frame in both films and any layout that puts type there hides it.
+// They are told apart by `data-scale`, not by mirroring. See ChapterVariant.
+// =============================================================================
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  background-color: var(--film-ground);
+  color: var(--text-primary);
+  overflow: clip;
+}
+
+// -----------------------------------------------------------------------------
+// ENVIRONMENTAL LIGHT — the film's own highlight colour, spilling past the frame
+// -----------------------------------------------------------------------------
+
+.chapter__light {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    62% 55% at var(--light-x, 72%) 45%,
+    color-mix(in oklab, var(--film-glow) 24%, transparent) 0%,
+    transparent 70%
+  );
+  opacity: 0.5;
+}
+
+// -----------------------------------------------------------------------------
+// MEDIA
+// -----------------------------------------------------------------------------
+
+/// Each variant sets `--mask` to the feather it needs; the composite and the
+/// vendor-prefixed twin are declared once, here.
+.chapter__media {
+  position: relative;
+  z-index: 1;
+  mask-image: var(--mask, none);
+  -webkit-mask-image: var(--mask, none);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+
+  fk-cinematic-media {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+
+/// A second, softer feather painted in the ground colour itself. The mask below
+/// handles the hard edge; this removes the faint tonal seam that survives it
+/// when the film's own vignette does not quite reach the sampled ground.
+.chapter__dissolve {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to top, var(--film-ground) 0%, transparent 22%);
+}
+
+// -----------------------------------------------------------------------------
+// COPY
+// -----------------------------------------------------------------------------
+
+.chapter__copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.chapter__copy-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-5);
+  max-inline-size: 34ch;
+}
+
+.chapter__eyebrow {
+  @include label;
+  margin: 0;
+  color: var(--text-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+
+  &::before {
+    content: '';
+    inline-size: 2.25rem;
+    block-size: 1px;
+    background-color: currentcolor;
+  }
+}
+
+.chapter__title {
+  @include display(clamp(2rem, 1.2rem + 2.8vw, 3.75rem));
+  margin: 0;
+  max-inline-size: 15ch;
+}
+
+.chapter__body {
+  margin: 0;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-snug);
+  color: var(--text-secondary);
+  max-inline-size: 40ch;
+}
+
+.chapter__cta {
+  @include focusable;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-block-end: 1px solid color-mix(in oklab, var(--film-glow) 55%, transparent);
+  padding-block-end: var(--sp-1);
+  transition: border-color var(--d-fast) var(--ease-out);
+
+  &:hover {
+    border-block-end-color: currentcolor;
+  }
+}
+
+.chapter__arrow {
+  transition: transform var(--d-fast) var(--ease-out);
+
+  .chapter__cta:hover & {
+    transform: translateX(3px);
+  }
+
+  @include motion-reduce {
+    transition: none;
+    .chapter__cta:hover & {
+      transform: none;
+    }
+  }
+}
+
+// =============================================================================
+// VARIANT — IMMERSIVE
+// The film is the section. Copy lives in the darkness the frame already has.
+// =============================================================================
+
+:host([data-variant='immersive']) {
+  display: grid;
+  min-block-size: min(78vh, 700px);
+
+  .chapter__media,
+  .chapter__copy {
+    grid-area: 1 / 1;
+  }
+
+  .chapter__media {
+    // Feathered on all four sides, so the film has no edge anywhere: it stops
+    // being a frame and simply becomes the page.
+    --mask:
+      linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%),
+      linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+
+    fk-cinematic-media {
+      --cm-ratio: auto;
+      --cm-focus: 68% center;
+      block-size: 100%;
+    }
+  }
+
+  .chapter__dissolve {
+    // A scrim graded from the film's own ground, holding the copy's contrast
+    // without a card and without a flat black overlay.
+    background-image: linear-gradient(
+      to right,
+      var(--film-ground) 0%,
+      color-mix(in oklab, var(--film-ground) 88%, transparent) 34%,
+      transparent 66%
+    );
+  }
+
+  .chapter__copy {
+    padding-inline: max(var(--gutter), calc((100% - var(--container-wide)) / 2));
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  @include bp-down(md) {
+    .chapter__media fk-cinematic-media {
+      --cm-focus: center;
+    }
+    .chapter__dissolve {
+      background-image: linear-gradient(
+        to top,
+        var(--film-ground) 6%,
+        color-mix(in oklab, var(--film-ground) 82%, transparent) 46%,
+        transparent 88%
+      );
+    }
+    .chapter__copy {
+      align-items: flex-end;
+      min-block-size: min(86vh, 760px);
+    }
+  }
+}
+
+// =============================================================================
+// VARIANT — OVERSIZED
+// Copy left on the film's own ground, film right, bleeding off the outer edge.
+// =============================================================================
+
+:host([data-variant='oversized']) {
+  display: grid;
+  align-items: center;
+  padding-block: clamp(2.25rem, 6vw, 5rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
+
+  @include bp(lg) {
+    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  }
+
+  .chapter__copy {
+    order: 2;
+    padding-inline: var(--gutter);
+
+    @include bp(lg) {
+      order: 1;
+      padding-inline-start: max(var(--gutter), calc((100% - var(--container-wide)) / 2));
+      padding-inline-end: clamp(2rem, 4vw, 4rem);
+    }
+  }
+
+  .chapter__media {
+    order: 1;
+
+    @include bp(lg) {
+      order: 2;
+    }
+
+    fk-cinematic-media {
+      // Landscape at every width. A portrait frame in a half-width column is
+      // taller than the viewport, which is what made this chapter feel bigger
+      // than the page it sits on. Narrower still on a phone, where the frame
+      // has the full width and 4:3 costs 100px more than the shot needs.
+      --cm-ratio: 16 / 10;
+
+      @include bp(lg) {
+        --cm-ratio: 5 / 4;
+      }
+    }
+
+    // Feathered on the edges that face the page; the outer edge simply leaves
+    // the viewport.
+    --mask:
+      linear-gradient(to right, transparent 0%, #000 14%),
+      linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  }
+
+  .chapter__dissolve {
+    background-image: none;
+  }
+}
+
+/// The larger of the two weights. Same reading order, noticeably more film:
+/// the media takes two thirds of the row instead of a little over half, the
+/// frame goes landscape-wide, and the section is taller. Two adjacent chapters
+/// that mirrored each other would read as a template; the same order at
+/// different weights reads as pacing.
+:host([data-variant='oversized'][data-scale='large']) {
+  padding-block: clamp(2.5rem, 8vw, 7rem);
+
+  @include bp(lg) {
+    grid-template-columns: minmax(0, 34fr) minmax(0, 66fr);
+  }
+
+  .chapter__media fk-cinematic-media {
+    --cm-ratio: 4 / 3;
+
+    @include bp(lg) {
+      // `--chapter-ratio` is set per chapter only when the film needs a tighter
+      // crop than the variant's default. See the `mediaRatio` input.
+      --cm-ratio: var(--chapter-ratio, 16 / 10);
+    }
+  }
+}
+
+@supports not (mask-composite: intersect) {
+  .chapter__media {
+    --mask: none;
+  }
+}

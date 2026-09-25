@@ -1,0 +1,328 @@
+// =============================================================================
+// DIVISIONS — a triptych
+//
+// Three panels, edge to edge, each graded to its own film. The image and the
+// copy no longer share the same space: laying type over a narrow column of
+// footage darkened the product to keep the words legible, and the result was
+// muddy on both counts — you could not read the burger and you could not read
+// the sentence.
+//
+// Now each panel is a frame above a caption. The still keeps its own light and
+// the copy sits on the film's sampled ground below it, with the boundary
+// feathered so the image dissolves into the text rather than stopping on a
+// line. Same three worlds, both halves legible.
+// =============================================================================
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+  background-color: var(--surface-page);
+  padding-block: var(--section-y);
+}
+
+.divisions__head {
+  display: grid;
+  gap: var(--sp-4);
+  margin-block-end: clamp(2rem, 5vw, 4rem);
+
+  h2 {
+    max-inline-size: 18ch;
+    margin: 0;
+  }
+
+  .u-lead {
+    max-inline-size: 56ch;
+  }
+}
+
+.divisions__triptych {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include bp(lg) {
+    max-inline-size: var(--container-wide);
+    margin-inline: max(var(--gutter), calc((100% - var(--container-wide)) / 2));
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--e-3);
+  }
+
+  @include bp(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include bp(xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.divisions__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--film-ground);
+
+  // A hairline in the film's own light, marking the join between worlds.
+  & + & {
+    border-block-start: 1px solid color-mix(in oklab, var(--film-glow) 30%, transparent);
+
+    @include bp(lg) {
+      border-inline-start: 0;
+    }
+  }
+
+  @include bp(lg) {
+    &:nth-child(even) {
+      border-inline-start: 1px solid color-mix(in oklab, var(--film-glow) 30%, transparent);
+    }
+  }
+
+  @include bp(xl) {
+    &:nth-child(n + 3) {
+      border-block-start: 0;
+    }
+    & + & {
+      border-inline-start: 1px solid color-mix(in oklab, var(--film-glow) 30%, transparent);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FRAME
+// -----------------------------------------------------------------------------
+
+// Every still is 16:9 and every frame is taller than that, so `cover` always
+// trims width and never height. How much it trims is fixed per breakpoint, and
+// that is what these two numbers are: `--crop-seen` is the share of the source
+// width that survives, `--crop-lost` is the share that does not.
+//
+//   16:10 frame → 1.600 / 1.778 = 0.90 seen, 0.10 lost
+//   4:3   frame → 1.333 / 1.778 = 0.75 seen, 0.25 lost
+.divisions__frame {
+  position: relative;
+  overflow: clip;
+  // A band on a phone, a portrait from md up. Stacked full-width, a 16:10
+  // still is a postcard between every caption; 12:5 keeps the subject and
+  // gives back roughly a third of its height.
+  aspect-ratio: 12 / 5;
+  --crop-seen: 42.19%;
+  --crop-lost: 0.5781;
+
+  @include bp(md) {
+    aspect-ratio: 16 / 10;
+    --crop-seen: 90%;
+    --crop-lost: 0.1;
+  }
+
+  @include bp(lg) {
+    aspect-ratio: 4 / 3;
+    --crop-seen: 75%;
+    --crop-lost: 0.25;
+  }
+}
+
+.divisions__still {
+  position: absolute;
+  inset: 0;
+  --cm-ratio: auto;
+  --cm-focus: clamp(
+      0%,
+      calc((var(--subject-x, 50%) - var(--crop-seen) / 2) / var(--crop-lost)),
+      100%
+    )
+    50%;
+
+  inline-size: 100%;
+  block-size: 100%;
+  transform: none;
+  transition: transform var(--d-reveal) var(--ease-out);
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    // Centres each panel's actual subject in whatever is left after the trim,
+    // rather than centring the *frame* and letting the subject fall wherever it
+    // happens to be. Centring the frame is what cut the mayonnaise jar in half:
+    // the burger and the jar sit between 21% and 93% of that still, so their
+    // midpoint is at 57%, not 50%.
+    //
+    // `--subject-x` is the one measured number per film — see SUBJECT_X in
+    // divisions-section.ts. Everything else is the crop arithmetic:
+    // to put the subject in the middle of the visible window, the window has to
+    // start half a window-width before it, expressed as a fraction of the width
+    // that was lost. The clamp handles subjects too close to an edge for that
+    // to be possible, where the best available answer is to sit against it.
+    object-position: clamp(
+        0%,
+        calc((var(--subject-x, 50%) - var(--crop-seen) / 2) / var(--crop-lost)),
+        100%
+      )
+      50%;
+    transform: scale(1.02);
+    transition: transform var(--d-reveal) var(--ease-out);
+  }
+
+  .divisions__panel:hover & img,
+  .divisions__panel:focus-within & img {
+    transform: scale(1.06);
+  }
+
+  @include motion-reduce {
+    img {
+      transition: none;
+    }
+    .divisions__panel:hover & img {
+      transform: scale(1.02);
+    }
+  }
+}
+
+.divisions__panel:hover .divisions__still,
+.divisions__panel:focus-within .divisions__still {
+  @include fine-pointer {
+    transform: scale(1.04);
+  }
+}
+
+@include motion-reduce {
+  .divisions__still {
+    transition: none;
+  }
+
+  .divisions__panel:hover .divisions__still {
+    transform: none;
+  }
+}
+
+/// Feathers the foot of the frame into the caption's ground, so the still ends
+/// by dissolving rather than on a horizontal edge.
+.divisions__grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to top,
+    var(--film-ground) 0%,
+    color-mix(in oklab, var(--film-ground) 35%, transparent) 22%,
+    transparent 46%
+  );
+}
+
+// -----------------------------------------------------------------------------
+// CAPTION
+// -----------------------------------------------------------------------------
+
+.divisions__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(var(--sp-2), 1.5vw, var(--sp-3));
+  flex: 1;
+  padding: clamp(1.125rem, 3vw, 2.25rem);
+  padding-block-start: 0;
+  color: var(--c-ivory-50);
+}
+
+.divisions__num {
+  @include label;
+  color: var(--film-glow);
+}
+
+.divisions__name {
+  @include heading(clamp(1.5rem, 1.15rem + 1.2vw, 2rem));
+  margin: 0;
+}
+
+.divisions__name-link {
+  @include focusable;
+  color: inherit;
+  text-decoration: none;
+
+  // Expands the hit area to the whole panel without wrapping every family link
+  // inside one giant anchor.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+}
+
+.divisions__desc {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--c-dark-secondary);
+  max-inline-size: 34ch;
+}
+
+.divisions__families {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  margin: 0;
+  padding: 0;
+  padding-block-start: var(--sp-1);
+  list-style: none;
+}
+
+.divisions__family {
+  @include focusable;
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  padding-block: 0.15rem;
+  font-size: var(--fs-xs);
+  color: var(--c-dark-secondary);
+  text-decoration: none;
+  transition: color var(--d-fast) var(--ease-out);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--c-ivory-50);
+  }
+
+  @include motion-reduce {
+    transition: none;
+  }
+}
+
+.divisions__count {
+  @include label;
+  margin: 0;
+  margin-block-start: auto;
+  padding-block-start: var(--sp-2);
+  color: var(--c-dark-muted);
+}
+
+// -----------------------------------------------------------------------------
+// LIGHT PANEL — the high-key film inverts the whole type set
+// -----------------------------------------------------------------------------
+
+.divisions__panel.is-light {
+  .divisions__content {
+    color: var(--c-ink-900);
+  }
+  .divisions__desc {
+    color: var(--c-ink-700);
+  }
+  .divisions__family {
+    color: var(--c-ink-700);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--c-ink-900);
+    }
+  }
+  .divisions__count {
+    color: var(--c-ink-500);
+  }
+  .divisions__num {
+    color: var(--c-cat-hygiene);
+  }
+}

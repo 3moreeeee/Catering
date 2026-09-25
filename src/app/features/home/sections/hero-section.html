@@ -1,0 +1,74 @@
+<ng-container *transloco="let t">
+  <section class="hero" aria-labelledby="home-title">
+    <div class="hero__glow" aria-hidden="true"></div>
+
+    <div class="container--wide hero__inner">
+      <div class="hero__content">
+        <p class="hero__eyebrow">{{ t('home.hero.eyebrow') }}</p>
+        <h1 id="home-title" class="hero__title">{{ t('home.hero.title') }}</h1>
+        <p class="hero__lead">{{ t('home.hero.lead') }}</p>
+
+        <div class="hero__actions">
+          <a class="btn btn--primary btn--lg" [routerLink]="to('products')">
+            {{ t('home.hero.primaryCta') }}
+          </a>
+          <a class="btn btn--secondary btn--lg" [routerLink]="to('contact')">
+            {{ t('home.hero.secondaryCta') }}
+          </a>
+        </div>
+
+        <dl class="hero__proof" [attr.aria-label]="t('home.hero.proofLabel')">
+          <div>
+            <dt class="hero__proof-value u-nums">1985</dt>
+            <dd>{{ t('home.statement.foundedLabel') }}</dd>
+          </div>
+          <div>
+            <dt class="hero__proof-value u-nums">{{ referenceCount() }}</dt>
+            <dd>{{ t('home.statement.referencesLabel') }}</dd>
+          </div>
+          <div>
+            <dt class="hero__proof-value u-nums">{{ categories().length }}</dt>
+            <dd>{{ t('home.statement.divisionsLabel') }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="hero__visual">
+        <div class="hero__image-wrap">
+          <fk-cinematic-media
+            class="hero__image"
+            slug="hero-products"
+            [alt]="t('home.hero.mediaAlt')"
+            [priority]="true"
+            [once]="true"
+            [mediaWidth]="1280"
+            [mediaHeight]="720"
+          />
+          <div class="hero__image-shade" aria-hidden="true"></div>
+        </div>
+
+        <div class="hero__availability">
+          <span class="hero__availability-dot" aria-hidden="true"></span>
+          <span>
+            <strong>{{ t('home.hero.professionalBadge') }}</strong>
+            <small>{{ t('home.hero.coverage') }}</small>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="container--wide hero__categories" [attr.aria-label]="t('home.hero.divisionsLabel')">
+      @for (category of categories(); track category.id; let i = $index) {
+        <a
+          class="hero__category"
+          [routerLink]="to('products/' + category.slug)"
+          [style.--cat-accent]="category.accent"
+        >
+          <span class="hero__category-num u-nums">0{{ i + 1 }}</span>
+          <span class="hero__category-name">{{ category.name | localized }}</span>
+          <span class="hero__category-arrow" aria-hidden="true">→</span>
+        </a>
+      }
+    </nav>
+  </section>
+</ng-container>

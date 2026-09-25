@@ -1,0 +1,846 @@
+{
+  "meta": {
+    "siteName": "Société Ferid Khemakhem",
+    "tagline": "Professional products. Trusted partnerships.",
+    "defaultDescription": "Importer and distributor of food, packaging and hygiene products for professionals across Tunisia. Established 1985."
+  },
+  "nav": {
+    "home": "Home",
+    "company": "Company",
+    "products": "Products",
+    "brands": "Brands",
+    "industries": "Industries",
+    "contact": "Contact",
+    "skipToContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "openSearch": "Open search",
+    "mainNavigation": "Main navigation",
+    "footerNavigation": "Footer navigation",
+    "breadcrumb": "Breadcrumb",
+    "backToTop": "Back to top",
+    "cta": "Contact us",
+    "login": "Sign in",
+    "account": "My account",
+    "adminUsers": "User management",
+    "megaMenuHint": "Four product universes, {{count}} references",
+    "cart": "Basket",
+    "cartCount": "Basket ({{count}})",
+    "adminDashboard": "Dashboard"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "fr": "Français",
+    "switchTo": "Switch to {{language}}"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Since 1985",
+      "title": "Professional solutions for foodservice and industry.",
+      "lead": "Importer and distributor of food, MONIN beverage, packaging and hygiene solutions for professionals across Tunisia.",
+      "primaryCta": "Explore our solutions",
+      "secondaryCta": "Request a professional quote",
+      "scrollHint": "Scroll to discover",
+      "sceneAlt": "Abstract composition of three forms representing the company's food, packaging and hygiene divisions.",
+      "divisionsLabel": "Our four product universes",
+      "mediaAlt": "An animated selection of professional products from the Catering catalogue.",
+      "professionalBadge": "Professional supply",
+      "coverage": "Serving businesses across Tunisia",
+      "proofLabel": "Company facts"
+    },
+    "showcase": {
+      "eyebrow": "Everything your operation needs",
+      "title": "Four expert universes. One trusted supplier.",
+      "lead": "Move directly from the products you need to the right formats, availability and professional offer."
+    },
+    "benefits": {
+      "eyebrow": "Why work with us",
+      "title": "Built around professional purchasing.",
+      "lead": "A practical partner for the products your team uses every day.",
+      "items": {
+        "range": {
+          "title": "One multi-category range",
+          "body": "Food, beverages, packaging and hygiene products sourced through one professional contact."
+        },
+        "formats": {
+          "title": "Formats made for service",
+          "body": "Professional pack sizes selected for restaurants, hotels, retail and industrial operations."
+        },
+        "advice": {
+          "title": "Human product guidance",
+          "body": "Tell us your use case and our team will help identify the relevant range, format and alternative."
+        },
+        "distribution": {
+          "title": "Local commercial follow-up",
+          "body": "A Tunisia-based team for availability, quotations and the practical details of your order."
+        }
+      }
+    },
+    "featured": {
+      "eyebrow": "Selected references",
+      "title": "From our catalogue.",
+      "viewAll": "View all {{count}} references",
+      "tabsLabel": "Filter featured products by division"
+    },
+    "offers": {
+      "eyebrow": "Promotional prices",
+      "title": "Our current offers.",
+      "lead": "See live promotions and offers that are coming soon.",
+      "live": "Offer live",
+      "scheduled": "Coming soon",
+      "starts": "Starts {{date}}",
+      "ends": "Ends {{date}}",
+      "viewProduct": "View product",
+      "previous": "Previous offers",
+      "next": "Next offers"
+    },
+    "industries": {
+      "eyebrow": "Who we supply",
+      "title": "Built for professional buyers.",
+      "lead": "Our clients operate across food service, retail, healthcare and industry. Each has different requirements — and draws on different parts of our range.",
+      "learnMore": "How we support this sector",
+      "allSectors": "See all sectors"
+    },
+    "brands": {
+      "eyebrow": "Brands we represent",
+      "title": "International sourcing.",
+      "lead": "We represent selected international manufacturers in Tunisia.",
+      "viewAll": "View all brands",
+      "marqueeLabel": "Partner brands"
+    },
+    "contact": {
+      "eyebrow": "Professional quote request",
+      "title": "Tell us what your operation needs.",
+      "lead": "Tell us what you need and we will come back to you with availability, formats and pricing."
+    },
+    "chapters": {
+      "food": {
+        "eyebrow": "Food & beverage",
+        "title": "Sauces that hold up to the heat.",
+        "body": "Ketchup, barbecue sauces and condiments in professional formats. Selected to stay consistent from the first cover of a service to the last.",
+        "ctaLabel": "See the food range",
+        "mediaAlt": "A gourmet burger beside a professional-format jar of mayonnaise."
+      },
+      "monin": {
+        "eyebrow": "Beverage",
+        "title": "A drinks menu that holds all year.",
+        "body": "MONIN syrups, frappé bases and bar ingredients. Enough to build a menu your team executes the same way at every service.",
+        "ctaLabel": "See syrups & beverage bases",
+        "mediaAlt": "MONIN syrup poured into an iced glass with lime and mint."
+      },
+      "packaging": {
+        "eyebrow": "Packaging",
+        "title": "Your product deserves its presentation.",
+        "body": "Verrines, cups, trays and polycarbonate glassware. Packaging decides what the customer sees before they taste anything.",
+        "ctaLabel": "See the packaging range",
+        "mediaAlt": "A layered dessert served in a clear verrine on dark stone."
+      },
+      "hygiene": {
+        "eyebrow": "Hygiene",
+        "title": "The protocol starts before service.",
+        "body": "Coats, hair nets, masks, gloves and overshoes. The disposable range a professional kitchen goes through every day.",
+        "ctaLabel": "See the hygiene range",
+        "mediaAlt": "A translucent disposable professional coat hanging in clean light."
+      }
+    },
+    "seams": {
+      "maison": "The company",
+      "divisions": "The divisions",
+      "cuisine": "In the kitchen",
+      "catalogue": "The catalogue",
+      "metiers": "By trade",
+      "partners": "Our partners",
+      "enquiry": "Your enquiry"
+    },
+    "statement": {
+      "thesis": "We do not manufacture. We select.",
+      "body": "Since 1985, Société Ferid Khemakhem has imported and distributed the food, packaging and hygiene supplies that Tunisia's professional kitchens run on. Our trade is the choice itself: finding, checking and carrying the products a kitchen can rely on.",
+      "founded": "1985",
+      "foundedLabel": "Founded",
+      "divisionsLabel": "Divisions",
+      "referencesLabel": "Catalogue references"
+    },
+    "divisions": {
+      "referenceCount": "{{count}} references"
+    },
+    "sectors": {
+      "title": "Tell us what you run. We know what it consumes.",
+      "listLabel": "Choose a professional sector",
+      "draws": "Draws on our divisions"
+    }
+  },
+  "about": {
+    "title": "Our company",
+    "lead": "Société Ferid Khemakhem has imported and distributed for Tunisian professionals since 1985.",
+    "presidentTitle": "Message from the President",
+    "presidentRole": "President, Société Ferid Khemakhem",
+    "timelineTitle": "Our history",
+    "missionTitle": "What we do",
+    "valuesTitle": "How we work",
+    "divisionsTitle": "Our product families",
+    "sourcingTitle": "International sourcing",
+    "sourcingBody": "We select suppliers whose products meet European and international standards, and broaden our range by following how the market moves.",
+    "qualityTitle": "Quality commitment",
+    "teamTitle": "Leadership",
+    "teamPlaceholder": "Leadership and team details are to be supplied by the company.",
+    "ctaTitle": "Work with us",
+    "ctaLead": "Tell us about your requirements and we will match them to our range.",
+    "milestonePending": "Further milestones to be supplied by the company."
+  },
+  "catalog": {
+    "title": "Products",
+    "lead": "{{count}} references across food, packaging and hygiene.",
+    "searchLabel": "Search products",
+    "searchPlaceholder": "Search by name, format or brand…",
+    "filters": "Filters",
+    "openFilters": "Open filters",
+    "closeFilters": "Close filters",
+    "applyFilters": "Show {{count}} results",
+    "clearAll": "Clear all filters",
+    "clearFilter": "Remove filter: {{label}}",
+    "activeFilters": "Active filters",
+    "resultCount": "{{count}} products",
+    "resultCountOne": "1 product",
+    "resultCountFiltered": "{{count}} of {{total}} products",
+    "sortLabel": "Sort by",
+    "sort": {
+      "relevance": "Most relevant",
+      "name-asc": "Name (A–Z)",
+      "name-desc": "Name (Z–A)",
+      "category": "Division"
+    },
+    "viewLabel": "View",
+    "viewGrid": "Grid view",
+    "viewList": "List view",
+    "loadMore": "Load more products",
+    "showingOf": "Showing {{shown}} of {{total}}",
+    "facet": {
+      "categories": "Division",
+      "subcategories": "Product family",
+      "brands": "Brand",
+      "industries": "Industry",
+      "sizes": "Format"
+    },
+    "empty": {
+      "title": "No products match those filters.",
+      "body": "Try removing a filter, or search for a different term.",
+      "action": "Clear all filters"
+    },
+    "error": {
+      "title": "We could not load the catalogue.",
+      "body": "Something went wrong on our side. Please try again.",
+      "action": "Try again"
+    },
+    "loading": "Loading products…"
+  },
+  "product": {
+    "brand": "Brand",
+    "category": "Division",
+    "family": "Product family",
+    "formats": "Available formats",
+    "formatsPending": "Formats to be confirmed — contact us for pack sizes.",
+    "description": "Description",
+    "technical": "Technical information",
+    "technicalPending": "Full technical specifications are available from our sales team on request.",
+    "useCases": "Typical uses",
+    "industries": "Relevant industries",
+    "datasheet": "Technical data sheet",
+    "datasheetPending": "Data sheet not yet available",
+    "related": "Related products",
+    "requestInfo": "Request information",
+    "requestInfoAbout": "Request information about {{name}}",
+    "quickView": "Quick view",
+    "quickViewOf": "Quick view: {{name}}",
+    "share": "Share",
+    "shareCopied": "Link copied",
+    "previous": "Previous product",
+    "next": "Next product",
+    "zoomHint": "Click the image to enlarge",
+    "verificationNote": "Some details of this reference are pending confirmation by our team.",
+    "noPriceNote": "Prices are quoted on request. Contact us with your volumes.",
+    "addToCart": "Add to basket",
+    "offer": "Offer",
+    "adding": "Adding…",
+    "added": "Added to basket",
+    "viewCart": "View basket",
+    "signInToOrder": "Sign in to order",
+    "addToCartAbout": "Add {{name}} to basket",
+    "addFailed": "Failed, try again",
+    "subtotal": "Subtotal for {{quantity}} units: {{price}}"
+  },
+  "brands": {
+    "title": "Brands",
+    "lead": "We represent selected international manufacturers in Tunisia.",
+    "searchLabel": "Search brands",
+    "searchPlaceholder": "Search brands…",
+    "filterLabel": "Filter by division",
+    "all": "All divisions",
+    "viewProducts": "View products",
+    "productCount": "{{count}} references",
+    "website": "Visit website",
+    "origin": "Origin",
+    "empty": "No brands match that search.",
+    "incompleteNote": "This directory lists the partners published by the company. Additional brand relationships are to be confirmed."
+  },
+  "industries": {
+    "title": "Industries we serve",
+    "lead": "Different sectors draw on different parts of our range. Here is how we support each.",
+    "howWeSupport": "How we support this sector",
+    "relevantProducts": "Relevant product families",
+    "viewProducts": "View products for this sector",
+    "verifiedNote": "Sector named by the company.",
+    "unverifiedNote": "Sector coverage to be confirmed by the company."
+  },
+  "contact": {
+    "title": "Contact us",
+    "lead": "Tell us what you need. We will respond with availability, formats and pricing.",
+    "detailsTitle": "Our details",
+    "address": "Address",
+    "telephone": "Telephone",
+    "fax": "Fax",
+    "email": "Email",
+    "hours": "Business hours",
+    "hoursPending": "Business hours to be confirmed",
+    "mapTitle": "Find us",
+    "mapPlaceholder": "Map based on the postal address published by the company.",
+    "viewOnMap": "View on Google Maps",
+    "loadMap": "Show the interactive map",
+    "mapConsent": "The map is provided by Google and is loaded only when you ask for it.",
+    "formTitle": "Send us a message",
+    "form": {
+      "name": "Full name",
+      "company": "Company",
+      "email": "Professional email",
+      "phone": "Telephone",
+      "jobTitle": "Job title",
+      "industry": "Your industry",
+      "category": "Product category of interest",
+      "department": "Department",
+      "subject": "Subject",
+      "message": "Message",
+      "consent": "I agree that my details may be used to respond to this enquiry.",
+      "consentDetail": "We will not share your details with third parties. See our privacy policy.",
+      "submit": "Send enquiry",
+      "submitting": "Sending…",
+      "optional": "optional",
+      "required": "required",
+      "selectPlaceholder": "Please choose…",
+      "productContext": "Enquiry about: {{name}}",
+      "removeProductContext": "Remove product from this enquiry"
+    },
+    "department": {
+      "sales": "Sales",
+      "logistics": "Logistics & deliveries",
+      "accounts": "Accounts",
+      "general": "General enquiry"
+    },
+    "validation": {
+      "required": "{{field}} is required.",
+      "email": "Enter a valid email address, for example name@company.tn.",
+      "minlength": "{{field}} must be at least {{min}} characters.",
+      "maxlength": "{{field}} must be no more than {{max}} characters.",
+      "phone": "Enter a valid telephone number.",
+      "consent": "Please confirm you agree before sending.",
+      "summaryTitle": "There is a problem with this form",
+      "summaryIntro": "Please correct the following:"
+    },
+    "success": {
+      "title": "Thank you — your enquiry has been sent.",
+      "body": "A member of our team will be in touch. Your reference is {{reference}}.",
+      "again": "Send another enquiry"
+    },
+    "failure": {
+      "title": "Your message could not be sent.",
+      "body": "Please try again, or contact us directly by telephone or email. Your entries have been kept.",
+      "retry": "Try again"
+    },
+    "errorUnavailable": "We cannot send your enquiry right now. Your message is kept below — try again in a moment, or call us on +216 71 557 548."
+  },
+  "search": {
+    "title": "Search",
+    "open": "Open search",
+    "close": "Close search",
+    "label": "Search the site",
+    "placeholder": "Search products, brands, industries…",
+    "hint": "Press / to search",
+    "recent": "Recent searches",
+    "clearRecent": "Clear recent searches",
+    "groups": {
+      "products": "Products",
+      "categories": "Categories",
+      "brands": "Brands",
+      "industries": "Industries",
+      "pages": "Pages"
+    },
+    "resultsAnnounce": "{{count}} results for {{query}}",
+    "noResultsAnnounce": "No results for {{query}}",
+    "empty": {
+      "title": "No results found.",
+      "body": "Check your spelling, or try a broader term such as “gloves” or “verrine”."
+    },
+    "initial": {
+      "title": "What are you looking for?",
+      "body": "Search across {{count}} product references, brands and industries."
+    },
+    "viewAll": "View all results for “{{query}}”",
+    "keyboardHint": "Use arrow keys to navigate, Enter to select, Escape to close.",
+    "headerPlaceholder": "Search products…"
+  },
+  "assistant": {
+    "eyebrow": "Catalogue assistant",
+    "title": "How can we help?",
+    "name": "Catering assistant",
+    "you": "You",
+    "open": "Open the assistant",
+    "close": "Close the assistant",
+    "launcher": "Need help?",
+    "welcome": "Hello! I know the Catering catalogue, brands, and solutions. Write in English, French, Tunisian, or your preferred language.",
+    "suggestionsLabel": "Suggested questions",
+    "suggestionProducts": "What products do you offer?",
+    "suggestionQuote": "How can I request a quote?",
+    "suggestionTunisian": "3andkom produits lel restaurants?",
+    "inputLabel": "Your question",
+    "placeholder": "Ask your question…",
+    "send": "Send question",
+    "thinking": "The assistant is preparing a response",
+    "error": "I can’t answer right now. Please try again or contact us directly.",
+    "rateLimited": "You’ve sent many messages. Please wait a few minutes before trying again.",
+    "disclaimer": "Availability, prices, and specifications are confirmed by our sales team."
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "lead": "Stay informed. Product news and range updates by email.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "name@company.tn",
+    "submit": "Subscribe",
+    "consent": "I agree to receive emails and can unsubscribe at any time.",
+    "success": "Thank you — please check your inbox to confirm.",
+    "error": "We could not complete your subscription. Please try again."
+  },
+  "footer": {
+    "description": "Importer and distributor of food, packaging and hygiene products for Tunisian professionals since 1985.",
+    "productsTitle": "Products",
+    "companyTitle": "Company",
+    "contactTitle": "Contact",
+    "allProducts": "All products",
+    "privacy": "Privacy policy",
+    "terms": "Terms & legal notice",
+    "copyright": "© {{year}} Société Ferid Khemakhem. All rights reserved.",
+    "legalPending": "Company registration details to be supplied.",
+    "followUs": "Follow us"
+  },
+  "sticky": {
+    "call": "Call",
+    "email": "Email",
+    "enquire": "Enquire"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "We could not find that page.",
+    "lead": "The page may have moved, or the address may be mistyped.",
+    "home": "Go to the homepage",
+    "products": "Browse products",
+    "search": "Search the site"
+  },
+  "error": {
+    "title": "Something went wrong.",
+    "body": "We could not load this content. Please try again.",
+    "retry": "Try again"
+  },
+  "auth": {
+    "secureArea": "Secure customer area",
+    "login": {
+      "title": "Welcome back.",
+      "lead": "Sign in to manage your professional account.",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "No account yet?",
+      "link": "Sign in"
+    },
+    "register": {
+      "title": "Create your professional account.",
+      "lead": "Choose the profile that matches how you do business.",
+      "submit": "Create my account",
+      "submitting": "Creating account…",
+      "hasAccount": "Already registered?",
+      "link": "Create an account",
+      "consent": "I confirm that the information supplied is accurate and accept the privacy policy."
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "clientType": "Customer type",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "companyName": "Company name",
+      "taxIdentifier": "Tax identifier",
+      "phone": "Phone"
+    },
+    "types": {
+      "physique": "Individual",
+      "physiqueHint": "A professional buying in their own name",
+      "morale": "Company",
+      "moraleHint": "A registered company or organisation"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "client": "Customer"
+    },
+    "validation": {
+      "email": "Enter a valid email address.",
+      "required": "This field is required.",
+      "passwordHint": "At least 10 characters."
+    },
+    "errors": {
+      "invalid_credentials": "Incorrect email or password.",
+      "email_exists": "An account already uses this email.",
+      "offline": "The account service is unavailable. Check that the Spring server is running.",
+      "unknown": "An unexpected error occurred.",
+      "password_mismatch": "The passwords do not match.",
+      "wrong_password": "The current password is incorrect.",
+      "password_unchanged": "Choose a password different from the current one.",
+      "cannot_demote_self": "You cannot remove your own administrator access.",
+      "cannot_delete_self": "You cannot delete your own administrator account here.",
+      "last_admin": "The last active administrator cannot be disabled or deleted.",
+      "admin_self_delete_forbidden": "Administrator accounts cannot be self-deleted.",
+      "client_type_required": "Choose a customer type.",
+      "first_name_required": "First name is required.",
+      "last_name_required": "Last name is required.",
+      "company_name_required": "Company name is required.",
+      "tax_identifier_required": "Tax identifier is required.",
+      "forbidden": "You do not have permission to perform this action.",
+      "unauthorized": "Your session has expired. Sign in again.",
+      "validation_failed": "Check the highlighted information."
+    }
+  },
+  "account": {
+    "eyebrow": "Your workspace",
+    "lead": "Manage your identity and account security.",
+    "profileTitle": "Professional profile",
+    "saved": "Your changes have been saved.",
+    "saving": "Saving…",
+    "save": "Save changes",
+    "adminTitle": "Administration account",
+    "adminLead": "Your account can manage platform users and access.",
+    "manageUsers": "Manage users",
+    "passwordTitle": "Security",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "passwordChanged": "Your password has been changed.",
+    "changePassword": "Change password",
+    "summaryTitle": "Account summary",
+    "role": "Role",
+    "logout": "Sign out",
+    "deleteTitle": "Delete account",
+    "deleteLead": "This permanently deletes your customer profile and cannot be undone.",
+    "deleteAction": "Delete my account",
+    "deleteConfirm": "Permanently delete your account? This cannot be undone.",
+    "tabs": {
+      "profile": "Details",
+      "security": "Security"
+    },
+    "profileLead": "These details appear on your orders and quote requests.",
+    "typeHint": "Determines which details identify you.",
+    "identityLabel": "Identity",
+    "identityHint": "The name shown on your orders and quotes.",
+    "contactLabel": "Contact details",
+    "contactHint": "So we can reach you about your requests.",
+    "passwordLead": "Change the password you use to sign in.",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 10 characters. Pick a password you do not use elsewhere.",
+    "memberSince": "Customer since {{date}}",
+    "cartCta": "My basket"
+  },
+  "admin": {
+    "eyebrow": "Administration",
+    "title": "User management",
+    "lead": "Create and maintain administrator and customer access from one controlled workspace.",
+    "search": "Search users",
+    "searchPlaceholder": "Name, company or email",
+    "searchAction": "Search",
+    "create": "Add user",
+    "back": "My account",
+    "editTitle": "Edit user",
+    "createTitle": "Create user",
+    "role": "Role",
+    "enabled": "Account enabled",
+    "saving": "Saving…",
+    "save": "Save user",
+    "empty": "No users match this search.",
+    "person": "User",
+    "type": "Type",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "disabled": "Disabled",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete {{name}} permanently?",
+    "success": {
+      "created": "User created.",
+      "updated": "User updated.",
+      "deleted": "User deleted."
+    }
+  },
+  "legal": {
+    "privacyTitle": "Privacy policy",
+    "termsTitle": "Terms & legal notice",
+    "lastUpdated": "Last updated",
+    "placeholderNotice": "This document is a placeholder. Final wording must be supplied and reviewed by the company against Tunisian law nº 2004-63 on personal data protection before launch."
+  },
+  "common": {
+    "loading": "Loading…",
+    "close": "Close",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page",
+    "pageOf": "Page {{current}} of {{total}}",
+    "pagination": "Pagination",
+    "readMore": "Read more",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "verificationPending": "Pending verification",
+    "placeholder": "To be supplied"
+  },
+  "cart": {
+    "eyebrow": "Professional request",
+    "title": "My basket",
+    "lead": "Gather the references you are interested in, then send them to our sales team as a quote request.",
+    "signInTitle": "Sign in to build your basket",
+    "signInLead": "The basket belongs to your professional account, so your quote request reaches us with your contact details.",
+    "emptyTitle": "Your basket is empty",
+    "emptyLead": "Browse the catalogue and add the references you would like an offer on.",
+    "browseCatalog": "Browse the catalogue",
+    "backToCatalog": "Back to the catalogue",
+    "linesTitle": "Selected references ({{count}})",
+    "reference": "Ref. {{reference}}",
+    "unitPrice": "Unit price: {{price}}",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "clear": "Empty the basket",
+    "total": "Estimated total",
+    "partialTotal": "Some references have no published price: the total above is partial and will be completed in our offer.",
+    "priceOnRequest": "Price on request",
+    "requestTitle": "Request an offer",
+    "requestLead": "Adjust your contact details if needed; we use the ones on your account by default.",
+    "noPaymentNote": "No payment is taken on this site: your request goes to our sales team, who reply with a priced offer.",
+    "submit": "Send the quote request",
+    "submitting": "Sending…",
+    "submittedTitle": "Request sent",
+    "submittedLead": "Your request has the reference {{reference}}. Our sales team will come back to you with an offer.",
+    "submittedPartial": "Some requested references have no published price: they will be quoted in our reply.",
+    "errorGeneric": "The action did not complete. Please try again.",
+    "errorSubmit": "Sending the request failed. Please try again.",
+    "fields": {
+      "contactName": "Contact name",
+      "companyName": "Company",
+      "contactPhone": "Phone",
+      "deliveryCity": "Delivery city",
+      "message": "Details (lead times, quantities, packaging…)"
+    },
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "removeAbout": "Remove {{name}} from the basket",
+    "summaryTitle": "Summary",
+    "units": "Units",
+    "back": "Back to the summary",
+    "order": {
+      "cta": "Buy",
+      "title": "Complete your order",
+      "lead": "Check your delivery details; we use the ones on your account by default.",
+      "message": "Delivery address and instructions",
+      "noPaymentNote": "No online payment: our team contacts you to confirm the order, delivery and settlement.",
+      "submit": "Confirm order · {{total}}",
+      "unpriced": "Some references have no published price: request a quote to order them.",
+      "submittedTitle": "Order sent",
+      "submittedLead": "Your order has the reference {{reference}}. Our team will contact you to confirm delivery and settlement.",
+      "errors": {
+        "order_unpriced": "Some references have no published price: request a quote for this basket.",
+        "order_contact_required": "Enter a phone number and a delivery city to order."
+      }
+    },
+    "bulk": {
+      "title": "Buying in large quantities?",
+      "lead": "For large volumes, ask our sales team for a tailored offer.",
+      "cta": "Request a quote"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "Hello {{name}}. Manage the catalogue, quote requests and accounts.",
+    "navigation": "Administration sections",
+    "loadError": "The data could not be loaded. Check that the API is running, then try again.",
+    "recentQuotes": "Latest quote requests",
+    "seeAll": "See all",
+    "viewSite": "View website",
+    "pipeline": {
+      "eyebrow": "Sales activity",
+      "title": "Request pipeline"
+    },
+    "charts": {
+      "activity": "Quote requests",
+      "activityHint": "Last 30 days",
+      "activityEmpty": "No requests received in the last 30 days.",
+      "activityAria": "{{count}} quote requests across {{days}} days",
+      "catalogue": "Catalogue by division",
+      "catalogueHint": "{{count}} products online across {{divisions}} divisions",
+      "division": "Division",
+      "products": "Products",
+      "day": "Day",
+      "requests": "Requests",
+      "others": "{{count}} other divisions",
+      "showTable": "Show the data"
+    },
+    "quick": {
+      "eyebrow": "Shortcuts",
+      "title": "Quick actions",
+      "productHint": "Create a catalogue reference",
+      "offerHint": "Schedule a promotion",
+      "userHint": "Add an account"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "products": "Products",
+      "offers": "Offers",
+      "quotes": "Quote requests",
+      "users": "Users"
+    },
+    "stats": {
+      "newQuotes": "New requests",
+      "inReview": "{{count}} in progress",
+      "products": "Products online",
+      "inactive": "{{count}} deactivated",
+      "unpriced": "Products without a price",
+      "priced": "{{count}} priced products",
+      "clients": "Clients",
+      "admins": "{{count}} administrators",
+      "offers": "Product offers",
+      "manageOffers": "Create and schedule promotions"
+    },
+    "quoteStatus": {
+      "SUBMITTED": "New",
+      "IN_REVIEW": "In progress",
+      "ANSWERED": "Offer sent",
+      "CLOSED": "Closed"
+    },
+    "quotes": {
+      "reference": "Reference",
+      "client": "Client",
+      "date": "Date",
+      "total": "Total",
+      "unitPrice": "Unit price",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "empty": "No quote requests yet.",
+      "note": "Internal note",
+      "partial": "Some lines had no published price: the total is partial."
+    },
+    "products": {
+      "create": "Add a product",
+      "createTitle": "New product",
+      "editTitle": "Edit product",
+      "search": "Search products",
+      "searchPlaceholder": "Name, reference or slug",
+      "allCategories": "All divisions",
+      "allStatuses": "All statuses",
+      "allPrices": "With or without a price",
+      "pricedYes": "Priced",
+      "pricedNo": "Not priced",
+      "statusActive": "Online",
+      "statusInactive": "Deactivated",
+      "product": "Product",
+      "searchProduct": "Find the product to promote",
+      "count": "{{count}} products",
+      "empty": "No product matches these filters.",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "deactivateConfirm": "Remove “{{name}}” from the catalogue? It stays visible here and can be reactivated.",
+      "priceOf": "Price of {{name}}",
+      "priceSaved": "Saved",
+      "choose": "Choose…",
+      "success": {
+        "created": "Product created.",
+        "updated": "Product updated.",
+        "deactivated": "Product removed from the catalogue.",
+        "reactivated": "Product back online."
+      },
+      "fields": {
+        "nameFr": "Name (French)",
+        "nameEn": "Name (English)",
+        "sourceId": "Internal reference",
+        "sourceIdHint": "Automatically generated from the product name.",
+        "slug": "Slug (page address)",
+        "slugHint": "Page address automatically generated from the name.",
+        "category": "Division",
+        "subcategory": "Family",
+        "brand": "Brand",
+        "reference": "Supplier reference",
+        "price": "Price (TND)",
+        "priceHint": "Leave empty to show “Price on request”.",
+        "stock": "Stock",
+        "shortFr": "Short description (French)",
+        "shortEn": "Short description (English)",
+        "image": "Main image",
+        "imageAlt": "Image alternative text",
+        "imageHint": "JPEG, PNG, WebP, GIF or AVIF — 10 MB maximum. The image will be uploaded to ImageKit.",
+        "imageUploading": "Uploading image to ImageKit…",
+        "featured": "Feature on the site"
+      },
+      "validation": {
+        "required": "“{{field}}” is required.",
+        "slug": "The slug may contain only lowercase letters, digits and hyphens (e.g. jumbo-kitchen-roll).",
+        "price": "The price must be a number with at most three decimals (e.g. 12.500).",
+        "stock": "The stock must be a whole number.",
+        "maxlength": "“{{field}}” cannot exceed {{max}} characters.",
+        "summary": "Correct the {{count}} highlighted fields before saving.",
+        "summaryOne": "Correct the highlighted field before saving."
+      }
+    },
+    "offers": {
+      "create": "Create a product offer",
+      "lead": "Choose a product with a regular price, then set its promotional price and validity period.",
+      "product": "Product",
+      "normalPrice": "Regular price",
+      "offerPrice": "Offer price",
+      "discount": "Discount",
+      "startsAt": "Offer starts",
+      "endsAt": "Offer ends",
+      "active": "Publish this offer",
+      "list": "Configured offers",
+      "period": "Period",
+      "live": "Live",
+      "inactive": "Inactive or scheduled",
+      "status": {
+        "ACTIVE": "Live",
+        "SCHEDULED": "Scheduled",
+        "EXPIRED": "Ended",
+        "INACTIVE": "Inactive"
+      },
+      "empty": "No offer has been configured.",
+      "saved": "The offer was saved and will automatically apply to the catalogue and basket."
+    },
+    "errors": {
+      "unknown": "The action did not complete.",
+      "invalid_price": "The price must be a positive number with at most three decimals.",
+      "offer_requires_price": "Add a regular product price first.",
+      "offer_price_not_lower": "The offer price must be lower than the regular price.",
+      "offer_dates_invalid": "The end date must be later than the start date.",
+      "product_slug_exists": "Another product already uses this slug.",
+      "product_source_id_exists": "Another product already uses this internal reference.",
+      "product_not_found": "This product no longer exists.",
+      "validation_failed": "Some fields are invalid.",
+      "image_invalid": "Choose a JPEG, PNG, WebP, GIF or AVIF image under 10 MB.",
+      "image_upload_failed": "The image could not be uploaded to ImageKit. Please try again.",
+      "forbidden": "Administrators only.",
+      "unauthorized": "Your session has expired. Sign in again."
+    },
+    "quoteKind": {
+      "ORDER": "Order",
+      "QUOTE": "Quote"
+    }
+  }
+}

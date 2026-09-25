@@ -1,0 +1,222 @@
+// =============================================================================
+// FORM CONTROLS
+// Labels are always real <label> elements. Placeholders are never the only
+// label — that was an explicit accessibility requirement.
+// =============================================================================
+@use '../abstracts/mixins' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.field__label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+}
+
+.field__required {
+  color: var(--c-error);
+  margin-left: 2px;
+}
+
+.field__hint {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--c-error);
+}
+
+.control {
+  inline-size: 100%;
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-sm);
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  transition:
+    border-color var(--d-fast) var(--ease-out),
+    background-color var(--d-fast) var(--ease-out),
+    box-shadow var(--d-fast) var(--ease-out);
+
+  &::placeholder {
+    color: var(--text-disabled);
+  }
+
+  &:hover:not(:disabled):not([readonly]) {
+    border-color: var(--border-strong);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-forest-600);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--c-forest-500) 12%, transparent);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    background-color: var(--surface-inset);
+    color: var(--text-disabled);
+    cursor: not-allowed;
+  }
+
+  // Driven by [attr.aria-invalid], never by a CSS-only :invalid selector —
+  // :invalid fires before the user has finished typing.
+  &[aria-invalid='true'] {
+    border-color: var(--c-error);
+
+    &:focus-visible {
+      outline-color: var(--c-error);
+    }
+  }
+}
+
+textarea.control {
+  min-height: 8rem;
+  resize: vertical;
+  line-height: var(--lh-body);
+}
+
+select.control {
+  appearance: none;
+  padding-right: var(--sp-10);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23626970' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sp-4) center;
+  cursor: pointer;
+}
+
+// --- Checkbox ---------------------------------------------------------------
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  cursor: pointer;
+  min-height: var(--tap-min);
+  padding-block: var(--sp-2);
+
+  input[type='checkbox'] {
+    flex: none;
+    inline-size: 20px;
+    block-size: 20px;
+    margin: 2px 0 0;
+    accent-color: var(--c-forest-600);
+    cursor: pointer;
+
+    @include focusable;
+  }
+}
+
+.checkbox__text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--text-secondary);
+}
+
+// --- Chip / active filter token --------------------------------------------
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-pill);
+  background-color: var(--surface-card);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition:
+    border-color var(--d-fast) var(--ease-out),
+    background-color var(--d-fast) var(--ease-out);
+
+  @include focusable;
+  @include tap-target;
+
+  &:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+}
+
+.chip--active,
+.chip[aria-pressed='true'] {
+  background-color: var(--c-forest-600);
+  border-color: var(--c-forest-600);
+  color: var(--c-ivory-50);
+
+  &:hover {
+    background-color: var(--c-forest-500);
+    border-color: var(--c-forest-500);
+    color: var(--c-ivory-50);
+  }
+}
+
+.chip__remove {
+  display: grid;
+  place-items: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// --- Skeleton ---------------------------------------------------------------
+
+.skeleton {
+  background-color: var(--surface-inset);
+  border-radius: var(--r-sm);
+  position: relative;
+  overflow: hidden;
+
+  @include motion-safe {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.6), transparent);
+      transform: translateX(-100%);
+      animation: skeleton-sweep 1.4s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+// Category identity only on explicitly categorized controls.
+@each $category in food, monin, packaging, hygiene, horeca {
+  [data-category='#{$category}'] {
+    --category-accent: var(--c-cat-#{$category});
+    &.chip--active {
+      color: var(--c-white);
+      background-color: var(--category-accent);
+      border-color: var(--category-accent);
+    }
+    input[type='checkbox'] { accent-color: var(--category-accent); }
+  }
+}

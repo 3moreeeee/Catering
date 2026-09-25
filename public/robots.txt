@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Filtered catalogue permutations are canonicalised to the unfiltered list;
+# keep them out of the index.
+Disallow: /*?q=
+Disallow: /*?sub=
+Disallow: /*?brand=
+Disallow: /*?industry=
+Disallow: /*?size=
+Disallow: /*?page=
+
+Sitemap: https://www.catering.com.tn/sitemap.xml

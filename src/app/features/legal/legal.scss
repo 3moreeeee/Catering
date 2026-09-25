@@ -1,0 +1,21 @@
+.legal {
+  padding-block: var(--sp-12) var(--sp-20);
+
+  h1 {
+    margin: 0 0 var(--sp-6);
+  }
+
+  address {
+    font-style: normal;
+  }
+}
+
+.legal__notice {
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-8);
+  border: 1px dashed var(--c-warning);
+  border-radius: var(--r-xs);
+  background-color: rgb(var(--c-dark-rgb) / 0.05);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}

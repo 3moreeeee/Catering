@@ -1,0 +1,166 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: contents;
+
+  @include bp(lg) {
+    display: none;
+  }
+}
+
+/// Sits under the sheet and closes it when pressed. On a phone the sheet
+/// covers it entirely, so it costs nothing there.
+.mnav__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-drawer) - 1);
+  background-color: rgb(var(--c-dark-rgb) / 0.42);
+
+  @include motion-safe {
+    animation: mnav-fade var(--d-base) var(--ease-out);
+  }
+}
+
+.mnav__panel {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-ivory-50);
+  // svh, not vh — avoids the iOS toolbar jump.
+  block-size: 100svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  @include motion-safe {
+    animation: mnav-in var(--d-base) var(--ease-out);
+  }
+
+  // From 480px up a full-bleed sheet of ivory is a lot of nothing: the drawer
+  // runs to 1024px, and on a tablet it would blank the entire screen to show
+  // six links. It becomes a right-hand sheet instead, which also gives the
+  // backdrop something to be.
+  @include bp(sm) {
+    inset-inline-start: auto;
+    inline-size: min(26rem, 92vw);
+    box-shadow: var(--e-4);
+    border-radius: var(--r-lg) 0 0 var(--r-lg);
+
+    @include motion-safe {
+      animation-name: mnav-slide;
+    }
+  }
+}
+
+@keyframes mnav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes mnav-slide {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+@keyframes mnav-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.mnav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--gutter);
+  border-bottom: 1px solid var(--c-ivory-200);
+}
+
+.mnav__body {
+  flex: 1;
+  padding: var(--sp-6) var(--gutter);
+}
+
+.mnav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mnav__link {
+  display: block;
+  padding: var(--sp-4) 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-decoration: none;
+
+  @include focusable;
+}
+
+.mnav__sublist {
+  list-style: none;
+  margin: 0 0 var(--sp-4);
+  padding: 0 0 0 var(--sp-4);
+  border-left: 1px solid var(--c-ivory-200);
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.mnav__sublink {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--tap-min);
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  @include focusable;
+
+  &::before {
+    content: '';
+    inline-size: 14px;
+    block-size: 2px;
+    border-radius: var(--r-pill);
+    background-color: var(--cat-accent, var(--text-accent));
+    flex: none;
+  }
+}
+
+.mnav__foot {
+  padding: var(--sp-6) var(--gutter) var(--sp-8);
+  border-top: 1px solid var(--c-ivory-200);
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.mnav__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.mnav__meta-link {
+  min-block-size: var(--tap-min);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  @include focusable;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

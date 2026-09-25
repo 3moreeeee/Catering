@@ -1,0 +1,215 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-card);
+  box-shadow: var(--e-3);
+}
+
+.map-card__frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+
+  @include bp(md) {
+    aspect-ratio: 4 / 3;
+  }
+  background: linear-gradient(135deg, rgb(var(--c-ui-rgb) / 0.14), transparent), var(--surface-inset);
+}
+
+iframe {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  filter: saturate(0.84) contrast(1.04);
+  transition: filter 500ms var(--ease-out);
+}
+
+:host(:hover) iframe,
+:host(:focus-within) iframe {
+  filter: saturate(1) contrast(1);
+}
+
+.map-card__badge {
+  position: absolute;
+  inset-block-start: var(--sp-4);
+  inset-inline-start: var(--sp-4);
+  display: flex;
+  max-inline-size: calc(100% - var(--sp-8));
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: var(--r-sm);
+  color: #fff;
+  background: rgb(var(--c-dark-rgb) / 0.92);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.18);
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+
+  > span:last-child {
+    display: grid;
+    gap: 0.1rem;
+    min-inline-size: 0;
+  }
+
+  strong {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+  }
+
+  small {
+    overflow: hidden;
+    color: rgb(255 255 255 / 0.7);
+    font-size: var(--fs-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.map-card__pulse {
+  position: relative;
+  display: grid;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(var(--c-ui-rgb) / 0.2);
+
+  &::before,
+  span {
+    position: absolute;
+    border-radius: 50%;
+    content: '';
+  }
+
+  &::before {
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    background: var(--c-copper-400);
+    box-shadow: 0 0 0 4px rgb(var(--c-ui-rgb) / 0.17);
+  }
+
+  span {
+    inset: 0;
+    border: 1px solid rgb(var(--c-ui-rgb) / 0.65);
+
+    @include motion-safe {
+      animation: map-pulse 2.4s var(--ease-out) infinite;
+    }
+  }
+}
+
+.map-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-top: 1px solid var(--border-hairline);
+}
+
+.map-card__address {
+  display: inline-flex;
+  min-inline-size: 0;
+  flex: 1 1 14rem;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+}
+
+.map-card__pin {
+  inline-size: 0.65rem;
+  block-size: 0.65rem;
+  flex: none;
+  border: 2px solid var(--c-copper-500);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+
+.map-card__foot .btn {
+  flex: none;
+}
+
+@include motion-reduce {
+  iframe {
+    transition: none;
+  }
+
+  .map-card__pulse span {
+    animation: none;
+  }
+}
+
+@keyframes map-pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.7);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// STILL — what stands in for the embed until the visitor asks for it
+//
+// Drawn entirely from design tokens: no third-party tile, no API key, no
+// request. It has to look like a decision rather than a gap, because most
+// visitors will never press the button and this is the location card they see.
+// -----------------------------------------------------------------------------
+
+.map-card__still {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  text-align: center;
+  overflow: hidden;
+
+  // A faint street plan, angled so it reads as a map rather than graph paper.
+  // Painted with two repeating gradients rather than a rotated child element,
+  // so nothing has a box outside the frame.
+  background-color: var(--surface-inset);
+  background-image:
+    repeating-linear-gradient(82deg, var(--border-hairline) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(172deg, var(--border-hairline) 0 1px, transparent 1px 44px);
+}
+
+.map-card__marker {
+  position: absolute;
+  inset-block-start: 38%;
+  inset-inline-start: 50%;
+  inline-size: 14px;
+  block-size: 14px;
+  margin-inline-start: -7px;
+  border-radius: var(--r-pill);
+  background-color: var(--c-copper-500);
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--c-copper-500) 22%, transparent);
+}
+
+.map-card__load {
+  position: relative;
+  margin-block-start: 3.5rem;
+}
+
+.map-card__consent {
+  position: relative;
+  margin: 0;
+  max-inline-size: 32ch;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}

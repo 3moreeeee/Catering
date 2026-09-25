@@ -1,0 +1,235 @@
+<ng-container *transloco="let t">
+  @if (product(); as p) {
+    <article class="container pdp" [style.--text-accent]="category()?.accent">
+      <nav class="pdp__crumbs" [attr.aria-label]="t('nav.breadcrumb')">
+        <ol>
+          <li>
+            <a [routerLink]="to('')">{{ t('nav.home') }}</a>
+          </li>
+          <li>
+            <a [routerLink]="to('products')">{{ t('catalog.title') }}</a>
+          </li>
+          @if (category(); as cat) {
+            <li>
+              <a [routerLink]="to('products/' + cat.slug)">{{ cat.name | localized }}</a>
+            </li>
+          }
+          <li aria-current="page">{{ p.name | localized }}</li>
+        </ol>
+      </nav>
+
+      <div class="pdp__layout">
+        <!-- Gallery -->
+        <div class="pdp__gallery">
+          <div class="pdp__stage">
+            @if (p.images[activeImage()]; as image) {
+              <img
+                [src]="image.src"
+                (error)="onImageError($event)"
+                [alt]="image.alt | localized"
+                [width]="image.width"
+                [height]="image.height"
+                fetchpriority="high"
+                decoding="async"
+              />
+            }
+          </div>
+
+          @if (p.images.length > 1) {
+            <ul class="pdp__thumbs">
+              @for (image of p.images; track image.src; let i = $index) {
+                <li>
+                  <button
+                    type="button"
+                    class="pdp__thumb"
+                    [attr.aria-pressed]="activeImage() === i"
+                    [attr.aria-label]="image.alt | localized"
+                    (click)="activeImage.set(i)"
+                  >
+                    <img [src]="image.src" alt="" width="80" height="80" loading="lazy" />
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- Detail -->
+        <div class="pdp__info">
+          @if (brand(); as b) {
+            <a class="pdp__brand u-label" [routerLink]="to('brands')" [fragment]="b.slug">{{
+              b.name
+            }}</a>
+          }
+
+          <h1 class="pdp__title">{{ p.name | localized | frenchType }}</h1>
+
+          <p class="u-lead pdp__lead">{{ p.shortDescription | localized }}</p>
+
+          <dl class="pdp__specs">
+            @if (category(); as cat) {
+              <div>
+                <dt class="u-label">{{ t('product.category') }}</dt>
+                <dd>
+                  <a [routerLink]="to('products/' + cat.slug)">{{ cat.name | localized }}</a>
+                </dd>
+              </div>
+            }
+            @if (subcategory(); as sub) {
+              <div>
+                <dt class="u-label">{{ t('product.family') }}</dt>
+                <dd>{{ sub.name | localized }}</dd>
+              </div>
+            }
+            @if (p.formats.length) {
+              <div>
+                <dt class="u-label">{{ t('product.formats') }}</dt>
+                <dd>
+                  <ul class="pdp__formats">
+                    @for (format of p.formats; track format.id) {
+                      <li class="chip u-nums">{{ format.value | frenchType }}</li>
+                    }
+                  </ul>
+                </dd>
+              </div>
+            }
+          </dl>
+
+          <!-- The price arrives from the API after hydration, so the block
+               stays empty rather than flashing a stale figure during SSR. -->
+          @if (pricePoint(); as point) {
+            <div class="pdp__price u-nums">
+              @if (point.offerActive && point.originalPrice !== null) {
+                <span class="admin-badge" data-status="ACTIVE">{{ t('product.offer') }}</span>
+                <del>{{ point.originalPrice.toFixed(3) }} {{ point.currency ?? 'TND' }}</del>
+              }
+              <strong>{{ displayPrice() }}</strong>
+            </div>
+          }
+
+          @if (auth.authenticated() && pricePoint()) {
+            <div class="pdp__purchase">
+              <label for="pdp-qty" class="u-label pdp__qty-label">{{ t('cart.quantity') }}</label>
+              <div class="pdp__buy-row">
+                <fk-quantity-stepper
+                  size="lg"
+                  inputId="pdp-qty"
+                  [value]="quantity()"
+                  [label]="t('cart.quantity')"
+                  [decreaseLabel]="t('cart.decrease')"
+                  [increaseLabel]="t('cart.increase')"
+                  (valueChange)="setQuantity($event)"
+                />
+                <button
+                  type="button"
+                  class="btn btn--primary btn--lg pdp__add"
+                  [disabled]="addState() === 'adding'"
+                  (click)="addToCart()"
+                >
+                  {{ addState() === 'adding' ? t('product.adding') : t('product.addToCart') }}
+                </button>
+              </div>
+
+              @if (subtotal(); as total) {
+                <p class="pdp__subtotal u-nums">
+                  {{ t('product.subtotal', { quantity: quantity(), price: total }) }}
+                </p>
+              }
+
+              @if (addState() === 'added') {
+                <p class="pdp__added" role="status">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                  <span>{{ t('product.added') }}</span>
+                  <a [routerLink]="to('cart')">{{ t('product.viewCart') }} →</a>
+                </p>
+              }
+            </div>
+          }
+
+          <div class="pdp__actions">
+            @if (!auth.authenticated()) {
+              <a class="btn btn--primary btn--lg" [routerLink]="to('login')">
+                {{ t('product.signInToOrder') }}
+              </a>
+            }
+
+            <a
+              class="btn btn--secondary btn--lg"
+              [routerLink]="to('contact')"
+              [queryParams]="{ product: p.slug }"
+            >
+              {{ t('product.requestInfo') }}
+            </a>
+            <button type="button" class="btn btn--ghost btn--lg" (click)="share()">
+              {{ shareCopied() ? t('product.shareCopied') : t('product.share') }}
+            </button>
+          </div>
+
+          @if (addState() === 'error') {
+            <p class="u-xs pdp__noprice" role="alert">{{ t('cart.errorGeneric') }}</p>
+          }
+          @if (pricePoint() && pricePoint()!.price === null) {
+            <p class="u-xs u-muted pdp__noprice">{{ t('product.noPriceNote') }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Long-form sections -->
+      <div class="pdp__sections">
+        <section class="pdp__section">
+          <h2 class="h3">{{ t('product.description') }}</h2>
+          <div class="prose">
+            <p>{{ p.description | localized }}</p>
+          </div>
+        </section>
+
+        <!-- No datasheets have been supplied for any product yet. Rather than a
+             permanently disabled control announcing that, the section appears
+             only for a product that actually has one. -->
+        @if (p.technicalSheetUrl; as sheet) {
+          <section class="pdp__section">
+            <h2 class="h3">{{ t('product.technical') }}</h2>
+            <h3 class="h4 pdp__subhead">{{ t('product.datasheet') }}</h3>
+            <a class="btn btn--secondary btn--sm" [href]="sheet" download>
+              {{ t('product.datasheet') }}
+            </a>
+          </section>
+        }
+
+        @if (industries().length) {
+          <section class="pdp__section">
+            <h2 class="h3">{{ t('product.industries') }}</h2>
+            <ul class="pdp__industries">
+              @for (industry of industries(); track industry.id) {
+                <li>
+                  <a class="chip" [routerLink]="to('industries')" [fragment]="industry.slug">{{
+                    industry.name | localized
+                  }}</a>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+
+      @if (related().length) {
+        <section class="pdp__related">
+          <h2 class="h3">{{ t('product.related') }}</h2>
+          <ul class="pdp__related-grid">
+            @for (item of related(); track item.id) {
+              <li><fk-product-card [product]="item" /></li>
+            }
+          </ul>
+        </section>
+      }
+    </article>
+  } @else {
+    <div class="container pdp__missing">
+      <h1 class="h2">{{ t('notFound.title') }}</h1>
+      <p class="u-lead">{{ t('notFound.lead') }}</p>
+      <a class="btn btn--primary" [routerLink]="to('products')">{{ t('notFound.products') }}</a>
+    </div>
+  }
+</ng-container>

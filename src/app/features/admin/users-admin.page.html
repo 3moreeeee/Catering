@@ -1,0 +1,191 @@
+<ng-container *transloco="let t">
+      @if (error()) {
+        <p class="account-status is-error" role="alert">{{ t('auth.errors.' + error()) }}</p>
+      }
+      @if (success()) {
+        <p class="account-status is-success" role="status">{{ t('admin.success.' + success()) }}</p>
+      }
+
+      <div class="account-card">
+        <div class="admin-toolbar">
+          <form class="admin-search" (submit)="$event.preventDefault(); load()">
+            <label class="u-visually-hidden" for="admin-search">{{ t('admin.search') }}</label>
+            <input
+              id="admin-search"
+              class="control"
+              name="q"
+              [(ngModel)]="query"
+              [placeholder]="t('admin.searchPlaceholder')"
+            />
+            <button class="btn btn--secondary" type="submit">{{ t('admin.searchAction') }}</button>
+          </form>
+          <button class="btn btn--primary" type="button" (click)="startCreate()">
+            {{ t('admin.create') }}
+          </button>
+        </div>
+
+        @if (editorOpen()) {
+          <div class="account-card">
+            <h2>{{ editing() ? t('admin.editTitle') : t('admin.createTitle') }}</h2>
+            <form class="account-form" [formGroup]="form" (ngSubmit)="save()">
+              <div class="account-form__grid">
+                <div class="field">
+                  <label class="field__label" for="admin-role">{{ t('admin.role') }}</label
+                  ><select
+                    id="admin-role"
+                    class="control"
+                    formControlName="role"
+                    (change)="setRole(form.controls.role.value)"
+                  >
+                    <option value="CLIENT">{{ t('auth.roles.client') }}</option>
+                    <option value="ADMIN">{{ t('auth.roles.admin') }}</option>
+                  </select>
+                </div>
+                <label class="checkbox"
+                  ><input type="checkbox" formControlName="enabled" /><span
+                    class="checkbox__text"
+                    >{{ t('admin.enabled') }}</span
+                  ></label
+                >
+              </div>
+              @if (selectedRole() === 'CLIENT') {
+                <div class="account-choice">
+                  <label
+                    ><input
+                      type="radio"
+                      formControlName="clientType"
+                      value="PHYSIQUE"
+                      (change)="setType('PHYSIQUE')"
+                    /><strong>{{ t('auth.types.physique') }}</strong></label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      formControlName="clientType"
+                      value="MORALE"
+                      (change)="setType('MORALE')"
+                    /><strong>{{ t('auth.types.morale') }}</strong></label
+                  >
+                </div>
+              }
+              <div class="account-form__grid">
+                @if (selectedRole() === 'ADMIN' || selectedType() === 'PHYSIQUE') {
+                  <div class="field">
+                    <label class="field__label" for="admin-first">{{
+                      t('auth.fields.firstName')
+                    }}</label
+                    ><input id="admin-first" class="control" formControlName="firstName" />
+                  </div>
+                  @if (selectedRole() === 'CLIENT') {
+                    <div class="field">
+                      <label class="field__label" for="admin-last">{{
+                        t('auth.fields.lastName')
+                      }}</label
+                      ><input id="admin-last" class="control" formControlName="lastName" />
+                    </div>
+                  }
+                } @else {
+                  <div class="field">
+                    <label class="field__label" for="admin-company">{{
+                      t('auth.fields.companyName')
+                    }}</label
+                    ><input id="admin-company" class="control" formControlName="companyName" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="admin-tax">{{
+                      t('auth.fields.taxIdentifier')
+                    }}</label
+                    ><input id="admin-tax" class="control" formControlName="taxIdentifier" />
+                  </div>
+                }
+                <div class="field">
+                  <label class="field__label" for="admin-email">{{ t('auth.fields.email') }}</label
+                  ><input id="admin-email" class="control" type="email" formControlName="email" />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="admin-phone">{{ t('auth.fields.phone') }}</label
+                  ><input id="admin-phone" class="control" type="tel" formControlName="phone" />
+                </div>
+                @if (!editing()) {
+                  <div class="field account-form__full">
+                    <label class="field__label" for="admin-password">{{
+                      t('auth.fields.password')
+                    }}</label
+                    ><input
+                      id="admin-password"
+                      class="control"
+                      type="password"
+                      formControlName="password"
+                      autocomplete="new-password"
+                    />
+                  </div>
+                }
+              </div>
+              <div class="account-form__actions">
+                <button class="btn btn--primary" type="submit" [disabled]="saving()">
+                  {{ saving() ? t('admin.saving') : t('admin.save') }}</button
+                ><button class="btn btn--secondary" type="button" (click)="closeEditor()">
+                  {{ t('common.cancel') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @if (loading()) {
+          <p class="admin-empty">{{ t('common.loading') }}</p>
+        } @else if (people().length === 0) {
+          <p class="admin-empty">{{ t('admin.empty') }}</p>
+        } @else {
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>{{ t('admin.person') }}</th>
+                  <th>{{ t('admin.role') }}</th>
+                  <th>{{ t('admin.type') }}</th>
+                  <th>{{ t('admin.status') }}</th>
+                  <th>{{ t('admin.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (person of people(); track person.id) {
+                  <tr>
+                    <td>
+                      <span class="admin-person"
+                        ><strong>{{ name(person) }}</strong
+                        ><small>{{ person.email }}</small></span
+                      >
+                    </td>
+                    <td>{{ t('auth.roles.' + person.role.toLowerCase()) }}</td>
+                    <td>
+                      {{
+                        person.clientType ? t('auth.types.' + person.clientType.toLowerCase()) : '—'
+                      }}
+                    </td>
+                    <td>{{ person.enabled ? t('admin.active') : t('admin.disabled') }}</td>
+                    <td>
+                      <div class="admin-actions">
+                        <button
+                          class="btn btn--secondary btn--sm"
+                          type="button"
+                          (click)="edit(person)"
+                        >
+                          {{ t('admin.edit') }}</button
+                        ><button
+                          class="btn btn--secondary btn--sm"
+                          type="button"
+                          (click)="remove(person)"
+                        >
+                          {{ t('admin.delete') }}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+</ng-container>

@@ -1,0 +1,91 @@
+<ng-container *transloco="let t">
+  <div class="container brands">
+    <header class="brands__head">
+      <h1 class="h1">{{ t('brands.title') }}</h1>
+      <p class="u-lead">{{ t('brands.lead') }}</p>
+    </header>
+
+    <div class="brands__controls">
+      <div class="field brands__search">
+        <label class="u-visually-hidden" for="fk-brand-search">{{ t('brands.searchLabel') }}</label>
+        <input
+          id="fk-brand-search"
+          class="control"
+          type="search"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          [placeholder]="t('brands.searchPlaceholder')"
+        />
+      </div>
+
+      <div class="brands__filters" role="group" [attr.aria-label]="t('brands.filterLabel')">
+        <button
+          type="button"
+          class="chip"
+          [class.chip--active]="categoryFilter() === null"
+          [attr.aria-pressed]="categoryFilter() === null"
+          (click)="categoryFilter.set(null)"
+        >
+          {{ t('brands.all') }}
+        </button>
+        @for (category of categories; track category.id) {
+          <button
+            type="button"
+            class="chip"
+            [class.chip--active]="categoryFilter() === category.id"
+            [attr.aria-pressed]="categoryFilter() === category.id"
+            (click)="categoryFilter.set(category.id)"
+          >
+            {{ category.shortName | localized }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (brands().length) {
+      <ul class="brands__grid">
+        @for (brand of brands(); track brand.id) {
+          <li class="brands__item" [id]="brand.slug">
+            <article class="brands__card">
+              <img class="brands__logo" [src]="brand.logo" [alt]="brand.name" width="180" height="64" />
+
+              <h2 class="h4 brands__name">{{ brand.name }}</h2>
+
+              @if (brand.country) {
+                <p class="u-xs u-muted">
+                  {{ t('brands.origin') }}: {{ brand.country | localized }}
+                </p>
+              }
+
+              <p class="u-sm brands__desc">{{ brand.description | localized }}</p>
+
+              <div class="brands__actions">
+                <a
+                  class="btn btn--secondary btn--sm"
+                  [routerLink]="to('products')"
+                  [queryParams]="{ brand: brand.id }"
+                >
+                  {{ t('brands.viewProducts') }}
+                  <span class="u-nums">({{ productCount(brand.id) }})</span>
+                </a>
+                @if (brand.website) {
+                  <a
+                    class="btn btn--ghost btn--sm"
+                    [href]="brand.website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ t('brands.website') }}
+                  </a>
+                }
+              </div>
+            </article>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="brands__empty">{{ t('brands.empty') }}</p>
+    }
+
+  </div>
+</ng-container>

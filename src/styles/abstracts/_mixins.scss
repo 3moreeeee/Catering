@@ -1,0 +1,157 @@
+// =============================================================================
+// MIXINS & FUNCTIONS
+// =============================================================================
+@use 'sass:map';
+
+$breakpoints: (
+  'xs': 375px,
+  'sm': 480px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+  '2xl': 1440px,
+  '3xl': 1920px,
+);
+
+/// Min-width media query. `@include bp(lg) { … }`
+@mixin bp($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error 'Unknown breakpoint `#{$name}`. Valid: #{map.keys($breakpoints)}.';
+  }
+  @media (min-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+/// Max-width media query, offset by 0.02px to avoid overlap with `bp()`.
+@mixin bp-down($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error 'Unknown breakpoint `#{$name}`.';
+  }
+  @media (max-width: (map.get($breakpoints, $name) - 0.02px)) {
+    @content;
+  }
+}
+
+/// Page container.
+@mixin container($max: var(--container-max)) {
+  width: 100%;
+  max-width: $max;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/// Standard vertical section rhythm.
+@mixin section {
+  padding-block: var(--section-y);
+}
+
+/// The single focus treatment used site-wide. Clears 3:1 on every ground.
+@mixin focus-ring {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+/// Applies the focus ring only for keyboard users.
+@mixin focusable {
+  &:focus {
+    outline: none;
+  }
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+/// Visually hidden but available to assistive technology.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/// Guarantees the WCAG 2.2 target-size minimum without forcing visual bulk.
+@mixin tap-target {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 50% 50% 50% 50%;
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/// Truncate to `$lines`.
+@mixin clamp-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/// Uppercase meta label.
+@mixin label {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/// Display / heading type.
+@mixin display($size: var(--fs-display)) {
+  font-family: var(--font-display);
+  font-size: $size;
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  text-wrap: balance;
+}
+
+@mixin heading($size: var(--fs-h2)) {
+  font-family: var(--font-display);
+  font-size: $size;
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  text-wrap: balance;
+}
+
+/// Responsive auto-fill grid.
+@mixin auto-grid($min: 240px, $gap: var(--sp-6)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(#{$min}, 100%), 1fr));
+  gap: $gap;
+}
+
+/// Wraps content that must not be animated for reduced-motion users.
+@mixin motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+@mixin motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+/// Desktop pointer only — for hover-dependent enhancement.
+@mixin fine-pointer {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}

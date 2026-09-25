@@ -1,0 +1,71 @@
+server:
+  # 8080 is occupied by Oracle XML DB on the target workstation.
+  port: ${PORT:8081}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: catering-identity
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  datasource:
+    # When DB_URL is absent, NeonEnvironmentPostProcessor accepts Neon's URI
+    # from NEON_DATABASE_URL_DIRECT (preferred) or NEON_DATABASE_URL (pooled).
+    url: ${DB_URL:jdbc:h2:file:./data/catering-identity;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        # Collapses lazy-collection loading into batched "in (...)" selects.
+        #
+        # A Product carries three lazy collections (images, formats and the
+        # industries element collection) and the catalogue mapper reads all
+        # three, so loading a page issued three extra selects per row. Against
+        # a local H2 file those were free; against Neon each one costs a network
+        # round trip, which measured ~0.42s per product — 43s to serve the 247
+        # -product catalogue, long enough that SSR prerendering of "/en" timed
+        # out and failed the production build.
+        #
+        # Batch fetching turns those per-row selects into one select per
+        # collection per batch. A join fetch is not an option here: two of the
+        # three are Lists, and fetching both in one query raises
+        # MultipleBagFetchException.
+        default_batch_fetch_size: 100
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:4200,http://localhost:4000}
+  jwt:
+    secret: ${APP_JWT_SECRET:}
+    lifetime: ${APP_JWT_LIFETIME:PT8H}
+    secure-cookie: ${APP_SECURE_COOKIE:false}
+  admin:
+    email: ${APP_ADMIN_EMAIL:}
+    password: ${APP_ADMIN_PASSWORD:}
+  catalog:
+    # Loads classpath:seed/catalog-seed.json when the product table is empty.
+    # Regenerate that file with: node scripts/export-backend-seed.mjs
+    seed-on-startup: ${APP_CATALOG_SEED:true}
+
+logging:
+  level:
+    org.springframework.security: INFO

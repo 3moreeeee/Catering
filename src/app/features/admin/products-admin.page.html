@@ -1,0 +1,493 @@
+<ng-container *transloco="let t">
+  @if (error()) {
+    <p class="account-status is-error" role="alert">
+      {{ t('dashboard.errors.' + errorKey()) }}
+    </p>
+  }
+  @if (success()) {
+    <p class="account-status is-success" role="status">
+      {{ t('dashboard.products.success.' + success()) }}
+    </p>
+  }
+
+  @if (editorOpen()) {
+    <div class="account-card" id="product-editor">
+      <h2>
+        {{ editing() ? t('dashboard.products.editTitle') : t('dashboard.products.createTitle') }}
+      </h2>
+      <form class="account-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="account-form__grid">
+          <div class="field">
+            <label class="field__label" for="p-name-fr">{{
+              t('dashboard.products.fields.nameFr')
+            }}</label>
+            <input
+              id="p-name-fr"
+              class="control"
+              formControlName="nameFr"
+              (input)="onNameInput()"
+              [attr.aria-invalid]="hasError('nameFr')"
+              [attr.aria-describedby]="hasError('nameFr') ? 'p-name-fr-err' : null"
+            />
+            @if (hasError('nameFr')) {
+              <p class="field__error" id="p-name-fr-err">{{ errorFor('nameFr') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-name-en">{{
+              t('dashboard.products.fields.nameEn')
+            }}</label>
+            <input
+              id="p-name-en"
+              class="control"
+              formControlName="nameEn"
+              [attr.aria-invalid]="hasError('nameEn')"
+              [attr.aria-describedby]="hasError('nameEn') ? 'p-name-en-err' : null"
+            />
+            @if (hasError('nameEn')) {
+              <p class="field__error" id="p-name-en-err">{{ errorFor('nameEn') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-source">{{
+              t('dashboard.products.fields.sourceId')
+            }}</label>
+            <input
+              id="p-source"
+              class="control admin-generated-field"
+              formControlName="sourceId"
+              readonly
+              aria-readonly="true"
+              [attr.aria-invalid]="hasError('sourceId')"
+              [attr.aria-describedby]="hasError('sourceId') ? 'p-source-err' : null"
+            />
+            @if (hasError('sourceId')) {
+              <p class="field__error" id="p-source-err">{{ errorFor('sourceId') }}</p>
+            }
+            <small class="field__hint">{{ t('dashboard.products.fields.sourceIdHint') }}</small>
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-slug">{{
+              t('dashboard.products.fields.slug')
+            }}</label>
+            <input
+              id="p-slug"
+              class="control admin-generated-field"
+              formControlName="slug"
+              readonly
+              aria-readonly="true"
+              [attr.aria-invalid]="hasError('slug')"
+              [attr.aria-describedby]="hasError('slug') ? 'p-slug-err' : null"
+            />
+            @if (hasError('slug')) {
+              <p class="field__error" id="p-slug-err">{{ errorFor('slug') }}</p>
+            }
+            <small class="field__hint">{{ t('dashboard.products.fields.slugHint') }}</small>
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-category">{{
+              t('dashboard.products.fields.category')
+            }}</label>
+            <select
+              id="p-category"
+              class="control"
+              formControlName="categoryId"
+              (change)="onCategoryChange(form.controls.categoryId.value)"
+              [attr.aria-invalid]="hasError('categoryId')"
+              [attr.aria-describedby]="hasError('categoryId') ? 'p-category-err' : null"
+            >
+              <option value="" disabled>{{ t('dashboard.products.choose') }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.externalId">{{ category.name.fr }}</option>
+              }
+            </select>
+            @if (hasError('categoryId')) {
+              <p class="field__error" id="p-category-err">{{ errorFor('categoryId') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-sub">{{
+              t('dashboard.products.fields.subcategory')
+            }}</label>
+            <select id="p-sub" class="control" formControlName="subcategoryId">
+              <option value="">—</option>
+              @for (sub of subcategories(); track sub.id) {
+                <option [value]="sub.externalId">{{ sub.name.fr }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-brand">{{
+              t('dashboard.products.fields.brand')
+            }}</label>
+            <select id="p-brand" class="control" formControlName="brandId">
+              <option value="">—</option>
+              @for (brand of brands(); track brand.id) {
+                <option [value]="brand.externalId">{{ brand.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-ref">{{
+              t('dashboard.products.fields.reference')
+            }}</label>
+            <input
+              id="p-ref"
+              class="control"
+              formControlName="reference"
+              [attr.aria-invalid]="hasError('reference')"
+              [attr.aria-describedby]="hasError('reference') ? 'p-ref-err' : null"
+            />
+            @if (hasError('reference')) {
+              <p class="field__error" id="p-ref-err">{{ errorFor('reference') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-price">{{
+              t('dashboard.products.fields.price')
+            }}</label>
+            <input
+              id="p-price"
+              class="control u-nums"
+              inputmode="decimal"
+              formControlName="price"
+              [attr.aria-invalid]="hasError('price')"
+              [attr.aria-describedby]="hasError('price') ? 'p-price-err' : null"
+            />
+            @if (hasError('price')) {
+              <p class="field__error" id="p-price-err">{{ errorFor('price') }}</p>
+            }
+            <small class="field__hint">{{ t('dashboard.products.fields.priceHint') }}</small>
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-stock">{{
+              t('dashboard.products.fields.stock')
+            }}</label>
+            <input
+              id="p-stock"
+              class="control u-nums"
+              inputmode="numeric"
+              formControlName="stockQuantity"
+              [attr.aria-invalid]="hasError('stockQuantity')"
+              [attr.aria-describedby]="hasError('stockQuantity') ? 'p-stock-err' : null"
+            />
+            @if (hasError('stockQuantity')) {
+              <p class="field__error" id="p-stock-err">{{ errorFor('stockQuantity') }}</p>
+            }
+          </div>
+          <div class="field account-form__full">
+            <label class="field__label" for="p-short-fr">{{
+              t('dashboard.products.fields.shortFr')
+            }}</label>
+            <textarea
+              id="p-short-fr"
+              class="control"
+              rows="2"
+              formControlName="shortDescriptionFr"
+              [attr.aria-invalid]="hasError('shortDescriptionFr')"
+              [attr.aria-describedby]="hasError('shortDescriptionFr') ? 'p-short-fr-err' : null"
+            ></textarea>
+            @if (hasError('shortDescriptionFr')) {
+              <p class="field__error" id="p-short-fr-err">{{ errorFor('shortDescriptionFr') }}</p>
+            }
+          </div>
+          <div class="field account-form__full">
+            <label class="field__label" for="p-short-en">{{
+              t('dashboard.products.fields.shortEn')
+            }}</label>
+            <textarea
+              id="p-short-en"
+              class="control"
+              rows="2"
+              formControlName="shortDescriptionEn"
+              [attr.aria-invalid]="hasError('shortDescriptionEn')"
+              [attr.aria-describedby]="hasError('shortDescriptionEn') ? 'p-short-en-err' : null"
+            ></textarea>
+            @if (hasError('shortDescriptionEn')) {
+              <p class="field__error" id="p-short-en-err">{{ errorFor('shortDescriptionEn') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-img-file">{{
+              t('dashboard.products.fields.image')
+            }}</label>
+            <div class="admin-image-upload">
+              <div>
+                <input
+                  id="p-img-file"
+                  class="control"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  [disabled]="uploadingImage()"
+                  (change)="uploadImage($event)"
+                />
+                <small class="field__hint">
+                  {{
+                    uploadingImage()
+                      ? t('dashboard.products.fields.imageUploading')
+                      : t('dashboard.products.fields.imageHint')
+                  }}
+                </small>
+              </div>
+              @if (form.controls.imageSrc.value) {
+                <img
+                  class="admin-image-preview"
+                  [src]="form.controls.imageSrc.value"
+                  alt=""
+                  width="92"
+                  height="72"
+                />
+              }
+            </div>
+            <input
+              id="p-img"
+              type="hidden"
+              formControlName="imageSrc"
+              placeholder="/img/products/…"
+              [attr.aria-invalid]="hasError('imageSrc')"
+              [attr.aria-describedby]="hasError('imageSrc') ? 'p-img-err' : null"
+            />
+            @if (hasError('imageSrc')) {
+              <p class="field__error" id="p-img-err">{{ errorFor('imageSrc') }}</p>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="p-img-alt">{{
+              t('dashboard.products.fields.imageAlt')
+            }}</label>
+            <input
+              id="p-img-alt"
+              class="control admin-generated-field"
+              formControlName="imageAltFr"
+              readonly
+              aria-readonly="true"
+              [attr.aria-invalid]="hasError('imageAltFr')"
+              [attr.aria-describedby]="hasError('imageAltFr') ? 'p-img-alt-err' : null"
+            />
+            @if (hasError('imageAltFr')) {
+              <p class="field__error" id="p-img-alt-err">{{ errorFor('imageAltFr') }}</p>
+            }
+          </div>
+          <label class="checkbox account-form__full"
+            ><input type="checkbox" formControlName="featured" /><span class="checkbox__text">{{
+              t('dashboard.products.fields.featured')
+            }}</span></label
+          >
+        </div>
+        @if (invalidCount() > 0) {
+          <p class="account-status is-error" role="alert">
+            {{
+              invalidCount() === 1
+                ? t('dashboard.products.validation.summaryOne')
+                : t('dashboard.products.validation.summary', { count: invalidCount() })
+            }}
+          </p>
+        }
+        <div class="account-form__actions">
+          <button class="btn btn--primary" type="submit" [disabled]="saving() || uploadingImage()">
+            {{ saving() ? t('admin.saving') : t('admin.save') }}</button
+          ><button class="btn btn--secondary" type="button" (click)="closeEditor()">
+            {{ t('common.cancel') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="account-card">
+    <div class="admin-toolbar">
+      <form class="admin-filters" (submit)="$event.preventDefault(); search()">
+        <label class="u-visually-hidden" for="p-search">{{ t('dashboard.products.search') }}</label>
+        <input
+          id="p-search"
+          class="control admin-filters__search"
+          name="q"
+          [(ngModel)]="query.q"
+          [placeholder]="t('dashboard.products.searchPlaceholder')"
+        />
+        <label class="u-visually-hidden" for="p-f-cat">{{
+          t('dashboard.products.fields.category')
+        }}</label>
+        <select
+          id="p-f-cat"
+          class="control"
+          name="category"
+          [(ngModel)]="query.category"
+          (change)="search()"
+        >
+          <option value="">{{ t('dashboard.products.allCategories') }}</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.externalId">{{ category.name.fr }}</option>
+          }
+        </select>
+        <label class="u-visually-hidden" for="p-f-status">{{ t('admin.status') }}</label>
+        <select
+          id="p-f-status"
+          class="control"
+          name="status"
+          [(ngModel)]="query.status"
+          (change)="search()"
+        >
+          <option value="">{{ t('dashboard.products.allStatuses') }}</option>
+          <option value="active">{{ t('dashboard.products.statusActive') }}</option>
+          <option value="inactive">{{ t('dashboard.products.statusInactive') }}</option>
+        </select>
+        <label class="u-visually-hidden" for="p-f-priced">{{
+          t('dashboard.products.fields.price')
+        }}</label>
+        <select
+          id="p-f-priced"
+          class="control"
+          name="priced"
+          [(ngModel)]="query.priced"
+          (change)="search()"
+        >
+          <option value="">{{ t('dashboard.products.allPrices') }}</option>
+          <option value="yes">{{ t('dashboard.products.pricedYes') }}</option>
+          <option value="no">{{ t('dashboard.products.pricedNo') }}</option>
+        </select>
+        <button class="btn btn--secondary" type="submit">{{ t('admin.searchAction') }}</button>
+      </form>
+      <button class="btn btn--primary" type="button" (click)="startCreate()">
+        {{ t('dashboard.products.create') }}
+      </button>
+    </div>
+
+    @if (loading() && !page()) {
+      <p class="admin-empty">{{ t('common.loading') }}</p>
+    } @else if (page(); as p) {
+      @if (p.items.length === 0) {
+        <p class="admin-empty">{{ t('dashboard.products.empty') }}</p>
+      } @else {
+        <p class="admin-count u-nums">{{ t('dashboard.products.count', { count: p.total }) }}</p>
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-table--products">
+            <thead>
+              <tr>
+                <th>{{ t('dashboard.products.product') }}</th>
+                <th>{{ t('dashboard.products.fields.category') }}</th>
+                <th>{{ t('dashboard.products.fields.price') }}</th>
+                <th>{{ t('dashboard.products.fields.stock') }}</th>
+                <th>{{ t('admin.status') }}</th>
+                <th>{{ t('admin.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of p.items; track product.id) {
+                <tr [class.is-inactive]="!product.active">
+                  <td>
+                    <div class="admin-product">
+                      @if (product.images[0]; as image) {
+                        <img
+                          class="admin-thumb"
+                          [src]="image.src"
+                          alt=""
+                          width="44"
+                          height="44"
+                          loading="lazy"
+                        />
+                      } @else {
+                        <span class="admin-thumb" aria-hidden="true"></span>
+                      }
+                      <span class="admin-person"
+                        ><strong>{{ product.name.fr }}</strong
+                        ><small>{{ product.reference || product.slug }}</small></span
+                      >
+                    </div>
+                  </td>
+                  <td>{{ categoryName(product.categoryId) }}</td>
+                  <td>
+                    <label class="u-visually-hidden" [attr.for]="'price-' + product.id">{{
+                      t('dashboard.products.priceOf', { name: product.name.fr })
+                    }}</label>
+                    <div class="admin-price">
+                      <input
+                        [id]="'price-' + product.id"
+                        class="control admin-price__input u-nums"
+                        inputmode="decimal"
+                        [value]="product.price === null ? '' : product.price.toFixed(3)"
+                        [placeholder]="t('cart.priceOnRequest')"
+                        [disabled]="priceSaving() === product.id"
+                        (change)="savePrice(product, $any($event.target).value)"
+                      />
+                      <span class="admin-price__unit">TND</span>
+                      @if (priceSaved() === product.id) {
+                        <span class="admin-price__saved" role="status">{{
+                          t('dashboard.products.priceSaved')
+                        }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="u-nums">{{ product.stockQuantity ?? '—' }}</td>
+                  <td>
+                    <span
+                      class="admin-badge"
+                      [attr.data-status]="product.active ? 'ACTIVE' : 'INACTIVE'"
+                      >{{
+                        product.active
+                          ? t('dashboard.products.statusActive')
+                          : t('dashboard.products.statusInactive')
+                      }}</span
+                    >
+                  </td>
+                  <td>
+                    <div class="admin-actions">
+                      <button
+                        class="btn btn--secondary btn--sm"
+                        type="button"
+                        (click)="edit(product)"
+                      >
+                        {{ t('admin.edit') }}
+                      </button>
+                      @if (product.active) {
+                        <button
+                          class="btn btn--secondary btn--sm"
+                          type="button"
+                          (click)="deactivate(product)"
+                        >
+                          {{ t('dashboard.products.deactivate') }}
+                        </button>
+                      } @else {
+                        <button
+                          class="btn btn--secondary btn--sm"
+                          type="button"
+                          (click)="reactivate(product)"
+                        >
+                          {{ t('dashboard.products.reactivate') }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (p.totalPages > 1) {
+          <nav class="admin-pager" [attr.aria-label]="t('common.pagination')">
+            <button
+              class="btn btn--secondary btn--sm"
+              type="button"
+              [disabled]="p.page === 0"
+              (click)="load(p.page - 1)"
+            >
+              {{ t('common.previous') }}
+            </button>
+            <span class="u-nums">{{
+              t('common.pageOf', { current: p.page + 1, total: p.totalPages })
+            }}</span>
+            <button
+              class="btn btn--secondary btn--sm"
+              type="button"
+              [disabled]="p.page + 1 >= p.totalPages"
+              (click)="load(p.page + 1)"
+            >
+              {{ t('common.next') }}
+            </button>
+          </nav>
+        }
+      }
+    }
+  </div>
+</ng-container>

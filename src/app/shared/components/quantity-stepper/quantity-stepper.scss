@@ -1,0 +1,96 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: inline-flex;
+}
+
+.qty {
+  display: inline-grid;
+  grid-template-columns: 2.5rem minmax(3rem, 4.5rem) 2.5rem;
+  align-items: stretch;
+  block-size: 2.75rem;
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-pill);
+  background: var(--surface-card);
+  transition: border-color var(--d-fast) var(--ease-out);
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--c-forest-600);
+  }
+}
+
+// On the product page the stepper sits beside a large call to action, so it
+// takes the same height as `.btn--lg` and the pair reads as one row.
+.qty--lg {
+  grid-template-columns: 3.25rem minmax(3.5rem, 5rem) 3.25rem;
+  block-size: 3.5rem;
+
+  .qty__input {
+    font-size: var(--fs-body);
+  }
+}
+
+.qty__btn {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--text-primary);
+  background: none;
+  cursor: pointer;
+  transition:
+    background-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out);
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--c-forest-700);
+    background: var(--surface-inset);
+  }
+
+  &:disabled {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.qty__input {
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  color: var(--text-primary);
+  background: none;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+
+  // The − / + buttons replace the native spinner.
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    color: var(--text-disabled);
+  }
+}

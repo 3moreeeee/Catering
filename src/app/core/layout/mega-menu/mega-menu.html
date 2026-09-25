@@ -1,0 +1,55 @@
+<ng-container *transloco="let t">
+  <!-- Click-away backdrop. aria-hidden: keyboard users dismiss with Escape. -->
+  <div class="mega__backdrop" aria-hidden="true" (click)="dismiss.emit()"></div>
+
+  <div class="mega__panel">
+    <div class="container--wide mega__inner">
+      <div class="mega__intro">
+        <p class="u-eyebrow">{{ t('nav.products') }}</p>
+        <p class="mega__hint u-sm u-muted">
+          {{ t('nav.megaMenuHint', { count: productCount() }) }}
+        </p>
+        <a class="link link--accent mega__all" [routerLink]="to('products')">
+          {{ t('footer.allProducts') }}
+          <span class="link__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <ul class="mega__grid">
+        @for (category of categories(); track category.id) {
+          <li class="mega__col">
+            <a
+              class="mega__card"
+              [routerLink]="to('products/' + category.slug)"
+              [style.--cat-accent]="category.accent"
+            >
+              <span class="mega__icon" aria-hidden="true"></span>
+              <span class="mega__title">{{ category.name | localized }}</span>
+              <span class="mega__desc u-sm">{{ category.description | localized }}</span>
+            </a>
+
+            <!-- Featured subcategories: real links, always present in the DOM. -->
+            <ul class="mega__subs">
+              @for (sub of category.subcategories.slice(0, 5); track sub.id) {
+                <li>
+                  <a
+                    class="mega__sub"
+                    [routerLink]="to('products/' + category.slug)"
+                    [queryParams]="{ sub: sub.id }"
+                    >{{ sub.name | localized }}</a
+                  >
+                </li>
+              }
+              <li>
+                <a class="mega__sub mega__sub--more" [routerLink]="to('products/' + category.slug)">
+                  {{ t('home.universes.explore') }}
+                  <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</ng-container>

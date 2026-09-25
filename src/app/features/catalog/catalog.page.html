@@ -1,0 +1,175 @@
+<ng-container *transloco="let t">
+  <div class="container catalog">
+    <!-- Breadcrumb -->
+    <nav class="catalog__crumbs" [attr.aria-label]="t('nav.breadcrumb')">
+      <ol>
+        <li><a [routerLink]="to('')">{{ t('nav.home') }}</a></li>
+        <li><a [routerLink]="to('products')">{{ t('catalog.title') }}</a></li>
+        @if (category(); as cat) {
+          <li aria-current="page">{{ heading() }}</li>
+        }
+      </ol>
+    </nav>
+
+    <header class="catalog__head">
+      <h1 class="catalog__title">{{ heading() }}</h1>
+      <p class="u-lead">{{ t('catalog.lead', { count: store.total() }) }}</p>
+    </header>
+
+    <div class="catalog__layout">
+      <!-- Desktop sticky sidebar / mobile drawer -->
+      <fk-catalog-filters
+        [store]="store"
+        [open]="filtersOpen()"
+        (dismiss)="filtersOpen.set(false)"
+      />
+
+      <div class="catalog__main">
+        <!-- Toolbar -->
+        <div class="catalog__toolbar">
+          <form class="catalog__search" (ngSubmit)="submitSearch()">
+            <label class="u-visually-hidden" for="fk-catalog-q">{{
+              t('catalog.searchLabel')
+            }}</label>
+            <input
+              id="fk-catalog-q"
+              class="control"
+              type="search"
+              name="q"
+              [(ngModel)]="searchTerm"
+              [placeholder]="t('catalog.searchPlaceholder')"
+            />
+          </form>
+
+          <button
+            type="button"
+            class="btn btn--secondary btn--sm catalog__filter-toggle"
+            [attr.aria-expanded]="filtersOpen()"
+            aria-controls="fk-catalog-filters"
+            (click)="filtersOpen.set(true)"
+          >
+            {{ t('catalog.openFilters') }}
+          </button>
+
+          <div class="catalog__sort">
+            <label class="u-visually-hidden" for="fk-catalog-sort">{{
+              t('catalog.sortLabel')
+            }}</label>
+            <select
+              id="fk-catalog-sort"
+              class="control"
+              [value]="store.query().sort"
+              (change)="onSort($any($event.target).value)"
+            >
+              @for (option of sortOptions; track option) {
+                <option [value]="option">{{ t('catalog.sort.' + option) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="catalog__view" role="group" [attr.aria-label]="t('catalog.viewLabel')">
+            <button
+              type="button"
+              class="btn btn--icon"
+              [attr.aria-pressed]="store.view() === 'grid'"
+              [attr.aria-label]="t('catalog.viewGrid')"
+              (click)="store.view.set('grid')"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="1" y="1" width="6" height="6" fill="currentColor" />
+                <rect x="9" y="1" width="6" height="6" fill="currentColor" />
+                <rect x="1" y="9" width="6" height="6" fill="currentColor" />
+                <rect x="9" y="9" width="6" height="6" fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="btn btn--icon"
+              [attr.aria-pressed]="store.view() === 'list'"
+              [attr.aria-label]="t('catalog.viewList')"
+              (click)="store.view.set('list')"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="1" y="2" width="14" height="2.5" fill="currentColor" />
+                <rect x="1" y="6.75" width="14" height="2.5" fill="currentColor" />
+                <rect x="1" y="11.5" width="14" height="2.5" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active filter chips -->
+        @if (store.activeChips().length) {
+          <div class="catalog__chips" [attr.aria-label]="t('catalog.activeFilters')">
+            <ul>
+              @for (chip of store.activeChips(); track chip.key + chip.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="chip chip--active"
+                    [attr.data-category]="chip.key === 'category' ? chip.id : null"
+                    [attr.aria-label]="t('catalog.clearFilter', { label: chip.label })"
+                    (click)="store.removeChip(chip.key, chip.id)"
+                  >
+                    {{ chip.label }}
+                    <span class="chip__remove" aria-hidden="true">×</span>
+                  </button>
+                </li>
+              }
+            </ul>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="store.clearAll()">
+              {{ t('catalog.clearAll') }}
+            </button>
+          </div>
+        }
+
+        <!-- Result count, announced to screen readers when it changes -->
+        <p class="catalog__count u-sm u-muted" role="status" aria-live="polite">
+          {{ t('catalog.resultCount', { count: store.total() }) }}
+        </p>
+
+        <!-- Results / empty state -->
+        @if (store.isEmpty()) {
+          <div class="catalog__empty">
+            <h2 class="h3">{{ t('catalog.empty.title') }}</h2>
+            <p class="u-muted">{{ t('catalog.empty.body') }}</p>
+            <button type="button" class="btn btn--primary" (click)="store.clearAll()">
+              {{ t('catalog.empty.action') }}
+            </button>
+          </div>
+        } @else {
+          <ul class="catalog__results" [class.catalog__results--list]="store.view() === 'list'">
+            @for (product of store.products(); track product.id) {
+              <li><fk-product-card [product]="product" [view]="store.view()" /></li>
+            }
+          </ul>
+
+          <!-- Pagination: real links, so crawlers can walk the whole catalogue -->
+          @if (store.totalPages() > 1) {
+            <nav class="catalog__pagination" [attr.aria-label]="t('common.pagination')">
+              <button
+                type="button"
+                class="btn btn--secondary btn--sm"
+                [disabled]="store.page() <= 1"
+                (click)="store.setPage(store.page() - 1)"
+              >
+                {{ t('common.previous') }}
+              </button>
+              <span class="u-sm u-nums">{{
+                t('common.pageOf', { current: store.page(), total: store.totalPages() })
+              }}</span>
+              <button
+                type="button"
+                class="btn btn--secondary btn--sm"
+                [disabled]="store.page() >= store.totalPages()"
+                (click)="store.setPage(store.page() + 1)"
+              >
+                {{ t('common.next') }}
+              </button>
+            </nav>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</ng-container>

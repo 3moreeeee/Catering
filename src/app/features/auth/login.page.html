@@ -1,0 +1,54 @@
+<ng-container *transloco="let t">
+  <section class="account-page">
+    <div class="account-shell account-shell--narrow">
+      <header class="account-heading">
+        <p class="u-eyebrow">{{ t('auth.secureArea') }}</p>
+        <h1>{{ t('auth.login.title') }}</h1>
+        <p>{{ t('auth.login.lead') }}</p>
+      </header>
+
+      <div class="account-card">
+        <form class="account-form" [formGroup]="form" (ngSubmit)="submit()">
+          @if (error()) {
+            <p class="account-status is-error" role="alert">
+              {{ t('auth.errors.' + error()) }}
+            </p>
+          }
+          <div class="field">
+            <label class="field__label" for="login-email">{{ t('auth.fields.email') }}</label>
+            <input
+              id="login-email"
+              class="control"
+              type="email"
+              autocomplete="email"
+              formControlName="email"
+            />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <span class="field__error">{{ t('auth.validation.email') }}</span>
+            }
+          </div>
+          <div class="field">
+            <label class="field__label" for="login-password">{{ t('auth.fields.password') }}</label>
+            <input
+              id="login-password"
+              class="control"
+              type="password"
+              autocomplete="current-password"
+              formControlName="password"
+            />
+            @if (form.controls.password.touched && form.controls.password.invalid) {
+              <span class="field__error">{{ t('auth.validation.required') }}</span>
+            }
+          </div>
+          <button class="btn btn--primary btn--block" type="submit" [disabled]="submitting()">
+            {{ submitting() ? t('auth.login.submitting') : t('auth.login.submit') }}
+          </button>
+        </form>
+        <p class="account-alt">
+          {{ t('auth.login.noAccount') }}
+          <a [routerLink]="registerUrl">{{ t('auth.register.link') }}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</ng-container>

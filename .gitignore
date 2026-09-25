@@ -1,0 +1,84 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# Miscellaneous
+/.env
+**/.env
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Pristine copies of migrated product photography — not served, not deployed.
+public/img/products/_original/
+
+# Environment files: real secrets never leave this machine. Templates stay.
+.env
+.env.*
+!.env.example
+**/.env.*
+!**/.env.example
+
+# Agent / tooling workspaces — local only.
+.claude/
+.codex/
+graphify-out/
+
+# Logs and test output.
+*.log
+/test-results
+/playwright-report
+/blob-report
+
+# Spring Boot backend build output and local state.
+backend-SpringBoot/target/
+backend-SpringBoot/out/
+backend-SpringBoot/data/
+backend-SpringBoot/.idea/
+*.iml
+
+# Heavy media hosted on ImageKit. angular.json already excludes these from the
+# build, so they are never deployed; the database stores only their URLs.
+public/img/products/
+public/img/chapters/
+public/video/
+public/videos-claude-prompt/
+
+# Vercel local link state.
+.vercel

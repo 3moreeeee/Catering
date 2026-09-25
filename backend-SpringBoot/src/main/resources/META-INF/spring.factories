@@ -1,0 +1,3 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+tn.com.catering.identity.config.DotenvEnvironmentPostProcessor,\
+tn.com.catering.identity.config.NeonEnvironmentPostProcessor

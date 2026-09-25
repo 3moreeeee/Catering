@@ -1,0 +1,1263 @@
+@use '../abstracts/mixins' as *;
+
+.account-page {
+  min-block-size: calc(100svh - var(--header-h));
+  padding-block: calc(var(--header-h) + var(--sp-12)) var(--section-y);
+  background:
+    radial-gradient(circle at 12% 8%, var(--c-copper-200), transparent 28rem), var(--surface-page);
+}
+
+.account-shell {
+  @include container(1120px);
+}
+
+.account-shell--narrow {
+  max-inline-size: 720px;
+}
+
+.account-heading {
+  margin-block-end: var(--sp-8);
+
+  h1 {
+    max-inline-size: 18ch;
+    margin: var(--sp-2) 0 var(--sp-3);
+    font-size: var(--fs-h2);
+  }
+
+  p:not(.u-eyebrow) {
+    max-inline-size: 58ch;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+.account-card {
+  padding: clamp(var(--sp-5), 5vw, var(--sp-10));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-card);
+  box-shadow: var(--e-2);
+
+  + .account-card {
+    margin-block-start: var(--sp-6);
+  }
+
+  h2 {
+    margin: 0 0 var(--sp-5);
+    font-size: var(--fs-h4);
+  }
+}
+
+.account-form {
+  display: grid;
+  gap: var(--sp-5);
+
+  // The choice cards provide the visual grouping; remove the browser's legacy
+  // fieldset box while preserving the semantic legend for assistive tech.
+  fieldset.field {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.account-form__grid {
+  display: grid;
+  gap: var(--sp-5);
+
+  @include bp(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.account-form__full {
+  grid-column: 1 / -1;
+}
+
+.account-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  padding-block-start: var(--sp-2);
+}
+
+.account-choice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-2);
+
+  label {
+    position: relative;
+    display: grid;
+    gap: var(--sp-1);
+    min-block-size: 84px;
+    padding: var(--sp-4);
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--r-md);
+    cursor: pointer;
+
+    &:has(input:checked) {
+      border-color: var(--c-forest-600);
+      background: color-mix(in srgb, var(--c-forest-300) 16%, var(--surface-card));
+    }
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  strong {
+    font-size: var(--fs-sm);
+  }
+
+  small {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+}
+
+.account-status {
+  padding: var(--sp-3) var(--sp-4);
+  border-inline-start: 3px solid var(--c-info);
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+  font-size: var(--fs-sm);
+
+  &.is-error {
+    border-color: var(--c-error);
+    color: var(--c-error);
+  }
+
+  &.is-success {
+    border-color: var(--c-success);
+    color: var(--c-success);
+  }
+}
+
+.account-alt {
+  margin: var(--sp-6) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  text-align: center;
+
+  a {
+    color: var(--text-accent);
+    font-weight: var(--fw-semibold);
+  }
+}
+
+.account-grid {
+  display: grid;
+  align-items: start;
+  gap: var(--sp-6);
+
+  @include bp(lg) {
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+  }
+}
+
+.account-summary {
+  display: grid;
+  gap: var(--sp-4);
+
+  dl {
+    display: grid;
+    grid-template-columns: minmax(110px, 0.4fr) 1fr;
+    gap: var(--sp-3) var(--sp-5);
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+
+  dt {
+    color: var(--text-muted);
+  }
+  dd {
+    margin: 0;
+    font-weight: var(--fw-medium);
+  }
+}
+
+.account-badge {
+  display: inline-flex;
+  inline-size: fit-content;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-pill);
+  color: var(--c-forest-800);
+  background: var(--c-forest-300);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-label);
+}
+
+.account-danger {
+  border-color: color-mix(in srgb, var(--c-error) 35%, var(--border-neutral));
+
+  p {
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+  }
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-block-end: var(--sp-5);
+}
+
+.admin-search {
+  display: flex;
+  flex: 1 1 320px;
+  gap: var(--sp-2);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+}
+
+.admin-table {
+  inline-size: 100%;
+  min-inline-size: 760px;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+
+  th,
+  td {
+    padding: var(--sp-3) var(--sp-4);
+    border-block-end: 1px solid var(--border-hairline);
+    text-align: start;
+  }
+
+  th {
+    color: var(--text-muted);
+    background: var(--surface-alt);
+    font-size: var(--fs-label);
+    letter-spacing: var(--ls-label);
+    text-transform: uppercase;
+  }
+
+  tr:last-child td {
+    border-block-end: 0;
+  }
+}
+
+.admin-person {
+  display: grid;
+  gap: 2px;
+
+  small {
+    color: var(--text-muted);
+  }
+}
+
+.admin-actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.admin-empty {
+  padding: var(--sp-10);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+// --- Back-office dashboard ---------------------------------------------------
+
+.admin-page {
+  // The global header already occupies its own row. Adding its height here a
+  // second time created the large empty band visible above the dashboard.
+  padding: 0;
+  background: var(--c-ivory-100);
+}
+
+.admin-layout {
+  display: grid;
+  min-block-size: calc(100svh - var(--header-h));
+
+  @include bp(lg) {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+}
+
+.admin-sidebar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  color: var(--c-ivory-50);
+  background: radial-gradient(circle at 15% 5%, rgb(255 255 255 / 10%), transparent 17rem), var(--c-forest-900);
+  box-shadow: 10px 0 30px rgb(var(--c-dark-rgb) / 8%);
+
+  @include bp(lg) {
+    position: sticky;
+    inset-block-start: var(--header-h);
+    block-size: calc(100svh - var(--header-h));
+  }
+}
+
+.admin-brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-5) var(--sp-5);
+  border-block-end: 1px solid rgb(255 255 255 / 10%);
+  color: inherit;
+  text-decoration: none;
+
+  img {
+    inline-size: min(100%, 200px);
+    block-size: auto;
+    background: transparent;
+    object-fit: contain;
+  }
+
+  span {
+    color: rgb(255 255 255 / 66%);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-label);
+    text-transform: uppercase;
+  }
+}
+
+.admin-workspace {
+  min-inline-size: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  min-block-size: 122px;
+  padding: clamp(var(--sp-5), 2.5vw, var(--sp-6)) clamp(var(--sp-5), 3vw, var(--sp-8));
+  border-block-end: 1px solid var(--border-hairline);
+  background: rgb(255 255 255 / 82%);
+  backdrop-filter: blur(14px);
+
+  h1 {
+    margin: 2px 0 var(--sp-1);
+    font-size: clamp(1.8rem, 1.55rem + 0.7vw, 2.35rem);
+    letter-spacing: -0.035em;
+  }
+
+  p:not(.u-eyebrow) {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+  }
+}
+
+.admin-topbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+
+  .btn {
+    min-block-size: 44px;
+    padding-inline: var(--sp-5);
+    font-size: var(--fs-sm);
+    box-shadow: 0 8px 22px rgb(var(--c-ui-rgb) / 8%);
+  }
+}
+
+.admin-content {
+  max-inline-size: 1500px;
+  margin-inline: auto;
+  padding: clamp(var(--sp-4), 2.5vw, var(--sp-6)) clamp(var(--sp-4), 3vw, var(--sp-8));
+}
+
+.admin-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--sp-4);
+}
+
+// Tabs scroll sideways on a narrow screen rather than wrapping onto a second
+// row, where the active underline would no longer read as one bar.
+.admin-tabs {
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-3) var(--sp-5);
+  overflow-x: auto;
+
+  @include bp(lg) {
+    flex: 1;
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+.admin-tabs__link {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: 46px;
+  padding: 0.625rem var(--sp-4);
+  border-radius: var(--r-md);
+  color: rgb(255 255 255 / 72%);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+
+  // The five glyphs are solid shapes. Painting a 1.7 stroke on top of the fill
+  // grew every one of them by ~1.7px in all directions, which closed the
+  // counters (the gap in the dashboard grid, the crease on the box) and made
+  // the icons read as blobs at 20px.
+  svg {
+    flex: 0 0 auto;
+    fill: currentColor;
+    stroke: none;
+  }
+
+  &:hover {
+    color: white;
+    background: rgb(255 255 255 / 8%);
+  }
+
+  &.is-active {
+    color: var(--c-forest-900);
+    background: var(--c-ivory-50);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 14%);
+  }
+}
+
+// Back-office actions are intentionally denser than marketing calls to action.
+.admin-page .btn {
+  min-block-size: 40px;
+  padding: 0.55rem var(--sp-4);
+  border-radius: 10px;
+  font-size: var(--fs-xs);
+}
+
+.admin-page .btn--sm {
+  min-block-size: 34px;
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+// Product search is a horizontal control group. Using the generic
+// `.admin-search` flex-grow rule inside a vertical field made its 320px basis
+// apply to the height and produced an oversized pill in the offer form.
+.admin-offer-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+
+  .btn {
+    min-inline-size: 112px;
+    min-block-size: 40px;
+    padding-inline: var(--sp-4);
+  }
+}
+
+.admin-sidebar__footer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-block-start: 1px solid rgb(255 255 255 / 12%);
+
+  .admin-person small {
+    color: rgb(255 255 255 / 55%);
+  }
+}
+
+.admin-avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 50%;
+  color: var(--c-forest-700);
+  background: var(--surface-inset);
+  font-weight: var(--fw-bold);
+}
+
+.admin-account-link {
+  color: white;
+  font-size: var(--fs-h4);
+  text-decoration: none;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--sp-4);
+  margin-block-end: var(--sp-6);
+}
+
+.admin-stat {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-5);
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  background: var(--surface-card);
+  box-shadow: var(--e-1);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--d-base) var(--ease-out),
+    box-shadow var(--d-base) var(--ease-out);
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--c-copper-500) 35%, var(--border-neutral));
+    box-shadow: var(--e-2);
+  }
+
+  &:nth-child(1) {
+    border-block-start: 3px solid var(--c-copper-500);
+  }
+  &:nth-child(2) {
+    border-block-start: 3px solid var(--c-cat-food);
+  }
+  &:nth-child(3) {
+    border-block-start: 3px solid var(--c-copper-400);
+  }
+  &:nth-child(4) {
+    border-block-start: 3px solid var(--c-forest-600);
+  }
+  &:nth-child(5) {
+    border-block-start: 3px solid #252525;
+  }
+}
+
+.admin-content .account-card {
+  padding: clamp(var(--sp-5), 2vw, var(--sp-8));
+  border-radius: 18px;
+  box-shadow: 0 12px 36px rgb(var(--c-dark-rgb) / 7%);
+}
+
+.admin-toolbar > .btn,
+.admin-search > .btn {
+  flex: 0 0 auto;
+  min-block-size: 40px;
+  padding-inline: var(--sp-4);
+}
+
+.admin-generated-field {
+  background: var(--surface-inset);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.admin-image-upload {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.admin-image-preview {
+  inline-size: 92px;
+  block-size: 72px;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-sm);
+  background: var(--surface-inset);
+  object-fit: contain;
+}
+
+.admin-discount {
+  display: inline-flex;
+  inline-size: fit-content;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--r-pill);
+  color: var(--c-food-800);
+  background: var(--c-food-100);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+@media (max-width: 620px) {
+  .admin-offer-search {
+    grid-template-columns: 1fr;
+
+    .btn {
+      inline-size: 100%;
+    }
+  }
+}
+
+.admin-overview-grid {
+  display: grid;
+  gap: var(--sp-5);
+  margin-block-end: var(--sp-6);
+
+  @include bp(lg) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.7fr);
+  }
+
+  .account-card {
+    margin: 0;
+  }
+}
+
+.admin-pipeline__row {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.45fr) minmax(120px, 1fr) 2.5rem;
+  align-items: center;
+  gap: var(--sp-3);
+  padding-block: var(--sp-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.admin-pipeline__track {
+  block-size: 8px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--border-neutral);
+
+  span {
+    display: block;
+    block-size: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--c-forest-700), var(--c-forest-500));
+  }
+}
+
+.admin-quick-actions {
+  display: grid;
+  gap: var(--sp-3);
+
+  > div h2 {
+    margin-block-end: var(--sp-2);
+  }
+
+  > a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--r-md);
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--c-forest-300);
+      background: var(--surface-inset);
+    }
+
+    > strong {
+      display: grid;
+      place-items: center;
+      inline-size: 36px;
+      block-size: 36px;
+      border-radius: 10px;
+      color: var(--c-forest-700);
+      background: var(--surface-inset);
+      font-size: var(--fs-h4);
+    }
+
+    span {
+      display: grid;
+      font-weight: var(--fw-semibold);
+    }
+    small {
+      color: var(--text-muted);
+      font-weight: var(--fw-regular);
+    }
+  }
+}
+
+.admin-stat__label {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.admin-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: 1.1;
+}
+
+.admin-stat__hint {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.admin-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-block-end: var(--sp-4);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 520px;
+  gap: var(--sp-2);
+
+  .control {
+    inline-size: auto;
+    min-inline-size: 0;
+  }
+}
+
+.admin-filters__search {
+  flex: 1 1 220px;
+}
+
+.admin-count {
+  margin: 0 0 var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.admin-product {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-inline-size: 0;
+}
+
+.admin-thumb {
+  flex: 0 0 44px;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--r-sm);
+  background: var(--surface-alt);
+  object-fit: contain;
+}
+
+.admin-price {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.admin-price__input {
+  inline-size: 7.5rem;
+  text-align: end;
+}
+
+.admin-price__unit {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+.admin-price__saved {
+  color: var(--c-success, #2d7d31);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.admin-table tr.is-inactive td {
+  color: var(--text-muted);
+
+  .admin-thumb {
+    opacity: 0.5;
+  }
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 2px var(--sp-2);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+
+  &[data-status='SUBMITTED'] {
+    background: color-mix(in oklab, var(--c-copper-500) 18%, transparent);
+    color: var(--c-copper-600, var(--c-copper-600));
+  }
+
+  &[data-status='IN_REVIEW'] {
+    background: color-mix(in oklab, var(--c-copper-400) 22%, transparent);
+  }
+
+  &[data-status='ANSWERED'],
+  &[data-status='ACTIVE'] {
+    background: color-mix(in oklab, var(--c-cat-food) 16%, transparent);
+    color: var(--c-food-800);
+  }
+
+  &[data-status='CLOSED'],
+  &[data-status='EXPIRED'],
+  &[data-status='INACTIVE'] {
+    color: var(--text-muted);
+  }
+
+  &[data-status='SCHEDULED'] {
+    color: var(--c-copper-600);
+    background: var(--surface-inset);
+  }
+}
+
+.admin-pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-block-start: var(--sp-5);
+}
+
+.admin-quotes {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-quote {
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+
+  &.is-open {
+    border-color: color-mix(in oklab, var(--c-copper-500) 35%, var(--border-neutral));
+  }
+}
+
+.admin-quote__summary {
+  display: grid;
+  // Reference, client, date, total, status. Collapses to two columns on a
+  // phone so nothing is squeezed below a readable width.
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  inline-size: 100%;
+  padding: var(--sp-4);
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  @include bp(md) {
+    grid-template-columns: 9rem minmax(0, 2fr) 6.5rem 8rem auto;
+  }
+}
+
+.admin-quote__ref {
+  font-variant-numeric: tabular-nums;
+}
+
+// A direct order needs acting on sooner than a quote request, so it stands out.
+.admin-quote__kind[data-kind='ORDER'] {
+  color: var(--c-forest-700);
+  font-weight: var(--fw-semibold);
+}
+
+.admin-quote__total {
+  font-weight: var(--fw-semibold);
+}
+
+.admin-quote__detail {
+  display: grid;
+  gap: var(--sp-4);
+  padding: 0 var(--sp-4) var(--sp-4);
+}
+
+.admin-quote__contact {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+
+  dt {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.admin-quote__message {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--surface-alt);
+  white-space: pre-line;
+}
+
+.admin-quote__workflow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+}
+
+.admin-quote__note {
+  flex: 1 1 280px;
+}
+
+// --- Back-office overview ----------------------------------------------------
+//
+// Chart colour follows the data's job rather than taste. The division bars are
+// nominal, so every bar shares one hue: a darker-where-bigger ramp would encode
+// length twice and spend the only free channel on nothing. The pipeline is
+// genuinely ordered, so it gets a four-step ordinal ramp of that same hue,
+// validated for monotone lightness and for clearing the card surface.
+
+$dash-series: var(--c-forest-600);
+$dash-step-1: var(--c-forest-300);
+$dash-step-2: var(--c-forest-500);
+$dash-step-3: var(--c-forest-600);
+$dash-step-4: var(--c-forest-700);
+$dash-grid: var(--border-neutral);
+
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  align-items: stretch;
+  gap: var(--sp-3);
+  margin-block-end: var(--sp-4);
+}
+
+.dash-kpi {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  min-block-size: 148px;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  background: var(--surface-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--d-base) var(--ease-out),
+    box-shadow var(--d-base) var(--ease-out);
+
+  &:hover {
+    border-color: color-mix(in oklab, #{$dash-series} 45%, var(--border-neutral));
+    box-shadow: var(--e-2);
+    transform: translateY(-2px);
+  }
+
+  // The inbox is what the administrator opens this screen for.
+  &--lead {
+    border-inline-start: 3px solid #{$dash-series};
+  }
+}
+
+.dash-kpi__label {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+// Proportional figures: tabular digits make a large standalone number look loose.
+.dash-kpi__value {
+  font-size: clamp(2rem, 1.65rem + 1vw, 2.5rem);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+.dash-kpi__hint {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.dash-grid {
+  display: grid;
+  gap: var(--sp-4);
+  margin-block-end: var(--sp-5);
+
+  @include bp(lg) {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+  }
+}
+
+// Two real columns, rather than letting the cards auto-place. A full-width card
+// cannot share a row with a half-width one, so auto-placement pushed every
+// narrow card onto its own row and left a column-wide hole beside it.
+.dash-grid__main,
+.dash-grid__side {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-4);
+  min-inline-size: 0;
+}
+
+.dash-card {
+  min-inline-size: 0;
+  padding: clamp(var(--sp-4), 2vw, var(--sp-5));
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  background: var(--surface-card);
+  box-shadow: 0 12px 36px rgb(var(--c-dark-rgb) / 6%);
+
+  // Cards inside a column are spaced by that column's grid gap; a sibling
+  // margin here would stack on top of it.
+  .dash-grid + & {
+    margin-block-start: var(--sp-5);
+  }
+}
+
+.dash-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-block-end: var(--sp-4);
+
+  h2 {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .u-eyebrow {
+    margin: 0 0 2px;
+  }
+}
+
+.dash-empty {
+  margin: 0;
+  padding: var(--sp-6) var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+// --- Activity sparkline ---
+
+.dash-figure {
+  margin: 0;
+}
+
+// A fixed block-size plus a separate caption row, so the date axis is never
+// clipped into its own nested scrollbar.
+.dash-spark {
+  display: block;
+  inline-size: 100%;
+  block-size: 140px;
+  overflow: visible;
+}
+
+.dash-spark__base {
+  stroke: #{$dash-grid};
+  stroke-width: 1;
+}
+
+.dash-spark__area {
+  fill: color-mix(in oklab, #{$dash-series} 14%, transparent);
+}
+
+.dash-spark__line {
+  fill: none;
+  stroke: #{$dash-series};
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  // preserveAspectRatio="none" stretches the box; this keeps the stroke even.
+  vector-effect: non-scaling-stroke;
+}
+
+.dash-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-block-start: var(--sp-2);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Pipeline funnel (ordered stages -> ordinal ramp) ---
+
+.dash-funnel {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dash-funnel__row {
+  display: grid;
+  grid-template-columns: minmax(80px, 0.7fr) minmax(60px, 1fr) 2.5rem;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.dash-funnel__label {
+  color: var(--text-secondary);
+}
+
+.dash-funnel__track {
+  block-size: 10px;
+  border-radius: var(--r-pill);
+  background: #{$dash-grid};
+}
+
+.dash-funnel__fill {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+
+  &[data-step='1'] {
+    background: #{$dash-step-1};
+  }
+  &[data-step='2'] {
+    background: #{$dash-step-2};
+  }
+  &[data-step='3'] {
+    background: #{$dash-step-3};
+  }
+  &[data-step='4'] {
+    background: #{$dash-step-4};
+  }
+}
+
+.dash-funnel__value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Catalogue bars (nominal categories -> one hue) ---
+
+.dash-bars {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// At phone width a name, a track and a value cannot share one row without
+// breaking the label mid-word ("professionn / el"), so the track drops to its
+// own line and the name keeps the full width.
+.dash-bars__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem;
+  grid-template-areas:
+    'label value'
+    'track track';
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+
+  @include bp(md) {
+    grid-template-columns: minmax(0, 0.9fr) minmax(60px, 1.6fr) 3rem;
+    grid-template-areas: 'label track value';
+    gap: var(--sp-3);
+  }
+}
+
+// Long division names wrap at word boundaries rather than being cut with an
+// ellipsis, so the label always says which division the bar belongs to.
+.dash-bars__label {
+  grid-area: label;
+  min-inline-size: 0;
+  color: var(--text-secondary);
+  overflow-wrap: break-word;
+}
+
+.dash-bars__track {
+  grid-area: track;
+  block-size: 12px;
+  border-radius: var(--r-pill);
+  background: #{$dash-grid};
+}
+
+.dash-bars__fill {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: #{$dash-series};
+}
+
+.dash-bars__value {
+  grid-area: value;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Table twin ---
+
+.dash-table-toggle {
+  margin-block-start: var(--sp-5);
+
+  summary {
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    cursor: pointer;
+  }
+
+  .admin-table-wrap {
+    margin-block-start: var(--sp-3);
+  }
+
+  .admin-table {
+    min-inline-size: 0;
+  }
+}
+
+// --- Shortcuts ---
+
+.dash-quick {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-3);
+}
+
+.dash-quick__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    border-color: color-mix(in oklab, #{$dash-series} 45%, var(--border-neutral));
+    background: var(--surface-inset);
+  }
+
+  span {
+    display: grid;
+    min-inline-size: 0;
+    font-weight: var(--fw-semibold);
+  }
+
+  small {
+    color: var(--text-muted);
+    font-weight: var(--fw-regular);
+  }
+}
+
+.dash-quick__icon {
+  display: grid;
+  flex: 0 0 36px;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 10px;
+  color: var(--c-forest-700);
+  background: var(--surface-inset);
+  font-size: var(--fs-h4);
+}

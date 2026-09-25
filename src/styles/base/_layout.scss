@@ -1,0 +1,88 @@
+// =============================================================================
+// LAYOUT UTILITIES
+// =============================================================================
+@use '../abstracts/mixins' as *;
+
+.container {
+  @include container;
+}
+
+.container--narrow {
+  @include container(var(--container-narrow));
+}
+
+.container--wide {
+  @include container(var(--container-wide));
+}
+
+.section {
+  @include section;
+}
+
+.section--tight {
+  padding-block: clamp(3rem, 6vw, 5rem);
+}
+
+/// Section on the alternate ivory ground.
+.section--alt {
+  background-color: var(--surface-alt);
+}
+
+/// Section on the dark forest ground. Pairs with `.on-dark` token overrides.
+.section--dark {
+  background-color: var(--surface-page);
+}
+
+.grid {
+  display: grid;
+  gap: var(--sp-6);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  @include bp(md) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--sp-8);
+  }
+  @include bp(lg) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/// Skip link — first focusable element in the document.
+.skip-link {
+  position: fixed;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  z-index: var(--z-skiplink);
+  padding: var(--sp-3) var(--sp-5);
+  background-color: var(--c-forest-900);
+  color: var(--c-ivory-50);
+  border-radius: var(--r-sm);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--sp-4)));
+  transition: transform var(--d-fast) var(--ease-out);
+
+  &:focus-visible {
+    transform: translateY(0);
+  }
+}
+
+/// Hairline rule used instead of shadows for most separation.
+.rule {
+  border: 0;
+  border-top: 1px solid var(--border-hairline);
+  margin: 0;
+}

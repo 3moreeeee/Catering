@@ -1,0 +1,327 @@
+<ng-container *transloco="let t">
+  <div class="container contact">
+    <header class="contact__head">
+      <h1 class="h1">{{ t('contact.title') }}</h1>
+      <p class="u-lead">{{ t('contact.lead') }}</p>
+    </header>
+
+    <div class="contact__layout">
+      <!-- Details -->
+      <aside class="contact__aside">
+        <h2 class="u-label">{{ t('contact.detailsTitle') }}</h2>
+        <address class="contact__address">
+          <div>
+            <span class="u-label">{{ t('contact.address') }}</span>
+            <p>
+              {{ company.address.street }}<br />
+              {{ company.address.postalCode }} {{ company.address.locality }}<br />
+              {{ company.address.country }}
+            </p>
+          </div>
+          <div>
+            <span class="u-label">{{ t('contact.telephone') }}</span>
+            <p>
+              <a class="link" [href]="'tel:' + company.telephone"
+                ><span class="u-nums">{{ company.telephoneDisplay }}</span></a
+              >
+            </p>
+          </div>
+          @if (company.faxDisplay) {
+            <div>
+              <span class="u-label">{{ t('contact.fax') }}</span>
+              <p class="u-nums u-muted">{{ company.faxDisplay }}</p>
+            </div>
+          }
+          <div>
+            <span class="u-label">{{ t('contact.email') }}</span>
+            <p>
+              <a class="link" [href]="'mailto:' + company.email">{{ company.email }}</a>
+            </p>
+          </div>
+          @if (company.businessHours; as hours) {
+            <div>
+              <span class="u-label">{{ t('contact.hours') }}</span>
+              <p>{{ hours | localized }}</p>
+            </div>
+          }
+        </address>
+
+        <div class="contact__map">
+          <h2 class="u-label">{{ t('contact.mapTitle') }}</h2>
+          <fk-google-map-card />
+        </div>
+      </aside>
+
+      <!-- Form -->
+      <div class="contact__form-wrap">
+        @if (state() === 'success') {
+          <div class="contact__result" role="status">
+            <h2 class="h3">{{ t('contact.success.title') }}</h2>
+            <p class="u-body">{{ t('contact.success.body', { reference: reference() }) }}</p>
+            <button type="button" class="btn btn--secondary" (click)="reset()">
+              {{ t('contact.success.again') }}
+            </button>
+          </div>
+        } @else {
+          <form class="contact__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <h2 class="h3 contact__form-title">{{ t('contact.formTitle') }}</h2>
+
+            <!-- Product context, when the buyer arrived from a product page -->
+            @if (contextProduct(); as product) {
+              <p class="contact__context">
+                {{ t('contact.form.productContext', { name: product.name | localized }) }}
+                <a
+                  class="link"
+                  [routerLink]="to('contact')"
+                  [attr.aria-label]="t('contact.form.removeProductContext')"
+                  >×</a
+                >
+              </p>
+            }
+
+            <!-- Error summary: focusable, links to the offending fields -->
+            @if (invalidFields().length) {
+              <div class="contact__errors" role="alert" tabindex="-1">
+                <h3 class="h4">{{ t('contact.validation.summaryTitle') }}</h3>
+                <p class="u-sm">{{ t('contact.validation.summaryIntro') }}</p>
+                <ul>
+                  @for (field of invalidFields(); track field) {
+                    <li>
+                      <a [href]="'#fk-' + field">{{ t('contact.form.' + field) }}</a>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (state() === 'error') {
+              <div class="contact__errors" role="alert">
+                <h3 class="h4">{{ t('contact.failure.title') }}</h3>
+                <!-- Two different failures, two different instructions. "We
+                     could not send it" and "we could not reach the service at
+                     all" call for different next steps, and the second one has
+                     to give a way through that does not depend on this form. -->
+                <p class="u-sm">
+                  {{
+                    failure() === 'unavailable'
+                      ? t('contact.errorUnavailable')
+                      : t('contact.failure.body')
+                  }}
+                </p>
+              </div>
+            }
+
+            <div class="contact__grid">
+              <!-- Name -->
+              <div class="field">
+                <label class="field__label" for="fk-name">
+                  {{ t('contact.form.name')
+                  }}<span class="field__required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="fk-name"
+                  class="control"
+                  type="text"
+                  autocomplete="name"
+                  formControlName="name"
+                  required
+                  [attr.aria-invalid]="hasError('name')"
+                  [attr.aria-describedby]="hasError('name') ? 'fk-name-err' : null"
+                />
+                @if (hasError('name')) {
+                  <p class="field__error" id="fk-name-err">{{ errorFor('name') }}</p>
+                }
+              </div>
+
+              <!-- Company -->
+              <div class="field">
+                <label class="field__label" for="fk-company">
+                  {{ t('contact.form.company')
+                  }}<span class="field__required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="fk-company"
+                  class="control"
+                  type="text"
+                  autocomplete="organization"
+                  formControlName="company"
+                  required
+                  [attr.aria-invalid]="hasError('company')"
+                  [attr.aria-describedby]="hasError('company') ? 'fk-company-err' : null"
+                />
+                @if (hasError('company')) {
+                  <p class="field__error" id="fk-company-err">{{ errorFor('company') }}</p>
+                }
+              </div>
+
+              <!-- Email -->
+              <div class="field">
+                <label class="field__label" for="fk-email">
+                  {{ t('contact.form.email')
+                  }}<span class="field__required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="fk-email"
+                  class="control"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  formControlName="email"
+                  required
+                  [attr.aria-invalid]="hasError('email')"
+                  [attr.aria-describedby]="hasError('email') ? 'fk-email-err' : null"
+                />
+                @if (hasError('email')) {
+                  <p class="field__error" id="fk-email-err">{{ errorFor('email') }}</p>
+                }
+              </div>
+
+              <!-- Phone -->
+              <div class="field">
+                <label class="field__label" for="fk-phone">
+                  {{ t('contact.form.phone') }}
+                  <span class="u-xs u-muted">({{ t('contact.form.optional') }})</span>
+                </label>
+                <input
+                  id="fk-phone"
+                  class="control"
+                  type="tel"
+                  inputmode="tel"
+                  autocomplete="tel"
+                  formControlName="phone"
+                  [attr.aria-invalid]="hasError('phone')"
+                  [attr.aria-describedby]="hasError('phone') ? 'fk-phone-err' : null"
+                />
+                @if (hasError('phone')) {
+                  <p class="field__error" id="fk-phone-err">{{ errorFor('phone') }}</p>
+                }
+              </div>
+
+              <!-- Job title -->
+              <div class="field">
+                <label class="field__label" for="fk-jobTitle">
+                  {{ t('contact.form.jobTitle') }}
+                  <span class="u-xs u-muted">({{ t('contact.form.optional') }})</span>
+                </label>
+                <input
+                  id="fk-jobTitle"
+                  class="control"
+                  type="text"
+                  autocomplete="organization-title"
+                  formControlName="jobTitle"
+                />
+              </div>
+
+              <!-- Department -->
+              <div class="field">
+                <label class="field__label" for="fk-department">{{
+                  t('contact.form.department')
+                }}</label>
+                <select id="fk-department" class="control" formControlName="department">
+                  @for (department of departments; track department) {
+                    <option [value]="department">
+                      {{ t('contact.department.' + department) }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Industry -->
+              <div class="field">
+                <label class="field__label" for="fk-industry">{{
+                  t('contact.form.industry')
+                }}</label>
+                <select id="fk-industry" class="control" formControlName="industry">
+                  <option value="">{{ t('contact.form.selectPlaceholder') }}</option>
+                  @for (industry of industries; track industry.id) {
+                    <option [value]="industry.id">{{ industry.name | localized }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Product category -->
+              <div class="field">
+                <label class="field__label" for="fk-category">{{
+                  t('contact.form.category')
+                }}</label>
+                <select id="fk-category" class="control" formControlName="category">
+                  <option value="">{{ t('contact.form.selectPlaceholder') }}</option>
+                  @for (category of categories; track category.id) {
+                    <option [value]="category.id">{{ category.name | localized }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Subject -->
+              <div class="field field--full">
+                <label class="field__label" for="fk-subject">{{ t('contact.form.subject') }}</label>
+                <input id="fk-subject" class="control" type="text" formControlName="subject" />
+              </div>
+
+              <!-- Message -->
+              <div class="field field--full">
+                <label class="field__label" for="fk-message">
+                  {{ t('contact.form.message')
+                  }}<span class="field__required" aria-hidden="true">*</span>
+                </label>
+                <textarea
+                  id="fk-message"
+                  class="control"
+                  rows="6"
+                  formControlName="message"
+                  required
+                  [attr.aria-invalid]="hasError('message')"
+                  [attr.aria-describedby]="hasError('message') ? 'fk-message-err' : null"
+                ></textarea>
+                @if (hasError('message')) {
+                  <p class="field__error" id="fk-message-err">{{ errorFor('message') }}</p>
+                }
+              </div>
+
+              <!-- Consent -->
+              <div class="field field--full">
+                <label class="checkbox" for="fk-consent">
+                  <input
+                    id="fk-consent"
+                    type="checkbox"
+                    formControlName="consent"
+                    required
+                    [attr.aria-invalid]="hasError('consent')"
+                    [attr.aria-describedby]="
+                      hasError('consent') ? 'fk-consent-err' : 'fk-consent-hint'
+                    "
+                  />
+                  <span class="checkbox__text">
+                    {{ t('contact.form.consent') }}
+                    <span class="field__required" aria-hidden="true">*</span>
+                  </span>
+                </label>
+                <p class="field__hint" id="fk-consent-hint">
+                  {{ t('contact.form.consentDetail') }}
+                  <a class="link" [routerLink]="to('privacy')">{{ t('footer.privacy') }}</a>
+                </p>
+                @if (hasError('consent')) {
+                  <p class="field__error" id="fk-consent-err">{{ errorFor('consent') }}</p>
+                }
+              </div>
+            </div>
+
+            <button
+              class="btn btn--primary btn--lg contact__submit"
+              type="submit"
+              [attr.data-loading]="state() === 'submitting'"
+              [disabled]="state() === 'submitting'"
+            >
+              <span class="btn__label">
+                {{
+                  state() === 'submitting' ? t('contact.form.submitting') : t('contact.form.submit')
+                }}
+              </span>
+              <span class="btn__spinner" aria-hidden="true"></span>
+            </button>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+</ng-container>

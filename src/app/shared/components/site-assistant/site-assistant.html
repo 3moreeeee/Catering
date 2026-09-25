@@ -1,0 +1,147 @@
+<ng-container *transloco="let t">
+  @if (open()) {
+    <button
+      class="assistant__backdrop"
+      type="button"
+      tabindex="-1"
+      aria-hidden="true"
+      (click)="close()"
+    ></button>
+
+    <section
+      id="site-assistant-panel"
+      class="assistant__panel"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="site-assistant-title"
+    >
+      <header class="assistant__header">
+        <span class="assistant__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M5 6.5h14v9H9l-4 3v-12Z" />
+            <path d="M8 10h8M8 13h5" />
+          </svg>
+        </span>
+        <div>
+          <p class="assistant__eyebrow">{{ t('assistant.eyebrow') }}</p>
+          <h2 id="site-assistant-title">{{ t('assistant.title') }}</h2>
+        </div>
+        <button
+          class="assistant__close"
+          type="button"
+          [attr.aria-label]="t('assistant.close')"
+          (click)="close()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div #messageList class="assistant__messages" aria-live="polite" aria-relevant="additions">
+        @if (messages().length === 0) {
+          <div class="assistant__intro">
+            <span class="assistant__intro-icon" aria-hidden="true">FK</span>
+            <p>{{ t('assistant.welcome') }}</p>
+            <div class="assistant__suggestions" [attr.aria-label]="t('assistant.suggestionsLabel')">
+              <button type="button" (click)="useSuggestion(t('assistant.suggestionProducts'))">
+                {{ t('assistant.suggestionProducts') }}
+              </button>
+              <button type="button" (click)="useSuggestion(t('assistant.suggestionQuote'))">
+                {{ t('assistant.suggestionQuote') }}
+              </button>
+              <button type="button" (click)="useSuggestion(t('assistant.suggestionTunisian'))">
+                {{ t('assistant.suggestionTunisian') }}
+              </button>
+            </div>
+          </div>
+        }
+
+        @for (message of messages(); track $index) {
+          <article
+            class="assistant__message"
+            [class.is-user]="message.role === 'user'"
+            [attr.dir]="'auto'"
+          >
+            <span class="assistant__speaker">
+              {{ message.role === 'user' ? t('assistant.you') : t('assistant.name') }}
+            </span>
+            <p>{{ message.content }}</p>
+            @if (message.products?.length) {
+              <div class="assistant__products">
+                @for (product of message.products; track product.href) {
+                  <a [routerLink]="product.href" (click)="close()">
+                    @if (product.image) {
+                      <img [src]="product.image" alt="" width="48" height="48" loading="lazy" />
+                    }
+                    <span>
+                      <small>{{ product.category }}</small>
+                      <strong>{{ product.name }}</strong>
+                    </span>
+                    <span class="assistant__arrow" aria-hidden="true">→</span>
+                  </a>
+                }
+              </div>
+            }
+          </article>
+        }
+
+        @if (loading()) {
+          <div class="assistant__typing" role="status">
+            <span class="visually-hidden">{{ t('assistant.thinking') }}</span>
+            <i></i><i></i><i></i>
+          </div>
+        }
+      </div>
+
+      <form class="assistant__composer" (submit)="submit($event)">
+        <label for="site-assistant-input" class="visually-hidden">{{
+          t('assistant.inputLabel')
+        }}</label>
+        <textarea
+          #inputElement
+          id="site-assistant-input"
+          rows="1"
+          maxlength="1200"
+          dir="auto"
+          [value]="input()"
+          [placeholder]="t('assistant.placeholder')"
+          [disabled]="loading()"
+          (input)="updateInput($event)"
+          (keydown)="onInputKeydown($event)"
+        ></textarea>
+        <button
+          type="submit"
+          [disabled]="loading() || input().trim().length < 2"
+          [attr.aria-label]="t('assistant.send')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="m4 12 16-8-5 16-3-6-8-2Z" />
+            <path d="m12 14 8-10" />
+          </svg>
+        </button>
+      </form>
+      <p class="assistant__disclaimer">{{ t('assistant.disclaimer') }}</p>
+    </section>
+  }
+
+  <button
+    #launcher
+    class="assistant__launcher"
+    type="button"
+    [class.is-open]="open()"
+    [attr.aria-expanded]="open()"
+    aria-controls="site-assistant-panel"
+    [attr.aria-label]="open() ? t('assistant.close') : t('assistant.open')"
+    (click)="toggle()"
+  >
+    <span class="assistant__launcher-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M4 5.5h16v11H9l-5 3v-14Z" />
+        <path d="M8 10h8M8 13h5" />
+      </svg>
+    </span>
+    <span>{{ t('assistant.launcher') }}</span>
+    <i aria-hidden="true"></i>
+  </button>
+</ng-container>

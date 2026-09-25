@@ -1,0 +1,145 @@
+<ng-container *transloco="let t">
+  <div class="container--wide footer__inner">
+    <div class="footer__grid">
+      <!-- Brand column -->
+      <div class="footer__brand">
+        <img src="/img/logo-light.svg" width="160" height="34" [alt]="t('meta.siteName')" />
+        <p class="footer__desc u-sm">{{ t('footer.description') }}</p>
+      </div>
+
+      <!-- Products -->
+      <nav class="footer__col" [attr.aria-label]="t('footer.productsTitle')">
+        <h2 class="footer__title">{{ t('footer.productsTitle') }}</h2>
+        <ul class="footer__list">
+          @for (category of categories(); track category.id) {
+            <li>
+              <a class="footer__link" [routerLink]="to('products/' + category.slug)">{{
+                category.name | localized
+              }}</a>
+            </li>
+          }
+          <li><a class="footer__link" [routerLink]="to('products')">{{ t('footer.allProducts') }}</a></li>
+        </ul>
+      </nav>
+
+      <!-- Company -->
+      <nav class="footer__col" [attr.aria-label]="t('footer.companyTitle')">
+        <h2 class="footer__title">{{ t('footer.companyTitle') }}</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" [routerLink]="to('about')">{{ t('nav.company') }}</a></li>
+          <li><a class="footer__link" [routerLink]="to('brands')">{{ t('nav.brands') }}</a></li>
+          <li><a class="footer__link" [routerLink]="to('industries')">{{ t('nav.industries') }}</a></li>
+          <li><a class="footer__link" [routerLink]="to('contact')">{{ t('nav.contact') }}</a></li>
+        </ul>
+      </nav>
+
+      <!-- Contact -->
+      <div class="footer__col">
+        <h2 class="footer__title">{{ t('footer.contactTitle') }}</h2>
+        <address class="footer__address">
+          <p class="u-sm">
+            {{ company.address.street }}<br />
+            {{ company.address.postalCode }} {{ company.address.locality }}<br />
+            {{ company.address.country }}
+          </p>
+          <p class="u-sm u-nums">
+            <a class="footer__link" [href]="'tel:' + company.telephone">{{
+              company.telephoneDisplay
+            }}</a>
+          </p>
+          @if (company.faxDisplay) {
+            <p class="u-sm u-nums u-muted">{{ t('contact.fax') }} {{ company.faxDisplay }}</p>
+          }
+          <p class="u-sm">
+            <a class="footer__link" [href]="'mailto:' + company.email">{{ company.email }}</a>
+          </p>
+        </address>
+
+        @if (company.social.length) {
+          <ul class="footer__social" [attr.aria-label]="t('footer.followUs')">
+            @for (link of company.social; track link.platform) {
+              <li>
+                <a
+                  class="footer__link u-sm"
+                  [href]="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Facebook</a
+                >
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Newsletter -->
+      <div class="footer__col footer__newsletter">
+        <h2 class="footer__title">{{ t('newsletter.title') }}</h2>
+        <p class="u-sm footer__desc">{{ t('newsletter.lead') }}</p>
+
+        @if (state() === 'success') {
+          <p class="footer__notice" role="status">{{ t('newsletter.success') }}</p>
+        } @else {
+          <form class="footer__form" (submit)="onNewsletterSubmit($event)" novalidate>
+            <div class="field">
+              <label class="u-visually-hidden" for="fk-newsletter-email">{{
+                t('newsletter.emailLabel')
+              }}</label>
+              <div class="footer__form-row">
+                <input
+                  id="fk-newsletter-email"
+                  class="control"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  inputmode="email"
+                  [formControl]="email"
+                  [placeholder]="t('newsletter.emailPlaceholder')"
+                  [attr.aria-invalid]="email.touched && email.invalid"
+                  [attr.aria-describedby]="email.touched && email.invalid ? 'fk-newsletter-error' : null"
+                />
+                <button
+                  class="btn btn--primary"
+                  type="submit"
+                  [attr.data-loading]="state() === 'submitting'"
+                  [disabled]="state() === 'submitting'"
+                >
+                  <span class="btn__label">{{ t('newsletter.submit') }}</span>
+                </button>
+              </div>
+              @if (email.touched && email.invalid) {
+                <p class="field__error" id="fk-newsletter-error">
+                  {{ t('contact.validation.email') }}
+                </p>
+              }
+              @if (state() === 'error') {
+                <p class="field__error" role="alert">{{ t('newsletter.error') }}</p>
+              }
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer__bottom">
+      <p class="u-xs u-muted">{{ t('footer.copyright', { year: year }) }}</p>
+
+      <ul class="footer__legal">
+        <li><a class="footer__link u-xs" [routerLink]="to('privacy')">{{ t('footer.privacy') }}</a></li>
+        <li><a class="footer__link u-xs" [routerLink]="to('terms')">{{ t('footer.terms') }}</a></li>
+        <li>
+          <a class="footer__link u-xs" [href]="switchLocaleUrl()" [attr.hreflang]="alternate()">{{
+            t('language.' + alternate())
+          }}</a>
+        </li>
+      </ul>
+
+      <button type="button" class="footer__top" (click)="backToTop()">
+        {{ t('nav.backToTop') }}
+        <span aria-hidden="true">↑</span>
+      </button>
+    </div>
+
+  </div>
+</ng-container>

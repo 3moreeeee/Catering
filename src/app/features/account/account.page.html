@@ -1,0 +1,330 @@
+<ng-container *transloco="let t">
+  <section class="acct">
+    <div class="acct__shell">
+      <!-- Identity -->
+      <header class="acct-id">
+        <span class="acct-id__avatar" aria-hidden="true">{{ initials() }}</span>
+        <div class="acct-id__text">
+          <p class="u-eyebrow">{{ t('account.eyebrow') }}</p>
+          <h1>{{ auth.displayName() }}</h1>
+          <ul class="acct-id__meta">
+            <li>{{ auth.user()?.email }}</li>
+            @if (auth.user()?.phone; as phone) {
+              <li class="u-nums">{{ phone }}</li>
+            }
+            @if (memberSince(); as since) {
+              <li>{{ t('account.memberSince', { date: since }) }}</li>
+            }
+          </ul>
+          <div class="acct-id__badges">
+            <span class="acct-badge">{{
+              t('auth.roles.' + (auth.user()?.role ?? 'CLIENT').toLowerCase())
+            }}</span>
+            @if (auth.user()?.clientType; as type) {
+              <span class="acct-badge acct-badge--soft">{{
+                t('auth.types.' + type.toLowerCase())
+              }}</span>
+            }
+          </div>
+        </div>
+        <div class="acct-id__actions">
+          @if (isClient()) {
+            <a class="btn btn--primary" [routerLink]="cartUrl">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2" />
+                <circle cx="9.5" cy="19.5" r="1.3" />
+                <circle cx="17" cy="19.5" r="1.3" />
+              </svg>
+              {{ t('account.cartCta') }}
+              @if (cart.itemCount() > 0) {
+                <span class="acct-count u-nums">{{ cart.itemCount() }}</span>
+              }
+            </a>
+          } @else {
+            <a class="btn btn--primary" [routerLink]="adminUrl">{{ t('account.manageUsers') }}</a>
+          }
+          <button class="btn btn--secondary" type="button" (click)="logout()">
+            {{ t('account.logout') }}
+          </button>
+        </div>
+      </header>
+
+      @if (error()) {
+        <p class="acct-status is-error" role="alert">{{ t('auth.errors.' + error()) }}</p>
+      }
+
+      <!-- Tabs -->
+      <div class="acct-tabs" role="tablist" [attr.aria-label]="t('account.eyebrow')">
+        <button
+          id="tab-profile"
+          type="button"
+          role="tab"
+          class="acct-tabs__tab"
+          aria-controls="panel-profile"
+          [attr.aria-selected]="tab() === 'profile'"
+          [attr.tabindex]="tab() === 'profile' ? 0 : -1"
+          (click)="tab.set('profile')"
+          (keydown.arrowRight)="switchTab('security')"
+          (keydown.arrowLeft)="switchTab('security')"
+        >
+          {{ t('account.tabs.profile') }}
+        </button>
+        <button
+          id="tab-security"
+          type="button"
+          role="tab"
+          class="acct-tabs__tab"
+          aria-controls="panel-security"
+          [attr.aria-selected]="tab() === 'security'"
+          [attr.tabindex]="tab() === 'security' ? 0 : -1"
+          (click)="tab.set('security')"
+          (keydown.arrowRight)="switchTab('profile')"
+          (keydown.arrowLeft)="switchTab('profile')"
+        >
+          {{ t('account.tabs.security') }}
+        </button>
+      </div>
+
+      @if (tab() === 'profile') {
+        <div id="panel-profile" role="tabpanel" aria-labelledby="tab-profile">
+          @if (isClient()) {
+            <form class="acct-card" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+              <div class="acct-card__head">
+                <h2>{{ t('account.profileTitle') }}</h2>
+                <p>{{ t('account.profileLead') }}</p>
+              </div>
+
+              <div class="acct-row">
+                <div id="type-label" class="acct-row__label">
+                  <strong>{{ t('auth.fields.clientType') }}</strong>
+                  <small>{{ t('account.typeHint') }}</small>
+                </div>
+                <div class="acct-type" role="radiogroup" aria-labelledby="type-label">
+                  <label>
+                    <input
+                      type="radio"
+                      formControlName="clientType"
+                      value="PHYSIQUE"
+                      (change)="setType('PHYSIQUE')"
+                    />
+                    <span class="acct-type__dot" aria-hidden="true"></span>
+                    <span class="acct-type__text">
+                      <strong>{{ t('auth.types.physique') }}</strong>
+                      <small>{{ t('auth.types.physiqueHint') }}</small>
+                    </span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      formControlName="clientType"
+                      value="MORALE"
+                      (change)="setType('MORALE')"
+                    />
+                    <span class="acct-type__dot" aria-hidden="true"></span>
+                    <span class="acct-type__text">
+                      <strong>{{ t('auth.types.morale') }}</strong>
+                      <small>{{ t('auth.types.moraleHint') }}</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="acct-row">
+                <div class="acct-row__label">
+                  <strong>{{ t('account.identityLabel') }}</strong>
+                  <small>{{ t('account.identityHint') }}</small>
+                </div>
+                <div class="acct-fields">
+                  @if (selectedType() === 'PHYSIQUE') {
+                    <div class="field">
+                      <label class="field__label" for="profile-first">{{
+                        t('auth.fields.firstName')
+                      }}</label>
+                      <input
+                        id="profile-first"
+                        class="control"
+                        formControlName="firstName"
+                        autocomplete="given-name"
+                      />
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="profile-last">{{
+                        t('auth.fields.lastName')
+                      }}</label>
+                      <input
+                        id="profile-last"
+                        class="control"
+                        formControlName="lastName"
+                        autocomplete="family-name"
+                      />
+                    </div>
+                  } @else {
+                    <div class="field">
+                      <label class="field__label" for="profile-company">{{
+                        t('auth.fields.companyName')
+                      }}</label>
+                      <input
+                        id="profile-company"
+                        class="control"
+                        formControlName="companyName"
+                        autocomplete="organization"
+                      />
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="profile-tax">{{
+                        t('auth.fields.taxIdentifier')
+                      }}</label>
+                      <input id="profile-tax" class="control" formControlName="taxIdentifier" />
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="acct-row">
+                <div class="acct-row__label">
+                  <strong>{{ t('account.contactLabel') }}</strong>
+                  <small>{{ t('account.contactHint') }}</small>
+                </div>
+                <div class="acct-fields">
+                  <div class="field">
+                    <label class="field__label" for="profile-email">{{
+                      t('auth.fields.email')
+                    }}</label>
+                    <input
+                      id="profile-email"
+                      class="control"
+                      type="email"
+                      formControlName="email"
+                      autocomplete="email"
+                    />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="profile-phone">{{
+                      t('auth.fields.phone')
+                    }}</label>
+                    <input
+                      id="profile-phone"
+                      class="control"
+                      type="tel"
+                      formControlName="phone"
+                      autocomplete="tel"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="acct-card__foot">
+                @if (profileState() === 'success' && profileForm.pristine) {
+                  <p class="acct-saved" role="status">
+                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                      <path d="M5 12.5l4.5 4.5L19 7.5" />
+                    </svg>
+                    {{ t('account.saved') }}
+                  </p>
+                }
+                <button
+                  class="btn btn--primary"
+                  type="submit"
+                  [disabled]="profileState() === 'saving' || profileForm.pristine"
+                >
+                  {{ profileState() === 'saving' ? t('account.saving') : t('account.save') }}
+                </button>
+              </div>
+            </form>
+          } @else {
+            <div class="acct-card">
+              <div class="acct-card__head">
+                <h2>{{ t('account.adminTitle') }}</h2>
+                <p>{{ t('account.adminLead') }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div id="panel-security" role="tabpanel" aria-labelledby="tab-security" class="acct-stack">
+          <form class="acct-card" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+            <div class="acct-card__head">
+              <h2>{{ t('account.passwordTitle') }}</h2>
+              <p>{{ t('account.passwordLead') }}</p>
+            </div>
+
+            <div class="acct-row">
+              <div class="acct-row__label">
+                <strong>{{ t('account.passwordLabel') }}</strong>
+                <small>{{ t('account.passwordHint') }}</small>
+              </div>
+              <div class="acct-fields acct-fields--single">
+                <div class="field">
+                  <label class="field__label" for="current-password">{{
+                    t('account.currentPassword')
+                  }}</label>
+                  <input
+                    id="current-password"
+                    class="control"
+                    type="password"
+                    autocomplete="current-password"
+                    formControlName="currentPassword"
+                  />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="new-password">{{
+                    t('account.newPassword')
+                  }}</label>
+                  <input
+                    id="new-password"
+                    class="control"
+                    type="password"
+                    autocomplete="new-password"
+                    formControlName="newPassword"
+                  />
+                </div>
+                <div class="field">
+                  <label class="field__label" for="confirm-new-password">{{
+                    t('auth.fields.confirmPassword')
+                  }}</label>
+                  <input
+                    id="confirm-new-password"
+                    class="control"
+                    type="password"
+                    autocomplete="new-password"
+                    formControlName="confirmPassword"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="acct-card__foot">
+              @if (passwordState() === 'success') {
+                <p class="acct-saved" role="status">
+                  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                  {{ t('account.passwordChanged') }}
+                </p>
+              }
+              <button
+                class="btn btn--primary"
+                type="submit"
+                [disabled]="passwordState() === 'saving'"
+              >
+                {{ t('account.changePassword') }}
+              </button>
+            </div>
+          </form>
+
+          @if (isClient()) {
+            <div class="acct-card acct-danger">
+              <div class="acct-danger__text">
+                <h2>{{ t('account.deleteTitle') }}</h2>
+                <p>{{ t('account.deleteLead') }}</p>
+              </div>
+              <button class="btn acct-danger__btn" type="button" (click)="deleteAccount()">
+                {{ t('account.deleteAction') }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+</ng-container>

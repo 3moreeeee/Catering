@@ -1,0 +1,263 @@
+// =============================================================================
+// DESIGN TOKENS — single source of truth
+// Every colour, size, duration and easing used anywhere in the application is
+// declared here as a CSS custom property. Nothing outside this file may invent
+// a raw value. See docs/03-creative-direction.md for the rationale.
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // COLOUR — core ramp
+  // ---------------------------------------------------------------------------
+  // Clean commercial whites: bright, neutral and quietly warm.
+  --c-ivory-50: #ffffff;
+  --c-ivory-100: #faf9f6;
+  --c-ivory-200: #e5e3de;
+  --c-white: #ffffff;
+
+  // Kept under the legacy `forest` API so every component stays compatible;
+  // Deep botanical greens bring warmth to the food-service brand surfaces.
+  --c-forest-900: #103b2d;
+  --c-forest-800: #174b36;
+  --c-forest-700: #1b5736;
+  --c-forest-600: #21683f;
+  --c-forest-500: #397d50;
+  --c-forest-300: #c8ddca;
+
+  // Legacy accent API shares the botanical global CTA hierarchy.
+  --c-copper-600: var(--c-forest-900);
+  --c-copper-500: var(--c-forest-700);
+  --c-copper-400: #e5ecd7;
+  --c-copper-200: var(--c-ivory-100);
+
+  --c-ink-900: #1c1e22;
+  --c-ink-700: #444444;
+  --c-ink-500: #686868;
+  --c-ink-300: #929997;
+
+  --c-stone-200: var(--c-ivory-200);
+  --c-stone-100: #faf7ef;
+
+  // Vinto menu hues sampled 2026-09-23; remapped to Catering categories.
+  // 600 = reference; darker shades support readable white text.
+  // Hygiene uses burnt orange; MONIN uses bottle green, never HoReCa violet.
+  --c-food-900: #0f4422;
+  --c-food-800: #145a2e;
+  --c-food-700: #1a7139;
+  --c-food-600: #22964c;
+  --c-food-100: #e2f1e8;
+  --c-food-50: #f4faf6;
+  --c-packaging-900: #14405f;
+  --c-packaging-800: #1a557f;
+  --c-packaging-700: #216a9e;
+  --c-packaging-600: #2e93dc;
+  --c-packaging-100: #e4f1fa;
+  --c-packaging-50: #f5fafd;
+  --c-horeca-900: #442d67;
+  --c-horeca-800: #5a3c8a;
+  --c-horeca-700: #714bac;
+  --c-horeca-600: #8d5ed7;
+  --c-horeca-100: #f0eafa;
+  --c-horeca-50: #f9f7fd;
+  --c-hygiene-900: #753311;
+  --c-hygiene-800: #914016;
+  --c-hygiene-700: #a64b17;
+  --c-hygiene-600: #fea638;
+  --c-hygiene-100: #fff3e5;
+  --c-hygiene-50: #fffbf5;
+  --c-cat-horeca: var(--c-horeca-700);
+  --c-dark-rgb: 16 59 45;
+  --c-ui-rgb: 33 104 63;
+  --c-light-rgb: 250 247 239;
+  --c-dark-secondary: #edf1e7;
+  --c-dark-muted: #d5e0ce;
+  --c-dark-disabled: #a6bda5;
+  --c-hero-mid: #1c5038;
+  --c-hero-end: #0b3026;
+
+  // Category identity — coordinated, never used as a large fill
+  --c-cat-food: var(--c-food-700);
+  --c-cat-monin: #102f29;
+  --c-cat-packaging: var(--c-packaging-700);
+  --c-cat-hygiene: var(--c-hygiene-700);
+
+  // Semantic
+  --c-success: #2d7d31;
+  --c-error: #b72f24;
+  --c-warning: var(--c-hygiene-800);
+  --c-info: var(--c-packaging-700);
+
+  // ---------------------------------------------------------------------------
+  // SEMANTIC SURFACES — components reference these, not the ramp above.
+  // Overridden wholesale by `.on-dark` so a component works on either ground.
+  // ---------------------------------------------------------------------------
+  --surface-page: var(--c-ivory-50);
+  --surface-alt: var(--c-ivory-100);
+  --surface-card: var(--c-white);
+  --surface-inset: var(--c-stone-100);
+
+  --text-primary: var(--c-ink-900);
+  --text-secondary: var(--c-ink-700);
+  --text-muted: var(--c-ink-500);
+  --text-disabled: var(--c-ink-300);
+  --text-accent: var(--c-forest-700);
+  --text-inverse: var(--c-ivory-50);
+
+  --border-hairline: var(--c-ivory-200);
+  --border-neutral: var(--c-stone-200);
+  --border-strong: var(--c-ink-300);
+
+  --focus-ring: var(--c-forest-600);
+  --focus-offset-color: var(--c-ivory-50);
+
+  // ---------------------------------------------------------------------------
+  // TYPOGRAPHY
+  // ---------------------------------------------------------------------------
+  --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  --fs-display: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
+  --fs-h1: clamp(2.25rem, 1.5rem + 3.2vw, 4rem);
+  --fs-h2: clamp(1.75rem, 1.3rem + 2.1vw, 3rem);
+  --fs-h3: clamp(1.375rem, 1.15rem + 1vw, 2rem);
+  --fs-h4: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+  --fs-body: 1.0625rem;
+  --fs-sm: 0.9375rem;
+  --fs-xs: 0.8125rem;
+  --fs-label: 0.75rem;
+
+  --lh-display: 0.98;
+  --lh-heading: 1.12;
+  --lh-snug: 1.35;
+  --lh-body: 1.65;
+
+  --ls-display: -0.035em;
+  --ls-heading: -0.02em;
+  --ls-body: 0;
+  --ls-label: 0.12em;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --measure: 68ch;
+  --measure-display: 24ch;
+
+  // ---------------------------------------------------------------------------
+  // SPACING — 4px base
+  // ---------------------------------------------------------------------------
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+  --sp-20: 5rem;
+  --sp-24: 6rem;
+  --sp-32: 8rem;
+
+  --section-y: clamp(3.25rem, 9vw, 9rem);
+  --gutter: 1.5rem;
+
+  // ---------------------------------------------------------------------------
+  // RADIUS — deliberately restrained; nothing reads as an app icon
+  // ---------------------------------------------------------------------------
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  // ---------------------------------------------------------------------------
+  // ELEVATION — reserved for genuinely floating surfaces only
+  // ---------------------------------------------------------------------------
+  --e-0: none;
+  --e-1: 0 2px 6px rgb(var(--c-dark-rgb) / 0.06);
+  --e-2: 0 10px 28px -10px rgb(var(--c-ui-rgb) / 0.16);
+  --e-3: 0 22px 52px -18px rgb(var(--c-ui-rgb) / 0.24);
+  --e-4: 0 34px 74px -24px rgb(var(--c-dark-rgb) / 0.34);
+
+  // ---------------------------------------------------------------------------
+  // MOTION
+  // ---------------------------------------------------------------------------
+  --d-instant: 80ms;
+  --d-fast: 160ms;
+  --d-base: 240ms;
+  --d-slow: 420ms;
+  --d-reveal: 720ms;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+
+  // ---------------------------------------------------------------------------
+  // LAYOUT
+  // ---------------------------------------------------------------------------
+  --container-max: 1480px;
+  --container-narrow: 768px;
+  --container-wide: 1680px;
+  --header-h: 72px;
+  --tap-min: 44px;
+
+  // ---------------------------------------------------------------------------
+  // Z-INDEX — the complete stacking contract. No z-index elsewhere.
+  // ---------------------------------------------------------------------------
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-megamenu: 300;
+  --z-drawer: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-skiplink: 700;
+}
+
+// -----------------------------------------------------------------------------
+// DARK GROUND CONTEXT
+// Applied to any section rendered on forest. Components inside need no changes.
+// -----------------------------------------------------------------------------
+.on-dark {
+  --surface-page: var(--c-forest-900);
+  --surface-alt: var(--c-forest-800);
+  --surface-card: var(--c-forest-700);
+  --surface-inset: var(--c-forest-800);
+
+  --text-primary: var(--c-ivory-50);
+  --text-secondary: var(--c-dark-secondary);
+  --text-muted: var(--c-dark-muted);
+  --text-disabled: var(--c-dark-disabled);
+  --text-accent: var(--c-copper-400);
+  --text-inverse: var(--c-ink-900);
+
+  --border-hairline: rgb(255 255 255 / 0.1);
+  --border-neutral: rgb(255 255 255 / 0.16);
+  --border-strong: rgb(255 255 255 / 0.32);
+
+  --focus-offset-color: var(--c-forest-900);
+
+  color: var(--text-primary);
+  background-color: var(--surface-page);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 2rem;
+    --header-h: 80px;
+  }
+}
+
+// Large desktop / 16-inch MacBook presentation: the content stays optically
+// centred with breathing room instead of stretching toward the screen edges.
+@media (min-width: 1600px) {
+  :root {
+    --gutter: 3rem;
+    --section-y: clamp(6rem, 7vw, 8.5rem);
+  }
+}

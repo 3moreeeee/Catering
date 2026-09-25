@@ -1,0 +1,111 @@
+<ng-container *transloco="let t">
+  @if (open()) {
+    <!-- The dismissable ground behind the sheet. On a phone the panel covers
+         the viewport and this is never reachable; from 480px up the panel is a
+         sheet and this is the page showing beside it, which is the first place
+         a user will press to get out. `aria-hidden` because Escape and the
+         close button already give assistive technology two ways out. -->
+    <div class="mnav__backdrop" aria-hidden="true" (click)="dismiss.emit()"></div>
+
+    <div
+      class="mnav__panel"
+      #panel
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="t('nav.mainNavigation')"
+    >
+      <div class="mnav__head">
+        <span class="u-eyebrow">{{ t('nav.mainNavigation') }}</span>
+        <button
+          type="button"
+          class="btn btn--icon"
+          [attr.aria-label]="t('nav.closeMenu')"
+          (click)="dismiss.emit()"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M2 2l12 12M14 2L2 14"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="mnav__body">
+        <ul class="mnav__list">
+          <li>
+            <a class="mnav__link" [routerLink]="to('')">{{ t('nav.home') }}</a>
+          </li>
+          <li>
+            <a class="mnav__link" [routerLink]="to('about')">{{ t('nav.company') }}</a>
+          </li>
+          <li>
+            <a class="mnav__link" [routerLink]="to('products')">{{ t('nav.products') }}</a>
+            <ul class="mnav__sublist">
+              @for (category of categories(); track category.id) {
+                <li>
+                  <a
+                    class="mnav__sublink"
+                    [routerLink]="to('products/' + category.slug)"
+                    [style.--cat-accent]="category.accent"
+                    >{{ category.name | localized }}</a
+                  >
+                </li>
+              }
+            </ul>
+          </li>
+          <li>
+            <a class="mnav__link" [routerLink]="to('brands')">{{ t('nav.brands') }}</a>
+          </li>
+          <li>
+            <a class="mnav__link" [routerLink]="to('industries')">{{ t('nav.industries') }}</a>
+          </li>
+          <li>
+            <a class="mnav__link" [routerLink]="to('contact')">{{ t('nav.contact') }}</a>
+          </li>
+          <li>
+            <a
+              class="mnav__link"
+              [routerLink]="
+                to(auth.isAdmin() ? 'admin' : auth.authenticated() ? 'account' : 'login')
+              "
+            >
+              {{
+                auth.isAdmin()
+                  ? t('nav.adminDashboard')
+                  : auth.authenticated()
+                    ? t('nav.account')
+                    : t('nav.login')
+              }}
+            </a>
+          </li>
+            <!-- The header hides the basket icon on the narrowest screens, so the
+                 drawer is where it stays reachable there. -->
+            <li>
+              <a class="mnav__link" [routerLink]="to('cart')">
+                {{ cart.itemCount() > 0 ? t('nav.cartCount', { count: cart.itemCount() }) : t('nav.cart') }}
+              </a>
+            </li>
+        </ul>
+      </nav>
+
+      <div class="mnav__foot">
+        <a class="btn btn--primary btn--block" [routerLink]="to('contact')">{{ t('nav.cta') }}</a>
+
+        <div class="mnav__meta">
+          <a class="mnav__meta-link" [href]="'tel:' + company.telephone">{{
+            company.telephoneDisplay
+          }}</a>
+          <a class="mnav__meta-link" [href]="'mailto:' + company.email">{{ company.email }}</a>
+          <a class="mnav__meta-link" [href]="switchLocaleUrl()" [attr.hreflang]="alternate()">{{
+            t('language.' + alternate())
+          }}</a>
+        </div>
+      </div>
+    </div>
+  }
+</ng-container>

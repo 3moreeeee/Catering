@@ -1,0 +1,222 @@
+@use '../../../../styles/abstracts/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.offers {
+  padding-block: clamp(var(--sp-12), 7vw, var(--sp-20));
+  color: var(--c-ivory-50);
+  background:
+    radial-gradient(circle at 90% 10%, rgb(var(--c-ui-rgb) / 20%), transparent 30rem),
+    var(--c-forest-900);
+}
+
+.offers__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  margin-block-end: var(--sp-8);
+
+  h2 {
+    margin: var(--sp-2) 0 0;
+    color: inherit;
+  }
+}
+
+.offers__head-side {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-5);
+
+  > p {
+    max-inline-size: 42ch;
+    margin: 0;
+    color: rgb(255 255 255 / 70%);
+  }
+}
+
+.offers__controls {
+  display: flex;
+  flex: none;
+  gap: var(--sp-2);
+
+  button {
+    display: grid;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border: 1px solid rgb(255 255 255 / 28%);
+    border-radius: 50%;
+    color: var(--c-ivory-50);
+    cursor: pointer;
+    transition:
+      color var(--d-fast) var(--ease-out),
+      background var(--d-fast) var(--ease-out);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--c-forest-900);
+      background: var(--c-ivory-50);
+    }
+  }
+}
+
+.offers__grid {
+  display: grid;
+  grid-auto-columns: calc((100% - (2 * var(--sp-5))) / 3);
+  grid-auto-flow: column;
+  gap: var(--sp-5);
+  margin: 0;
+  padding: 0 0 var(--sp-2);
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  li {
+    min-inline-size: 0;
+    scroll-snap-align: start;
+  }
+}
+
+.offer-card {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(0, 1.2fr);
+  min-block-size: 340px;
+  block-size: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: var(--r-lg);
+  color: var(--text-primary);
+  background: var(--surface-card);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 18%);
+}
+
+.offer-card__media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  padding: var(--sp-5);
+  background: var(--surface-alt);
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    max-block-size: 230px;
+    background: transparent;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+}
+
+.offer-card__discount {
+  position: absolute;
+  inset-block-start: var(--sp-4);
+  inset-inline-start: var(--sp-4);
+  display: grid;
+  place-items: center;
+  min-inline-size: 58px;
+  min-block-size: 58px;
+  padding: var(--sp-2);
+  border-radius: 50%;
+  color: white;
+  background: var(--c-copper-600);
+  font-weight: var(--fw-bold);
+}
+
+.offer-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: clamp(var(--sp-5), 3vw, var(--sp-8));
+
+  h3 {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .btn {
+    min-block-size: 40px;
+    padding: var(--sp-2) var(--sp-4);
+    font-size: var(--fs-xs);
+  }
+}
+
+.offer-card__status {
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--r-pill);
+  color: var(--c-copper-600);
+  background: var(--surface-inset);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+
+  &.is-live {
+    color: var(--c-food-800);
+    background: var(--c-food-100);
+  }
+}
+
+.offer-card__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: 0;
+
+  del {
+    color: var(--text-muted);
+  }
+
+  strong {
+    color: var(--c-copper-600);
+    font-size: var(--fs-h3);
+  }
+}
+
+.offer-card__date {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 560px) {
+  .offers__head-side {
+    align-items: center;
+  }
+
+  .offers__grid {
+    grid-auto-columns: min(88%, 380px);
+  }
+
+  .offer-card {
+    grid-template-columns: 1fr;
+  }
+
+  .offer-card__media {
+    min-block-size: 220px;
+  }
+}
+
+@media (min-width: 560.02px) and (max-width: 1050px) {
+  .offers__grid {
+    grid-auto-columns: calc((100% - var(--sp-5)) / 2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offers__grid {
+    scroll-behavior: auto;
+  }
+}
