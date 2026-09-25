@@ -9,6 +9,10 @@
     }
   },
   "routes": [
+    {
+      "src": "/api/(auth|persons|products|categories|brands|cart|quotes|admin|health)(/.*)?",
+      "dest": "https://catering-4uyr.onrender.com/api/$1$2"
+    },
     { "src": "/", "dest": "/api/ssr" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/api/ssr" }

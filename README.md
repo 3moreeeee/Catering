@@ -249,6 +249,31 @@ upload succeeds. The private key is never included in the Angular application.
 The session token is held in an HttpOnly, SameSite=Strict cookie; it is never
 stored in browser local storage. No default administrator password is shipped.
 
+### Production hosting
+
+| Part | Host | Root directory | Address |
+|---|---|---|---|
+| Frontend (Angular SSR) | Vercel | `frontend` | https://catering-red-sigma.vercel.app |
+| Backend (Spring Boot, Docker) | Render | `backend` | https://catering-4uyr.onrender.com |
+| Database | Neon PostgreSQL | — | — |
+
+The browser never calls Render directly. A production build calls `/api` on the
+Vercel domain, and `frontend/vercel.json` forwards the backend's routes
+(`/api/auth`, `persons`, `products`, `categories`, `brands`, `cart`, `quotes`,
+`admin`, `health`) to Render; `/api/contact`, `/api/newsletter` and
+`/api/assistant` stay on the Vercel SSR server. Keeping the API same-origin is
+what lets the `SameSite=Strict` session cookie work. If the Render address
+changes, update it in `frontend/vercel.json`.
+
+Render builds `backend/Dockerfile` with the health check `/api/health` and these
+environment variables (values live only in the Render dashboard):
+`SPRING_PROFILES_ACTIVE=prod`, `NEON_DATABASE_URL`, `APP_JWT_SECRET`,
+`APP_ADMIN_EMAIL`, `APP_ADMIN_PASSWORD`, `IMAGEKIT_PUBLIC_KEY`,
+`IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`,
+`APP_CORS_ORIGINS=https://catering-red-sigma.vercel.app` and
+`APP_SECURE_COOKIE=true`. With the `prod` profile the backend refuses to start
+without PostgreSQL or a stable `APP_JWT_SECRET`.
+
 ### Catalogue, panier and devis
 
 The same Spring Boot module owns the catalogue. An administrator manages products
