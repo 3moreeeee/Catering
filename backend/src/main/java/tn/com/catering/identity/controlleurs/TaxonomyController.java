@@ -1,8 +1,10 @@
 package tn.com.catering.identity.controlleurs;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tn.com.catering.identity.common.PublicCatalogueCache;
 import tn.com.catering.identity.DTO.BrandResponse;
 import tn.com.catering.identity.DTO.CategoryResponse;
 import tn.com.catering.identity.services.ProductService;
@@ -23,12 +25,12 @@ public class TaxonomyController {
     }
 
     @GetMapping("/api/categories")
-    List<CategoryResponse> categories() {
-        return products.categories();
+    ResponseEntity<List<CategoryResponse>> categories() {
+        return PublicCatalogueCache.ok(products.categories());
     }
 
     @GetMapping("/api/brands")
-    List<BrandResponse> brands() {
-        return products.brands();
+    ResponseEntity<List<BrandResponse>> brands() {
+        return PublicCatalogueCache.ok(products.brands());
     }
 }

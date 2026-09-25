@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tn.com.catering.identity.common.PublicCatalogueCache;
 import tn.com.catering.identity.DTO.PageResponse;
 import tn.com.catering.identity.DTO.ProductPricePoint;
 import tn.com.catering.identity.DTO.ProductPriceRequest;
@@ -40,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping
-    PageResponse<ProductResponse> search(
+    ResponseEntity<PageResponse<ProductResponse>> search(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String subcategory,
@@ -49,12 +50,12 @@ public class ProductController {
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int pageSize) {
-        return products.search(q, category, subcategory, brand, featured, sort, page, pageSize);
+        return PublicCatalogueCache.ok(products.search(q, category, subcategory, brand, featured, sort, page, pageSize));
     }
 
     @GetMapping("/{slug}")
-    ProductResponse bySlug(@PathVariable String slug) {
-        return products.bySlug(slug);
+    ResponseEntity<ProductResponse> bySlug(@PathVariable String slug) {
+        return PublicCatalogueCache.ok(products.bySlug(slug));
     }
 
     /**
@@ -63,8 +64,8 @@ public class ProductController {
      * the bundled snapshot.
      */
     @GetMapping("/prices")
-    List<ProductPricePoint> prices(@RequestParam List<String> sourceIds) {
-        return products.prices(sourceIds);
+    ResponseEntity<List<ProductPricePoint>> prices(@RequestParam List<String> sourceIds) {
+        return PublicCatalogueCache.ok(products.prices(sourceIds));
     }
 
     @GetMapping("/id/{id}")
