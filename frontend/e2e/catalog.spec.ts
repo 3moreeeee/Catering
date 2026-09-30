@@ -18,7 +18,8 @@ test.describe('catalogue discovery', () => {
     await page.goto('/fr/products/monin');
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('MONIN');
-    await expect(page.getByRole('status')).toContainText('57');
+    // 57 Vinto references, 3 withdrawn and 37 added from the MONIN price list.
+    await expect(page.getByRole('status')).toContainText('91');
 
     const cards = page.locator('fk-product-card');
     await expect(cards.first()).toBeVisible();
@@ -34,16 +35,20 @@ test.describe('catalogue discovery', () => {
 
   test('narrows results by division and keeps the filter in the URL', async ({ page }) => {
     await page.goto('/fr/products');
+    const count = async () =>
+      Number((await page.getByRole('status').innerText()).match(/\d+/)?.[0] ?? '0');
+    const total = await count();
+    expect(total).toBeGreaterThan(0);
     await page
       .getByRole('checkbox', { name: /Hygiène/i })
       .first()
       .check();
 
     await expect(page).toHaveURL(/category=hygiene/);
-    // Filtering must reduce the result set below the unfiltered total.
-    const filtered = Number((await page.getByRole('status').innerText()).match(/\d+/)?.[0] ?? '0');
-    expect(filtered).toBeGreaterThan(0);
-    expect(filtered).toBeLessThan(268);
+    // Filtering, done by the server, must reduce the result set below the
+    // unfiltered total once the new page arrives.
+    await expect.poll(count).toBeLessThan(total);
+    expect(await count()).toBeGreaterThan(0);
   });
 
   test('switches division from the top products menu without leaving the catalogue', async ({
@@ -108,7 +113,9 @@ test.describe('catalogue discovery', () => {
       .first()
       .click();
     await expect(page).toHaveURL(/\/fr\/products$/);
-    await expect(page.getByRole('status')).toContainText('247');
+    // 295 records after the supplier reconciliation, shown as 293 cards: the two
+    // colour lines (verrine goutte, calot) each display once.
+    await expect(page.getByRole('status')).toContainText('293');
     // Back to the unfiltered catalogue: more results than the filtered view had.
     const cleared = Number((await page.getByRole('status').innerText()).match(/\d+/)?.[0] ?? '0');
     expect(cleared).toBeGreaterThan(100);
@@ -147,14 +154,14 @@ test.describe('catalogue discovery', () => {
 });
 
 test.describe('product detail', () => {
-  test('never displays a price', async ({ page }) => {
+  // Every product is priced from the supplier price lists since the 2026-09 reconciliation.
+  test('displays the price as an amount and currency only', async ({ page }) => {
     await page.goto('/fr/products/food');
     await page.locator('fk-product-card .card__link').first().click();
 
-    await expect(page.locator('.pdp__noprice')).toBeVisible();
-    const body = await page.locator('main').innerText();
-    expect(body).not.toMatch(/\b\d+[.,]\d{2}\s?(TND|DT|€|\$)/);
-    expect(body).toMatch(/tarifs sont communiqués sur demande/i);
+    const price = page.locator('.pdp__price');
+    await expect(price).toContainText(/\d+,\d{3} TND/);
+    expect(await price.innerText()).not.toMatch(/\bHT\b|#/);
   });
 
   test('omits the technical section entirely when no datasheet exists', async ({ page }) => {

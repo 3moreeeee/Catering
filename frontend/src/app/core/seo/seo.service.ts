@@ -12,6 +12,15 @@ export interface SeoInput {
   readonly image?: string | undefined;
   readonly type?: 'website' | 'article' | 'product' | undefined;
   readonly noIndex?: boolean | undefined;
+  /**
+   * Query string that is part of this page's identity, without "?", e.g.
+   * `page=2` for a catalogue page. It is kept in the canonical and hreflang
+   * URLs, so page 2 is its own indexable page rather than a duplicate of page 1.
+   */
+  readonly query?: string | undefined;
+  /** Neighbouring pages of a paginated list, as query strings ('' for page 1). */
+  readonly prev?: string | undefined;
+  readonly next?: string | undefined;
 }
 
 /**
@@ -34,13 +43,19 @@ export class SeoService {
     const fullTitle = input.title.includes(suffix) ? input.title : `${input.title} | ${suffix}`;
     const path = input.path.replace(/^\/+|\/+$/g, '');
     const locale = this.locales.locale();
-    const canonical = this.absolute(locale, path);
-    const image = this.config.origin + (input.image ?? this.config.defaultOgImage);
+    const canonical = this.absolute(locale, path, input.query);
+    // Product photographs are absolute ImageKit URLs; site assets are paths.
+    const image = /^https?:\/\//.test(input.image ?? '')
+      ? input.image!
+      : this.config.origin + (input.image ?? this.config.defaultOgImage);
 
     this.title.setTitle(fullTitle);
 
     this.setName('description', input.description);
-    this.setName('robots', input.noIndex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
+    this.setName(
+      'robots',
+      input.noIndex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large',
+    );
 
     this.setProperty('og:type', input.type ?? 'website');
     this.setProperty('og:title', fullTitle);
@@ -57,11 +72,25 @@ export class SeoService {
     this.setName('twitter:image', image);
 
     this.setCanonical(canonical);
-    this.setHreflang(path);
+    this.setHreflang(path, input.query);
+    this.setRelation(
+      'prev',
+      input.prev === undefined ? null : this.absolute(locale, path, input.prev),
+    );
+    this.setRelation(
+      'next',
+      input.next === undefined ? null : this.absolute(locale, path, input.next),
+    );
   }
 
-  private absolute(locale: Locale, path: string): string {
-    return `${this.config.origin}/${locale}${path ? `/${path}` : ''}`;
+  private absolute(locale: Locale, path: string, query?: string): string {
+    return `${this.config.origin}/${locale}${path ? `/${path}` : ''}${query ? `?${query}` : ''}`;
+  }
+
+  private setRelation(rel: 'prev' | 'next', href: string | null): void {
+    const existing = this.document.head.querySelector(`link[rel='${rel}']`);
+    if (href === null) existing?.remove();
+    else this.upsertLink(`link[rel='${rel}']`, { rel, href });
   }
 
   private setName(name: string, content: string): void {
@@ -81,16 +110,14 @@ export class SeoService {
    * it is the language the business operates in and the legacy site's only
    * real language.
    */
-  private setHreflang(path: string): void {
+  private setHreflang(path: string, query?: string): void {
     const head = this.document.head;
-    head
-      .querySelectorAll("link[rel='alternate'][hreflang]")
-      .forEach((node) => node.remove());
+    head.querySelectorAll("link[rel='alternate'][hreflang]").forEach((node) => node.remove());
 
     const entries: readonly (readonly [string, string])[] = [
-      ['fr', this.absolute('fr', path)],
-      ['en', this.absolute('en', path)],
-      ['x-default', this.absolute('fr', path)],
+      ['fr', this.absolute('fr', path, query)],
+      ['en', this.absolute('en', path, query)],
+      ['x-default', this.absolute('fr', path, query)],
     ];
 
     for (const [hreflang, href] of entries) {

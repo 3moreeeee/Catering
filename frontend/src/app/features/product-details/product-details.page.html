@@ -32,6 +32,14 @@
                 fetchpriority="high"
                 decoding="async"
               />
+            } @else {
+              <img
+                [src]="placeholderImage.src"
+                [alt]="placeholderImage.alt | localized"
+                width="800"
+                height="800"
+                decoding="async"
+              />
             }
           </div>
 
@@ -64,7 +72,45 @@
 
           <h1 class="pdp__title">{{ p.name | localized | frenchType }}</h1>
 
+          @if (formatVisual(); as format) {
+            <p
+              class="pdp__format u-nums"
+              [class.pdp__format--packaging]="p.categoryId === 'packaging'"
+              [class.pdp__format--hygiene]="p.categoryId === 'hygiene'"
+            >
+              {{ t('product.format.' + format.qualifier) }}
+              <strong>{{ format.value | frenchType }}</strong>
+            </p>
+          }
+
           <p class="u-lead pdp__lead">{{ p.shortDescription | localized }}</p>
+
+          @if (p.colorVariants?.length) {
+            <fieldset class="pdp__colors">
+              <legend class="u-label">{{ t('product.color') }}</legend>
+              <div class="pdp__color-options">
+                @for (variant of p.colorVariants; track variant.id) {
+                  <button
+                    type="button"
+                    class="pdp__color-option"
+                    [class.pdp__color-option--selected]="selectedColorId() === variant.id"
+                    [attr.aria-pressed]="selectedColorId() === variant.id"
+                    (click)="selectColor(variant.id)"
+                  >
+                    <span
+                      class="pdp__swatch"
+                      [style.background-color]="variant.swatch"
+                      aria-hidden="true"
+                    ></span>
+                    {{ variant.label | localized }}
+                  </button>
+                }
+              </div>
+              @if (!selectedColor()) {
+                <p class="u-xs u-muted pdp__color-hint">{{ t('product.chooseColorFirst') }}</p>
+              }
+            </fieldset>
+          }
 
           <dl class="pdp__specs">
             @if (category(); as cat) {
@@ -101,21 +147,54 @@
             <div class="pdp__price u-nums">
               @if (point.offerActive && point.originalPrice !== null) {
                 <span class="admin-badge" data-status="ACTIVE">{{ t('product.offer') }}</span>
-                <del>{{ point.originalPrice.toFixed(3) }} {{ point.currency ?? 'TND' }}</del>
+                <del>{{ money(point.originalPrice, point.currency) }}</del>
               }
-              <strong>{{ displayPrice() }}</strong>
+              <strong
+                >{{ displayPrice() }}
+                @if (packTerms() && point.price !== null) {
+                  <span class="pdp__per-pack"> / {{ t('pack.packs.one') }}</span>
+                }
+              </strong>
             </div>
+            @if (packTerms(); as terms) {
+              <dl class="pdp__pack u-nums" data-testid="pdp-pack">
+                @if (!point.offerActive) {
+                  <div>
+                    <dt>{{ t('pack.unitPrice') }}</dt>
+                    <dd>{{ pack.perUnit(terms) }}</dd>
+                  </div>
+                }
+                <div>
+                  <dt>{{ t('pack.packaging') }}</dt>
+                  <dd>{{ pack.pieces(terms.packQuantity, terms.unitLabel) }}</dd>
+                </div>
+                @if (!point.offerActive) {
+                  <div>
+                    <dt>{{ t('pack.calculation') }}</dt>
+                    <dd>{{ pack.calculation(terms) }}</dd>
+                  </div>
+                }
+                <div>
+                  <dt>{{ t('pack.packPrice') }}</dt>
+                  <dd>
+                    <strong>{{ displayPrice() }}</strong>
+                  </dd>
+                </div>
+              </dl>
+            }
           }
 
           @if (auth.authenticated() && pricePoint()) {
             <div class="pdp__purchase">
-              <label for="pdp-qty" class="u-label pdp__qty-label">{{ t('cart.quantity') }}</label>
+              <label for="pdp-qty" class="u-label pdp__qty-label">{{
+                packTerms() ? t('pack.quantity') : t('cart.quantity')
+              }}</label>
               <div class="pdp__buy-row">
                 <fk-quantity-stepper
                   size="lg"
                   inputId="pdp-qty"
                   [value]="quantity()"
-                  [label]="t('cart.quantity')"
+                  [label]="packTerms() ? t('pack.quantity') : t('cart.quantity')"
                   [decreaseLabel]="t('cart.decrease')"
                   [increaseLabel]="t('cart.increase')"
                   (valueChange)="setQuantity($event)"
@@ -123,14 +202,29 @@
                 <button
                   type="button"
                   class="btn btn--primary btn--lg pdp__add"
-                  [disabled]="addState() === 'adding'"
+                  [disabled]="
+                    addState() === 'adding' || (!!p.colorVariants?.length && !selectedColor())
+                  "
                   (click)="addToCart()"
                 >
                   {{ addState() === 'adding' ? t('product.adding') : t('product.addToCart') }}
                 </button>
               </div>
 
-              @if (subtotal(); as total) {
+              @if (packTerms(); as terms) {
+                <p
+                  class="pdp__subtotal pdp__subtotal--pack u-nums"
+                  data-testid="pdp-pack-total"
+                  aria-live="polite"
+                >
+                  <span>{{ pack.packsEqual(quantity(), terms) }}</span>
+                  @if (subtotal(); as total) {
+                    <span
+                      >{{ t('pack.total') }} : <strong>{{ total }}</strong></span
+                    >
+                  }
+                </p>
+              } @else if (subtotal(); as total) {
                 <p class="pdp__subtotal u-nums">
                   {{ t('product.subtotal', { quantity: quantity(), price: total }) }}
                 </p>
@@ -158,7 +252,10 @@
             <a
               class="btn btn--secondary btn--lg"
               [routerLink]="to('contact')"
-              [queryParams]="{ product: p.slug }"
+              [queryParams]="{
+                product: selectedColor()?.slug ?? p.slug,
+                color: selectedColorLabel(),
+              }"
             >
               {{ t('product.requestInfo') }}
             </a>

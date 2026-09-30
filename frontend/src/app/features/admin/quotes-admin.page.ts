@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { AdminApiService, Page } from '../../core/admin/admin-api.service';
 import { Quote, QuoteStatus } from '../../core/cart/cart.models';
+import { PackText } from '../../shared/utils/pack-text.service';
 
 /**
  * The devis inbox: every panier a client has submitted.
@@ -28,7 +29,9 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
       <div class="account-card">
         <div class="admin-toolbar">
           <div class="admin-filters">
-            <label class="u-visually-hidden" for="q-status">{{ t('dashboard.quotes.status') }}</label>
+            <label class="u-visually-hidden" for="q-status">{{
+              t('dashboard.quotes.status')
+            }}</label>
             <select id="q-status" class="control" [(ngModel)]="status" (change)="load(0)">
               <option value="">{{ t('dashboard.quotes.allStatuses') }}</option>
               @for (s of statuses; track s) {
@@ -58,7 +61,9 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
                       }}</small></span
                     >
                     <span class="admin-person"
-                      ><strong>{{ quote.companyName || quote.contactName || quote.contactEmail }}</strong
+                      ><strong>{{
+                        quote.companyName || quote.contactName || quote.contactEmail
+                      }}</strong
                       ><small>{{ quote.contactEmail }}</small></span
                     >
                     <span class="u-nums">{{ quote.createdAt.slice(0, 10) }}</span>
@@ -71,10 +76,22 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
                   @if (openId() === quote.id) {
                     <div class="admin-quote__detail">
                       <dl class="admin-quote__contact">
-                        <div><dt>{{ t('cart.fields.contactName') }}</dt><dd>{{ quote.contactName || '—' }}</dd></div>
-                        <div><dt>{{ t('cart.fields.companyName') }}</dt><dd>{{ quote.companyName || '—' }}</dd></div>
-                        <div><dt>{{ t('cart.fields.contactPhone') }}</dt><dd>{{ quote.contactPhone || '—' }}</dd></div>
-                        <div><dt>{{ t('cart.fields.deliveryCity') }}</dt><dd>{{ quote.deliveryCity || '—' }}</dd></div>
+                        <div>
+                          <dt>{{ t('cart.fields.contactName') }}</dt>
+                          <dd>{{ quote.contactName || '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>{{ t('cart.fields.companyName') }}</dt>
+                          <dd>{{ quote.companyName || '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>{{ t('cart.fields.contactPhone') }}</dt>
+                          <dd>{{ quote.contactPhone || '—' }}</dd>
+                        </div>
+                        <div>
+                          <dt>{{ t('cart.fields.deliveryCity') }}</dt>
+                          <dd>{{ quote.deliveryCity || '—' }}</dd>
+                        </div>
                       </dl>
                       @if (quote.message) {
                         <p class="admin-quote__message">{{ quote.message }}</p>
@@ -96,11 +113,35 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
                                 <td>
                                   <span class="admin-person"
                                     ><strong>{{ line.productName }}</strong
-                                    ><small>{{ line.reference || line.productSourceId }}</small></span
+                                    ><small>{{
+                                      line.reference || line.productSourceId
+                                    }}</small></span
                                   >
                                 </td>
-                                <td class="u-nums">{{ line.quantity }}</td>
-                                <td class="u-nums">{{ money(line.unitPrice) }}</td>
+                                @if (line.saleMode === 'PACK_ONLY' && line.packQuantity) {
+                                  <!-- Frozen pack terms: quantity counts packs. -->
+                                  <td class="u-nums" data-testid="quote-pack-qty">
+                                    {{ pack.packs(line.quantity) }} ×
+                                    {{ pack.pieces(line.packQuantity, line.unitLabel ?? 'piece') }}
+                                    <br /><small>{{
+                                      pack.pieces(line.totalPieces ?? 0, line.unitLabel ?? 'piece')
+                                    }}</small>
+                                  </td>
+                                  <td class="u-nums">
+                                    {{ money(line.unitPrice) }} / {{ t('pack.packs.one') }}
+                                    @if (
+                                      line.piecePrice !== null && line.piecePrice !== undefined
+                                    ) {
+                                      <br /><small
+                                        >{{ money(line.piecePrice) }} /
+                                        {{ pack.unit(line.unitLabel ?? 'piece', 1) }}</small
+                                      >
+                                    }
+                                  </td>
+                                } @else {
+                                  <td class="u-nums">{{ line.quantity }}</td>
+                                  <td class="u-nums">{{ money(line.unitPrice) }}</td>
+                                }
                                 <td class="u-nums">{{ money(line.lineTotal) }}</td>
                               </tr>
                             }
@@ -113,18 +154,37 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
 
                       <div class="admin-quote__workflow">
                         <div class="field">
-                          <label class="field__label" [attr.for]="'st-' + quote.id">{{ t('dashboard.quotes.status') }}</label>
-                          <select [id]="'st-' + quote.id" class="control" [(ngModel)]="draftStatus" [disabled]="quote.status === 'CLOSED'">
+                          <label class="field__label" [attr.for]="'st-' + quote.id">{{
+                            t('dashboard.quotes.status')
+                          }}</label>
+                          <select
+                            [id]="'st-' + quote.id"
+                            class="control"
+                            [(ngModel)]="draftStatus"
+                            [disabled]="quote.status === 'CLOSED'"
+                          >
                             @for (s of statuses; track s) {
                               <option [value]="s">{{ t('dashboard.quoteStatus.' + s) }}</option>
                             }
                           </select>
                         </div>
                         <div class="field admin-quote__note">
-                          <label class="field__label" [attr.for]="'note-' + quote.id">{{ t('dashboard.quotes.note') }}</label>
-                          <textarea [id]="'note-' + quote.id" class="control" rows="2" [(ngModel)]="draftNote"></textarea>
+                          <label class="field__label" [attr.for]="'note-' + quote.id">{{
+                            t('dashboard.quotes.note')
+                          }}</label>
+                          <textarea
+                            [id]="'note-' + quote.id"
+                            class="control"
+                            rows="2"
+                            [(ngModel)]="draftNote"
+                          ></textarea>
                         </div>
-                        <button class="btn btn--primary" type="button" [disabled]="saving()" (click)="save(quote)">
+                        <button
+                          class="btn btn--primary"
+                          type="button"
+                          [disabled]="saving()"
+                          (click)="save(quote)"
+                        >
                           {{ saving() ? t('admin.saving') : t('admin.save') }}
                         </button>
                       </div>
@@ -136,11 +196,23 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
 
             @if (p.totalPages > 1) {
               <nav class="admin-pager" [attr.aria-label]="t('common.pagination')">
-                <button class="btn btn--secondary btn--sm" type="button" [disabled]="p.page === 0" (click)="load(p.page - 1)">
+                <button
+                  class="btn btn--secondary btn--sm"
+                  type="button"
+                  [disabled]="p.page === 0"
+                  (click)="load(p.page - 1)"
+                >
                   {{ t('common.previous') }}
                 </button>
-                <span class="u-nums">{{ t('common.pageOf', { current: p.page + 1, total: p.totalPages }) }}</span>
-                <button class="btn btn--secondary btn--sm" type="button" [disabled]="p.page + 1 >= p.totalPages" (click)="load(p.page + 1)">
+                <span class="u-nums">{{
+                  t('common.pageOf', { current: p.page + 1, total: p.totalPages })
+                }}</span>
+                <button
+                  class="btn btn--secondary btn--sm"
+                  type="button"
+                  [disabled]="p.page + 1 >= p.totalPages"
+                  (click)="load(p.page + 1)"
+                >
                   {{ t('common.next') }}
                 </button>
               </nav>
@@ -155,6 +227,7 @@ import { Quote, QuoteStatus } from '../../core/cart/cart.models';
 })
 export class QuotesAdminPage {
   private readonly api = inject(AdminApiService);
+  readonly pack = inject(PackText);
 
   readonly statuses: readonly QuoteStatus[] = ['SUBMITTED', 'IN_REVIEW', 'ANSWERED', 'CLOSED'];
   readonly page = signal<Page<Quote> | null>(null);
@@ -197,10 +270,17 @@ export class QuotesAdminPage {
   async save(quote: Quote): Promise<void> {
     this.saving.set(true);
     try {
-      const updated = await this.api.updateQuoteStatus(quote.id, this.draftStatus, this.draftNote || null);
+      const updated = await this.api.updateQuoteStatus(
+        quote.id,
+        this.draftStatus,
+        this.draftNote || null,
+      );
       this.page.update((current) =>
         current
-          ? { ...current, items: current.items.map((item) => (item.id === updated.id ? updated : item)) }
+          ? {
+              ...current,
+              items: current.items.map((item) => (item.id === updated.id ? updated : item)),
+            }
           : current,
       );
     } catch {

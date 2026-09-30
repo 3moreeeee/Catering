@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, switchMap } from 'rxjs';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { SeoService } from '../../core/seo/seo.service';
@@ -12,7 +21,7 @@ import { SITE_CONFIG } from '../../core/config/site.config';
 import { COMPANY } from '../../data/company.data';
 import { CATEGORIES } from '../../data/categories.data';
 import { INDUSTRIES } from '../../data/industries.data';
-import { PRODUCTS } from '../../data/products.data';
+import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
 import { GoogleMapCard } from '../../shared/components/google-map-card/google-map-card';
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
@@ -84,11 +93,15 @@ export class ContactPage {
     initialValue: this.route.snapshot.queryParamMap,
   });
 
-  /** The product a buyer arrived from, if any. */
-  readonly contextProduct = computed(() => {
-    const slug = this.params().get('product');
-    return slug ? (PRODUCTS.find((p) => p.slug === slug) ?? null) : null;
-  });
+  private readonly productRepo = inject(PRODUCT_REPOSITORY);
+
+  /** The product a buyer arrived from, if any, looked up by slug in the database. */
+  readonly contextProduct = toSignal(
+    toObservable(computed(() => this.params().get('product'))).pipe(
+      switchMap((slug) => (slug ? this.productRepo.byProductSlug(slug) : of(null))),
+    ),
+    { initialValue: null },
+  );
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
@@ -108,15 +121,25 @@ export class ContactPage {
   readonly invalidFields = signal<string[]>([]);
 
   constructor() {
-    queueMicrotask(() => {
+    // The product arrives from the API after the first render: pre-fill the
+    // division and subject once it does, without overwriting what the buyer typed.
+    effect(() => {
       const product = this.contextProduct();
-      if (product) {
+      if (!product) return;
+      const subject = this.form.controls.subject;
+      untracked(() =>
         this.form.patchValue({
           category: product.categoryId,
-          subject: this.locales.text(product.name),
-        });
-      }
+          ...(subject.dirty
+            ? {}
+            : {
+                subject: `${this.locales.text(product.name)}${this.params().get('color') ? ` — ${this.params().get('color')}` : ''}`,
+              }),
+        }),
+      );
+    });
 
+    queueMicrotask(() => {
       this.seo.apply({
         title: this.transloco.translate('contact.title'),
         description: this.transloco.translate('contact.lead'),
@@ -219,9 +242,7 @@ export class ContactPage {
       const body = (await response.json()) as Partial<EnquiryResponse> | null;
 
       if (!response.ok || body?.ok !== true) {
-        throw new SubmissionError(
-          body?.code === 'not_configured' ? 'unavailable' : 'failed',
-        );
+        throw new SubmissionError(body?.code === 'not_configured' ? 'unavailable' : 'failed');
       }
 
       if (typeof body.reference !== 'string' || body.reference.length === 0) {

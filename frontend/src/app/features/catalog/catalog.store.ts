@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, map, switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 import {
   CategoryId,
   FacetSet,
@@ -19,7 +19,7 @@ import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { CATEGORIES } from '../../data/categories.data';
-import { DEFAULT_PAGE_SIZE } from '../../data/repositories/in-memory.repository';
+import { CATALOG_PAGE_SIZE } from '../../data/repositories/api-product.repository';
 
 const CSV = (value: string | null): string[] =>
   value
@@ -84,29 +84,21 @@ export class CatalogStore {
       sizes: CSV(params.get('size')) as SizeBucket[],
       sort,
       page: Number(params.get('page') ?? 1) || 1,
-      pageSize: DEFAULT_PAGE_SIZE,
+      pageSize: CATALOG_PAGE_SIZE,
     };
   });
 
-  // The repository answers synchronously with the bundled catalogue and later
-  // with the live one from the API. Reading only the synchronous value — as
-  // this store used to — froze the page on whatever was there at first read:
-  // with the API catalogue arriving over HTTP, that was an empty page, and the
-  // catalogue showed "0 produits". So the store follows the stream, and falls
-  // back to the synchronous read only until the stream's first value, which is
-  // what server rendering and the hydrating first render see.
-  private readonly liveResult = toSignal(
+  // One server page and its facet counts per query. Server rendering waits for
+  // both requests, and the HTTP transfer cache hands their responses to the
+  // hydrating browser, so the first client render reads them without a second
+  // request.
+  private readonly result = toSignal(
     toObservable(this.query).pipe(switchMap((query) => this.repo.list(query))),
+    { initialValue: this.emptyPage() },
   );
-  private readonly result = computed<Paginated<Product>>(
-    () => this.liveResult() ?? firstSync(this.repo.list(this.query()), this.emptyPage()),
-  );
-
-  private readonly liveFacets = toSignal(
+  private readonly facetSet = toSignal(
     toObservable(this.query).pipe(switchMap((query) => this.repo.facets(query))),
-  );
-  private readonly facetSet = computed<FacetSet>(
-    () => this.liveFacets() ?? firstSync(this.repo.facets(this.query()), this.emptyFacets()),
+    { initialValue: this.emptyFacets() },
   );
 
   readonly products = computed(() => this.result().items);
@@ -178,10 +170,6 @@ export class CatalogStore {
     this.patch({ sort: sort === 'relevance' ? null : sort, page: null });
   }
 
-  setPage(page: number): void {
-    this.patch({ page: page > 1 ? String(page) : null });
-  }
-
   removeChip(key: string, id: string): void {
     if (key === 'q') {
       this.patch({ q: null, page: null });
@@ -232,17 +220,10 @@ export class CatalogStore {
   }
 
   private emptyPage(): Paginated<Product> {
-    return { items: [], total: 0, page: 1, pageSize: DEFAULT_PAGE_SIZE, totalPages: 1 };
+    return { items: [], total: 0, page: 1, pageSize: CATALOG_PAGE_SIZE, totalPages: 1 };
   }
 
   private emptyFacets(): FacetSet {
     return { categories: [], subcategories: [], brands: [], industries: [], sizes: [] };
   }
-}
-
-/** The value a source emits synchronously on subscription, or `fallback`. */
-function firstSync<T>(source: Observable<T>, fallback: T): T {
-  let value = fallback;
-  source.subscribe((next) => (value = next)).unsubscribe();
-  return value;
 }

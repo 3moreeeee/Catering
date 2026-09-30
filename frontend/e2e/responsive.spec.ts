@@ -50,6 +50,18 @@ async function elementsOutsideViewport(page: Page, width: number) {
       );
     };
     const excused = (el: Element) => {
+      // A slide of a horizontal scroller (the offers carousel) is reachable by
+      // scrolling it, with its own controls: not lost content, provided the
+      // scroller itself sits inside the viewport. Clipping (`clip`/`hidden`)
+      // is not excused for text: that is content nobody can reach.
+      for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+        const style = getComputedStyle(p);
+        if (['auto', 'scroll'].includes(style.overflowX) && p.scrollWidth > p.clientWidth + 1) {
+          const box = p.getBoundingClientRect();
+          if (box.left >= -1 && box.right <= vw + 1) return true;
+          break;
+        }
+      }
       if (!MEDIA.has(el.tagName.toLowerCase())) return false;
       for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
         const overflow = getComputedStyle(p).overflowX;
@@ -102,8 +114,7 @@ async function clippedText(page: Page) {
       if (!hides(style.overflowX) && !hides(style.overflowY) && style.webkitLineClamp === 'none') {
         continue;
       }
-      const cut =
-        el.scrollWidth - el.clientWidth > 2 || el.scrollHeight - el.clientHeight > 4;
+      const cut = el.scrollWidth - el.clientWidth > 2 || el.scrollHeight - el.clientHeight > 4;
       if (cut) {
         offenders.push(
           `${el.tagName.toLowerCase()}.${(el.className || '').toString().split(' ')[0]} ` +
@@ -190,12 +201,18 @@ test.describe('header', () => {
 
       const inside = await page.evaluate((vw) => {
         const controls = [
-          ...document.querySelectorAll('.header__inner a, .header__inner button, .header__inner input'),
+          ...document.querySelectorAll(
+            '.header__inner a, .header__inner button, .header__inner input',
+          ),
         ].filter((el) => (el as HTMLElement).offsetParent !== null);
         return controls
           .map((el) => {
             const b = el.getBoundingClientRect();
-            return { cls: (el.className || '').toString().split(' ')[0], right: b.right, left: b.left };
+            return {
+              cls: (el.className || '').toString().split(' ')[0],
+              right: b.right,
+              left: b.left,
+            };
           })
           .filter((c) => c.right > vw + 1 || c.left < -1);
       }, width);
@@ -252,9 +269,7 @@ test.describe('mobile navigation', () => {
     await expect(page.locator('.mnav__panel')).toBeVisible();
 
     expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe('hidden');
-    expect(
-      await page.evaluate(() => !!document.activeElement?.closest('.mnav__panel')),
-    ).toBe(true);
+    expect(await page.evaluate(() => !!document.activeElement?.closest('.mnav__panel'))).toBe(true);
   });
 
   test('Escape closes it and returns focus to the burger', async ({ page }) => {
@@ -321,7 +336,16 @@ test.describe('third parties and dead controls', () => {
 });
 
 test.describe('unfinished content never reaches a visitor', () => {
-  const ROUTES = ['', '/about', '/products', '/brands', '/industries', '/contact', '/privacy', '/terms'];
+  const ROUTES = [
+    '',
+    '/about',
+    '/products',
+    '/brands',
+    '/industries',
+    '/contact',
+    '/privacy',
+    '/terms',
+  ];
   const MARKERS = [
     'NEEDS_',
     'à confirmer',

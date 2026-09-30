@@ -16,15 +16,13 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocaleService } from '../../i18n/locale.service';
 import { LocalizedRouter } from '../../i18n/localized-router.service';
-import {
-  CATEGORY_REPOSITORY,
-  PRODUCT_REPOSITORY,
-} from '../../../data/repositories/catalog.repository';
+import { CATEGORY_REPOSITORY } from '../../../data/repositories/catalog.repository';
 import { Locale } from '../../../shared/models/localized-text.model';
 import { MegaMenu } from '../mega-menu/mega-menu';
 import { MobileNav } from '../mobile-nav/mobile-nav';
 import { AuthService } from '../../auth/auth.service';
 import { CartService } from '../../cart/cart.service';
+import { CatalogStats } from '../../catalog/catalog-stats.service';
 
 /**
  * Sticky header.
@@ -54,14 +52,11 @@ export class SiteHeader {
   private readonly locales = inject(LocaleService);
   private readonly links = inject(LocalizedRouter);
   private readonly categoryRepo = inject(CATEGORY_REPOSITORY);
-  private readonly productRepo = inject(PRODUCT_REPOSITORY);
   readonly auth = inject(AuthService);
   readonly cart = inject(CartService);
 
   readonly categories = toSignal(this.categoryRepo.all(), { initialValue: [] });
-  readonly totalProducts = toSignal(this.productRepo.all().pipe(), { initialValue: [] });
-
-  readonly productCount = computed(() => this.totalProducts().length);
+  readonly productCount = inject(CatalogStats).total;
 
   readonly scrolled = signal(false);
   readonly megaOpen = signal(false);

@@ -61,6 +61,8 @@
 }
 
 .card__media {
+  --format-scale: 1;
+  --format-shift: 0%;
   position: relative;
   aspect-ratio: 1 / 1;
   background:
@@ -87,14 +89,20 @@
     // White studio canvases retained by the safety check disappear into the
     // warm card surface, while pale products keep all of their original detail.
     mix-blend-mode: multiply;
+    transform: translateY(var(--format-shift)) scale(var(--format-scale));
+    transform-origin: center bottom;
     transition: transform var(--d-slow) var(--ease-out);
   }
 
   .card:hover & img {
     @include fine-pointer {
-      transform: scale(1.04);
+      transform: translateY(var(--format-shift)) scale(calc(var(--format-scale) * 1.04));
     }
   }
+}
+
+.card__media--normalized img {
+  padding: 0;
 }
 
 .card__body {
@@ -126,12 +134,51 @@
   line-height: var(--lh-snug);
   letter-spacing: -0.01em;
   margin: 0;
-  // Vinto uses descriptive trade names that include dimensions and pack sizes.
-  // Four lines preserve that buying information in the narrow homepage grid.
-  @include clamp-lines(4);
+  // Trade names carry dimensions and pack sizes: the name is shown whole, never
+  // clamped. The grids give every card of a row the height of the tallest.
+  overflow-wrap: anywhere;
 }
 
 .card__format {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--sp-2);
+  max-inline-size: 100%;
+  padding: 0.3rem var(--sp-3);
+  border-radius: var(--r-pill);
+  background: color-mix(in oklab, var(--c-cat-monin) 9%, var(--surface-card));
+  color: var(--c-cat-monin);
+  font-weight: var(--fw-semibold);
+  line-height: 1.35;
+  margin: 0;
+
+  svg {
+    flex: 0 0 1.1rem;
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  strong {
+    font-weight: var(--fw-bold);
+  }
+}
+
+.card__format--packaging {
+  background: color-mix(in oklab, var(--c-cat-packaging) 9%, var(--surface-card));
+  color: var(--c-cat-packaging);
+}
+
+.card__format--hygiene {
+  background: color-mix(in oklab, var(--c-cat-hygiene) 9%, var(--surface-card));
+  color: var(--c-cat-hygiene);
+}
+
+.card__format-fallback {
   color: var(--text-muted);
   margin: 0;
 }
@@ -159,6 +206,27 @@
 
 // Placeholder while the live price loads: same line box as the price, so the
 // card keeps its height and nothing shifts when the figure arrives.
+// The amount and "/ lot" never break inside themselves; a narrow card wraps
+// between them instead of leaving "/" on one line and "lot" on the next.
+.card__amount,
+.card__per-pack {
+  white-space: nowrap;
+}
+
+.card__per-pack {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-regular);
+  color: var(--text-secondary);
+}
+
+// What a pack holds, then the piece price: two quiet lines under the pack
+// price, so neither competes with it on a phone.
+.card__pack {
+  display: grid;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
 .card__price--pending span {
   display: block;
   inline-size: 5.5em;

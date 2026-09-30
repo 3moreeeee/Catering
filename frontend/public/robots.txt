@@ -1,13 +1,13 @@
 User-agent: *
 Allow: /
 
-# Filtered catalogue permutations are canonicalised to the unfiltered list;
-# keep them out of the index.
+# Filtered catalogue permutations are noindex; keep crawlers out of them.
+# Catalogue pages (?page=2, ?page=3 …) are distinct, self-canonical pages and
+# stay crawlable.
 Disallow: /*?q=
 Disallow: /*?sub=
 Disallow: /*?brand=
 Disallow: /*?industry=
 Disallow: /*?size=
-Disallow: /*?page=
 
 Sitemap: https://www.catering.com.tn/sitemap.xml

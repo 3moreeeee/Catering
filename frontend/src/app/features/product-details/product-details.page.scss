@@ -132,8 +132,89 @@
   margin: 0;
 }
 
+.pdp__format {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-pill);
+  background: color-mix(in oklab, var(--c-cat-monin) 9%, var(--surface-card));
+  color: var(--c-cat-monin);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.pdp__format--packaging {
+  background: color-mix(in oklab, var(--c-cat-packaging) 9%, var(--surface-card));
+  color: var(--c-cat-packaging);
+}
+
+.pdp__format--hygiene {
+  background: color-mix(in oklab, var(--c-cat-hygiene) 9%, var(--surface-card));
+  color: var(--c-cat-hygiene);
+}
+
 .pdp__lead {
   margin: 0;
+}
+
+.pdp__colors {
+  border: 0;
+  padding: 0;
+  margin: var(--sp-5) 0 0;
+  min-inline-size: 0;
+
+  legend {
+    margin-block-end: var(--sp-2);
+    color: var(--text-secondary);
+  }
+}
+
+.pdp__color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.pdp__color-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-pill);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+
+  &:hover,
+  &--selected {
+    border-color: var(--text-accent);
+  }
+
+  &--selected {
+    box-shadow: inset 0 0 0 1px var(--text-accent);
+    font-weight: var(--fw-semibold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.pdp__swatch {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  flex: none;
+  border: 1px solid color-mix(in oklab, black 18%, transparent);
+  border-radius: 50%;
+}
+
+.pdp__color-hint {
+  margin: var(--sp-2) 0 0;
 }
 
 .pdp__pending {
@@ -204,6 +285,41 @@
   border: 1px solid var(--border-hairline);
   border-radius: var(--r-md);
   background: var(--surface-alt);
+}
+
+.pdp__per-pack {
+  font-size: var(--fs-md, 1rem);
+  font-weight: var(--fw-regular);
+  color: var(--text-secondary);
+}
+
+// Pack terms: unit price, pack content, calculation and pack price, as a
+// compact definition list that wraps to one column on a phone.
+.pdp__pack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--sp-2) var(--sp-4);
+  margin: 0;
+
+  div {
+    display: grid;
+    gap: 2px;
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.pdp__subtotal--pack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
 }
 
 .pdp__qty-label {

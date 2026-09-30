@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { forkJoin, map } from 'rxjs';
 import { LocalizedRouter } from '../../../core/i18n/localized-router.service';
 import {
   CATEGORY_REPOSITORY,
@@ -9,14 +10,15 @@ import {
 } from '../../../data/repositories/catalog.repository';
 import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 import { ProductCard } from '../../../shared/components/cards/product-card';
-import { CategoryId, Product } from '../../../shared/models/catalog.model';
+import { CATEGORY_IDS, CategoryId, Product } from '../../../shared/models/catalog.model';
+import { CatalogStats } from '../../../core/catalog/catalog-stats.service';
 
 /**
  * Section 4 — featured products, tabbed by division.
  *
  * Implements the WAI-ARIA tabs pattern properly: roving tabindex, arrow-key
- * navigation with Home/End, and panels associated by `aria-controls`. Switching
- * tabs filters an already-loaded list; nothing is refetched.
+ * navigation with Home/End, and panels associated by `aria-controls`. Every
+ * panel is loaded with the page; switching tabs refetches nothing.
  */
 @Component({
   selector: 'fk-featured-section',
@@ -74,7 +76,11 @@ import { CategoryId, Product } from '../../../shared/models/catalog.model';
 
         <div class="featured__foot">
           <a class="btn btn--secondary btn--lg" [routerLink]="to('products')">
-            {{ t('home.featured.viewAll', { count: total() }) }}
+            @if (total(); as count) {
+              {{ t('home.featured.viewAll', { count }) }}
+            } @else {
+              {{ t('footer.allProducts') }}
+            }
           </a>
         </div>
       </div>
@@ -88,10 +94,6 @@ export class FeaturedSection {
   private readonly productRepo = inject(PRODUCT_REPOSITORY);
 
   readonly categories = toSignal(this.categoryRepo.all(), { initialValue: [] });
-  private readonly featured = toSignal(this.productRepo.featured(40), {
-    initialValue: [] as readonly Product[],
-  });
-  private readonly allProducts = toSignal(this.productRepo.all(), { initialValue: [] });
 
   /**
    * Products shown per division.
@@ -101,27 +103,27 @@ export class FeaturedSection {
    */
   private static readonly SHOWCASE_SIZE = 5;
 
-  readonly total = computed(() => this.allProducts().length);
+  /**
+   * Each division's showcase, selected by the database: curated (featured)
+   * products first, then verified ones. Four bounded requests, fetched once
+   * during server rendering and handed to the browser by the transfer cache.
+   */
+  private readonly showcase = toSignal(
+    forkJoin(
+      CATEGORY_IDS.map((id) =>
+        this.productRepo
+          .featured(FeaturedSection.SHOWCASE_SIZE, id)
+          .pipe(map((items) => [id, items] as const)),
+      ),
+    ).pipe(map((entries) => new Map<CategoryId, readonly Product[]>(entries))),
+    { initialValue: new Map<CategoryId, readonly Product[]>() },
+  );
+
+  readonly total = inject(CatalogStats).total;
   readonly active = signal<CategoryId>('food');
 
   productsFor(id: CategoryId): readonly Product[] {
-    const inCategory = (product: Product): boolean => product.categoryId === id;
-
-    const curated = this.featured().filter(inCategory);
-    if (curated.length >= FeaturedSection.SHOWCASE_SIZE) {
-      return curated.slice(0, FeaturedSection.SHOWCASE_SIZE);
-    }
-
-    // Top up from the wider catalogue so the showcase is always a complete
-    // grid. Curated picks keep their order at the front; the rest fills in
-    // behind them, skipping records whose details are still unverified so the
-    // homepage leads with the products we can actually stand behind.
-    const seen = new Set(curated.map((product) => product.id));
-    const filler = this.allProducts().filter(
-      (product) => inCategory(product) && !seen.has(product.id) && !product.needsVerification,
-    );
-
-    return [...curated, ...filler].slice(0, FeaturedSection.SHOWCASE_SIZE);
+    return this.showcase().get(id) ?? [];
   }
 
   to(path: string): string[] {

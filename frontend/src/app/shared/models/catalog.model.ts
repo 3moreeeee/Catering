@@ -32,12 +32,25 @@ export interface SeoMetadata {
 // Product
 // -----------------------------------------------------------------------------
 
+/** Measured bounds of the product object in its photograph, served by the API. */
+export interface ProductImageMetrics {
+  /** Fraction of the canvas occupied by the detected product object. */
+  readonly occupancy: number;
+  /** Fraction of canvas width occupied by the same object bounds. */
+  readonly width: number;
+  /** Bottom edge of the detected object, as a fraction of canvas height. */
+  readonly bottom: number;
+  readonly reliable: boolean;
+}
+
 export interface ProductImage {
   readonly src: string;
   /** Meaningful alt text. Never empty for a product image, never "Hello World". */
   readonly alt: LocalizedText;
   readonly width: number;
   readonly height: number;
+  /** Present for measured catalogue photographs; drives consistent format scaling. */
+  readonly metrics?: ProductImageMetrics;
 }
 
 export interface ProductOffer {
@@ -66,6 +79,14 @@ export interface ProductFormat {
   readonly reference?: string;
 }
 
+/** A purchasable SKU displayed as a choice on one parent product page. */
+export interface ProductColorVariant {
+  readonly id: string;
+  readonly slug: string;
+  readonly label: LocalizedText;
+  readonly swatch: string;
+}
+
 export const SIZE_BUCKETS = ['single', 'small', 'medium', 'large', 'bulk'] as const;
 export type SizeBucket = (typeof SIZE_BUCKETS)[number];
 
@@ -80,6 +101,7 @@ export interface Product {
   readonly brandId?: string;
   readonly industries: readonly IndustryId[];
   readonly formats: readonly ProductFormat[];
+  readonly colorVariants?: readonly ProductColorVariant[];
   readonly images: readonly ProductImage[];
   readonly featured: boolean;
   /** Configured promotion returned by Neon, including upcoming offers. */

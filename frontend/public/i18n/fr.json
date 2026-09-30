@@ -239,6 +239,13 @@
     "category": "Division",
     "family": "Famille de produits",
     "formats": "Formats disponibles",
+    "format": {
+      "small": "Petit format",
+      "standard": "Format standard",
+      "large": "Grand format",
+      "plain": "Format",
+      "fit": "Taille"
+    },
     "formatsPending": "Formats à confirmer — contactez-nous pour les conditionnements.",
     "description": "Description",
     "technical": "Informations techniques",
@@ -260,6 +267,9 @@
     "verificationNote": "Certains détails de cette référence restent à confirmer par notre équipe.",
     "noPriceNote": "Les tarifs sont communiqués sur demande. Contactez-nous avec vos volumes.",
     "addToCart": "Ajouter au panier",
+    "chooseColor": "Choisir une couleur",
+    "color": "Couleur",
+    "chooseColorFirst": "Choisissez une couleur avant d’ajouter ce produit au panier.",
     "offer": "Offre",
     "adding": "Ajout…",
     "added": "Ajouté au panier",
@@ -788,7 +798,16 @@
         "imageAlt": "Texte alternatif de l'image",
         "imageHint": "JPEG, PNG, WebP, GIF ou AVIF — 10 Mo maximum. L'image sera envoyée vers ImageKit.",
         "imageUploading": "Envoi de l'image vers ImageKit…",
-        "featured": "Mettre en avant sur le site"
+        "featured": "Mettre en avant sur le site",
+        "saleMode": "Mode de vente",
+        "saleModeUNIT": "À l’unité (prix saisi directement)",
+        "saleModePACK_ONLY": "Par lot uniquement",
+        "unitPrice": "Prix unitaire (TND)",
+        "unitPriceHint": "Prix d’une seule pièce, avec au plus trois décimales (ex. 0,120).",
+        "packQuantity": "Quantité par lot",
+        "packQuantityHint": "Nombre entier de pièces dans un lot vendu.",
+        "unitLabel": "Unité",
+        "packPrice": "Prix du lot calculé"
       },
       "validation": {
         "required": "« {{field}} » est obligatoire.",
@@ -797,8 +816,14 @@
         "stock": "Le stock doit être un nombre entier.",
         "maxlength": "« {{field}} » ne peut dépasser {{max}} caractères.",
         "summary": "Corrigez les {{count}} champs signalés avant d’enregistrer.",
-        "summaryOne": "Corrigez le champ signalé avant d’enregistrer."
-      }
+        "summaryOne": "Corrigez le champ signalé avant d’enregistrer.",
+        "unitPrice": "Le prix unitaire doit être supérieur à zéro, avec au plus trois décimales (ex. 0,120).",
+        "packQuantity": "La quantité par lot doit être un nombre entier d’au moins 1."
+      },
+      "pricingTitle": "Prix et vente",
+      "packFormula": "{{unitPrice}} × {{pieces}} = {{packPrice}} / lot",
+      "previewTitle": "Ce que verra le client",
+      "packPriceDerived": "Calculé à partir du prix unitaire"
     },
     "offers": {
       "create": "Créer une offre produit",
@@ -836,11 +861,92 @@
       "image_invalid": "Choisissez une image JPEG, PNG, WebP, GIF ou AVIF de moins de 10 Mo.",
       "image_upload_failed": "L'image n'a pas pu être envoyée vers ImageKit. Réessayez.",
       "forbidden": "Action réservée aux administrateurs.",
-      "unauthorized": "Votre session a expiré. Reconnectez-vous."
+      "unauthorized": "Votre session a expiré. Reconnectez-vous.",
+      "pack_unit_price_required": "Un produit vendu par lot doit avoir un prix unitaire supérieur à zéro.",
+      "pack_quantity_required": "Un produit vendu par lot doit indiquer le nombre de pièces par lot.",
+      "pack_price_too_large": "Le prix du lot dépasse la valeur maximale autorisée.",
+      "pack_price_derived": "Le prix de ce produit est calculé à partir de son prix unitaire : modifiez-le dans la fiche."
     },
     "quoteKind": {
       "ORDER": "Commande",
       "QUOTE": "Devis"
     }
+  },
+  "units": {
+    "piece": {
+      "one": "pièce",
+      "other": "pièces"
+    },
+    "gobelet": {
+      "one": "gobelet",
+      "other": "gobelets"
+    },
+    "barquette": {
+      "one": "barquette",
+      "other": "barquettes"
+    },
+    "sachet": {
+      "one": "sachet",
+      "other": "sachets"
+    },
+    "boite": {
+      "one": "boîte",
+      "other": "boîtes"
+    },
+    "rouleau": {
+      "one": "rouleau",
+      "other": "rouleaux"
+    },
+    "bouteille": {
+      "one": "bouteille",
+      "other": "bouteilles"
+    },
+    "paire": {
+      "one": "paire",
+      "other": "paires"
+    },
+    "feuille": {
+      "one": "feuille",
+      "other": "feuilles"
+    },
+    "bol": {
+      "one": "bol",
+      "other": "bols"
+    },
+    "pot": {
+      "one": "pot",
+      "other": "pots"
+    },
+    "paille": {
+      "one": "paille",
+      "other": "pailles"
+    },
+    "pique": {
+      "one": "pique",
+      "other": "piques"
+    },
+    "sac": {
+      "one": "sac",
+      "other": "sacs"
+    },
+    "can": {
+      "one": "boîte",
+      "other": "boîtes"
+    }
+  },
+  "pack": {
+    "packs": {
+      "one": "lot",
+      "other": "lots"
+    },
+    "soldBy": "Vendu par lot de {{pieces}}",
+    "unitPrice": "Prix unitaire",
+    "packaging": "Conditionnement",
+    "calculation": "Calcul",
+    "packPrice": "Prix du lot",
+    "perPackSuffix": "{{pieces}} / lot",
+    "quantity": "Nombre de lots",
+    "total": "Total",
+    "totalPieces": "Quantité totale"
   }
 }

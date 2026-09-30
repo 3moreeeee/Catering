@@ -3,10 +3,8 @@ import { RouterLink } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocalizedRouter } from '../../../core/i18n/localized-router.service';
-import {
-  CATEGORY_REPOSITORY,
-  PRODUCT_REPOSITORY,
-} from '../../../data/repositories/catalog.repository';
+import { CATEGORY_REPOSITORY } from '../../../data/repositories/catalog.repository';
+import { CatalogStats } from '../../../core/catalog/catalog-stats.service';
 import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 import { RevealDirective } from '../../../core/motion/reveal.directive';
 import { CategoryId } from '../../../shared/models/catalog.model';
@@ -122,9 +120,11 @@ const SUBJECT_X: Readonly<Record<CategoryId, string>> = {
                 }
               </ul>
 
-              <p class="divisions__count u-nums">
-                {{ t('home.divisions.referenceCount', { count: countFor(category.id) }) }}
-              </p>
+              @if (countFor(category.id); as count) {
+                <p class="divisions__count u-nums">
+                  {{ t('home.divisions.referenceCount', { count }) }}
+                </p>
+              }
             </div>
           </li>
         }
@@ -136,15 +136,13 @@ const SUBJECT_X: Readonly<Record<CategoryId, string>> = {
 export class DivisionsSection {
   private readonly links = inject(LocalizedRouter);
   private readonly categoryRepo = inject(CATEGORY_REPOSITORY);
-  private readonly productRepo = inject(PRODUCT_REPOSITORY);
+  private readonly stats = inject(CatalogStats);
 
   readonly categories = toSignal(this.categoryRepo.all(), { initialValue: [] });
-  private readonly counts = toSignal(this.productRepo.countByCategory(), {
-    initialValue: { food: 0, monin: 0, packaging: 0, hygiene: 0 },
-  });
 
-  countFor(id: CategoryId): number {
-    return this.counts()[id];
+  /** Null while unknown; the count line is then left out. */
+  countFor(id: CategoryId): number | null {
+    return this.stats.category(id);
   }
 
   still(id: CategoryId): string {
@@ -158,7 +156,11 @@ export class DivisionsSection {
 
   palette(id: CategoryId): FilmPalette {
     return (
-      FILM_PALETTE[DIVISION_STILL[id]] ?? { ground: 'var(--c-forest-900)', glow: 'var(--c-forest-600)', highKey: false }
+      FILM_PALETTE[DIVISION_STILL[id]] ?? {
+        ground: 'var(--c-forest-900)',
+        glow: 'var(--c-forest-600)',
+        highKey: false,
+      }
     );
   }
 

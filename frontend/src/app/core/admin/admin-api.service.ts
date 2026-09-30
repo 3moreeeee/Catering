@@ -57,6 +57,14 @@ export interface AdminProduct {
   readonly formats: readonly AdminProductFormat[];
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly saleMode: 'UNIT' | 'PACK_ONLY';
+  /** Price of one piece; null unless PACK_ONLY. */
+  readonly unitPrice: number | null;
+  /** Pieces per pack, read from the primary format. */
+  readonly packQuantity: number | null;
+  readonly unitLabel: string | null;
+  /** unitPrice × packQuantity, computed by the server; null unless PACK_ONLY. */
+  readonly packPrice: number | null;
 }
 
 /** Mirrors the backend ProductRequest record field for field. */
@@ -98,6 +106,12 @@ export interface ProductPayload {
     sizeBucket: string | null;
     reference: string | null;
   }[];
+  readonly saleMode: 'UNIT' | 'PACK_ONLY';
+  /** Required for PACK_ONLY; the server derives the pack price and ignores `price`. */
+  readonly unitPrice: number | null;
+  /** Written by the server onto the primary format. */
+  readonly packQuantity: number | null;
+  readonly unitLabel: string | null;
 }
 
 export interface AdminCategory {

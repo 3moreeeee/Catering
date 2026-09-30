@@ -2,6 +2,13 @@
  * Uploads served images/videos to ImageKit, then rewrites matching media URLs
  * in Neon in one transaction. Safe to resume through tmp/imagekit-manifest.json.
  * Secrets are read from ../backend/.env and are never printed.
+ *
+ * Flags:
+ *   --upload-only    upload to ImageKit and stop: Neon, the seed, the generated
+ *                    config and backend/.env are not touched. Assets already
+ *                    served by ImageKit at their path are not uploaded again.
+ *   --only=<regex>   limit to web paths matching <regex>, e.g.
+ *                    --only=^/img/products/catalogue/.*\.v2\.webp$
  */
 import { Blob } from 'node:buffer';
 import fs from 'node:fs';
@@ -33,22 +40,36 @@ const seedPath = path.join(
 
 loadEnv([path.join(root, '..', 'backend', '.env'), path.join(root, 'tmp', '.env')]);
 
+const uploadOnly = process.argv.includes('--upload-only');
+const onlyArg = process.argv.find((arg) => arg.startsWith('--only='));
+const only = onlyArg ? new RegExp(onlyArg.slice('--only='.length)) : null;
+
 const privateKey = required('IMAGEKIT_PRIVATE_KEY');
 const endpoint = required('IMAGEKIT_URL_ENDPOINT').replace(/\/+$/, '');
 const databaseUrl =
   process.env.NEON_DATABASE_URL_DIRECT || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error('Missing NEON_DATABASE_URL_DIRECT or NEON_DATABASE_URL.');
+if (!uploadOnly && !databaseUrl)
+  throw new Error('Missing NEON_DATABASE_URL_DIRECT or NEON_DATABASE_URL.');
 if (!privateKey.startsWith('private_'))
   throw new Error('IMAGEKIT_PRIVATE_KEY has an invalid format.');
 if (!/^https:\/\//.test(endpoint)) throw new Error('IMAGEKIT_URL_ENDPOINT must be an HTTPS URL.');
-syncPrimaryImageKitEnv();
+if (!uploadOnly) syncPrimaryImageKitEnv();
 
 const files = [
   ...walk(path.join(root, 'public', 'img')),
   ...walk(path.join(root, 'public', 'video')),
-].filter((file) => !file.includes(`${path.sep}_original${path.sep}`));
+]
+  .filter((file) => !file.includes(`${path.sep}_original${path.sep}`))
+  .filter((file) => !only || only.test(toWebPath(file)));
 const manifest = readManifest();
-const pending = files.filter((file) => !manifest[toWebPath(file)]);
+const pending = [];
+for (const file of files.filter((file) => !manifest[toWebPath(file)])) {
+  // An asset already served at its path is recorded, not uploaded a second time.
+  const served = uploadOnly ? await servedUrl(toWebPath(file)) : null;
+  if (served) manifest[toWebPath(file)] = served;
+  else pending.push(file);
+}
+if (uploadOnly) writeManifest(manifest);
 
 console.log(
   `ImageKit migration: ${files.length} served assets, ${files.length - pending.length} already uploaded, ${pending.length} pending.`,
@@ -74,6 +95,8 @@ if (failures.length) {
   console.error(`Upload stopped with ${failures.length} failed asset(s):`);
   for (const failure of failures.slice(0, 20)) console.error(`- ${failure}`);
   process.exitCode = 1;
+} else if (uploadOnly) {
+  console.log(`Upload-only run complete: ${completed} uploaded; Neon and the seed were not touched.`);
 } else {
   await rewriteNeonUrls(manifest, databaseUrl);
   rewriteSeed(manifest);
@@ -112,6 +135,13 @@ async function upload(file, webPath) {
     await new Promise((resolve) => setTimeout(resolve, attempt * 1_000));
   }
   throw new Error('Upload failed.');
+}
+
+async function servedUrl(webPath) {
+  const url = `${endpoint}/fk-catering${webPath}`;
+  const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(30_000) });
+  const type = response.headers.get('content-type') ?? '';
+  return response.ok && /^(image|video)\//.test(type) ? url : null;
 }
 
 async function rewriteNeonUrls(mapping, connectionString) {

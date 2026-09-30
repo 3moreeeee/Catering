@@ -7,17 +7,17 @@ import { ProductPricePoint } from './cart.models';
 import { retryWhileWaking } from '../http/retry-while-waking';
 
 /**
- * Looks catalogue prices up from the API for products the page is rendering.
+ * Catalogue prices for the products a page renders.
  *
- * The bundled catalogue snapshot deliberately carries no prices — it is the
- * search, facet and prerender source, and baking prices into the JavaScript
- * bundle would freeze them at build time. Prices are therefore fetched at
- * runtime, in one batched request per rendered page, and cached for the session.
+ * Catalogue responses already carry each product's price terms, so the product
+ * repository seeds them here (`seed`) as pages, products and selections
+ * arrive — during server rendering too, so the HTML a crawler or a visitor
+ * receives already shows the price, and the hydrating browser (fed the same
+ * responses by the transfer cache) shows the same one without a request.
  *
- * On the server during SSR nothing is fetched: prerendered HTML must not embed a
- * price that may since have changed, so the price appears on hydration. Until it
- * does, `isPending` is true — on the server too, so the prerendered card and the
- * hydrating one show the same placeholder.
+ * Ids no catalogue response covered — another colour of a line, a cart line —
+ * are fetched in the browser, in one batched request per tick, and cached for
+ * the session.
  */
 @Injectable({ providedIn: 'root' })
 export class PricingService {
@@ -56,6 +56,16 @@ export class PricingService {
     });
   }
 
+  /** Records price terms that arrived with catalogue responses; never overwritten by a stale value. */
+  seed(points: readonly ProductPricePoint[]): void {
+    if (!points.length) return;
+    points.forEach((point) => {
+      this.cache.set(point.sourceId, point);
+      this.failed.delete(point.sourceId);
+    });
+    this.revision.update((value) => value + 1);
+  }
+
   priceOf(sourceId: string): ProductPricePoint | null {
     this.revision();
     return this.cache.get(sourceId) ?? null;
@@ -67,8 +77,11 @@ export class PricingService {
    */
   isPending(sourceId: string): boolean {
     this.revision();
+    if (this.cache.has(sourceId)) return false;
+    // The server fetches nothing itself: what the catalogue responses did not
+    // seed stays a placeholder, exactly as the hydrating browser first shows it.
     if (!isPlatformBrowser(this.platformId)) return true;
-    return !this.cache.has(sourceId) && !this.failed.has(sourceId);
+    return !this.failed.has(sourceId);
   }
 
   /** Drops a back-office-edited price so the next catalogue render reloads it. */

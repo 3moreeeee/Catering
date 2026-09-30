@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { PRODUCT_REPOSITORY } from '../../../data/repositories/catalog.repository';
+import { CatalogStats } from '../../../core/catalog/catalog-stats.service';
 import { RevealDirective } from '../../../core/motion/reveal.directive';
 
 /**
@@ -43,10 +42,12 @@ import { RevealDirective } from '../../../core/motion/reveal.directive';
             <dt class="statement__fact-value u-nums">3</dt>
             <dd class="statement__fact-label">{{ t('home.statement.divisionsLabel') }}</dd>
           </div>
-          <div class="statement__fact">
-            <dt class="statement__fact-value u-nums">{{ referenceCount() }}</dt>
-            <dd class="statement__fact-label">{{ t('home.statement.referencesLabel') }}</dd>
-          </div>
+          @if (referenceCount(); as count) {
+            <div class="statement__fact">
+              <dt class="statement__fact-value u-nums">{{ count }}</dt>
+              <dd class="statement__fact-label">{{ t('home.statement.referencesLabel') }}</dd>
+            </div>
+          }
         </dl>
       </div>
     </ng-container>
@@ -132,10 +133,6 @@ import { RevealDirective } from '../../../core/motion/reveal.directive';
   `,
 })
 export class StatementSection {
-  private readonly productRepo = inject(PRODUCT_REPOSITORY);
-
-  private readonly products = toSignal(this.productRepo.all(), { initialValue: [] });
-
-  /** Read from the catalogue, never typed, so the claim cannot go stale. */
-  readonly referenceCount = computed(() => this.products().length);
+  /** Read from the database, never typed, so the claim cannot go stale. */
+  readonly referenceCount = inject(CatalogStats).total;
 }

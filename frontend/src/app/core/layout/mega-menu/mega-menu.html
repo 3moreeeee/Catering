@@ -6,9 +6,11 @@
     <div class="container--wide mega__inner">
       <div class="mega__intro">
         <p class="u-eyebrow">{{ t('nav.products') }}</p>
-        <p class="mega__hint u-sm u-muted">
-          {{ t('nav.megaMenuHint', { count: productCount() }) }}
-        </p>
+        @if (productCount() !== null) {
+          <p class="mega__hint u-sm u-muted">
+            {{ t('nav.megaMenuHint', { count: productCount() }) }}
+          </p>
+        }
         <a class="link link--accent mega__all" [routerLink]="to('products')">
           {{ t('footer.allProducts') }}
           <span class="link__arrow" aria-hidden="true">→</span>

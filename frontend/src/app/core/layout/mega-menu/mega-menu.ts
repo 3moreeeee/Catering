@@ -22,7 +22,8 @@ import { Category } from '../../../shared/models/catalog.model';
 })
 export class MegaMenu {
   readonly categories = input.required<readonly Category[]>();
-  readonly productCount = input.required<number>();
+  /** Null while unknown; the hint is then left out rather than showing a wrong number. */
+  readonly productCount = input.required<number | null>();
   readonly dismiss = output<void>();
 
   private readonly links = inject(LocalizedRouter);

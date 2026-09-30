@@ -23,11 +23,11 @@ test.describe('site assistant', () => {
     await page.getByRole('button', { name: 'Ouvrir l’assistant' }).click();
 
     const dialog = page.getByRole('dialog');
-    await dialog.getByLabel('Votre question').fill('3andkom bac polycarbonate?');
+    await dialog.getByLabel('Votre question').fill('3andkom chope polycarbonate?');
     await dialog.getByRole('button', { name: 'Envoyer la question' }).click();
 
     await expect(dialog).toContainText('Ey, l9it hedhouma fil catalogue');
-    await expect(dialog.getByRole('link', { name: /Bac Polycarbonate Gn/ })).toBeVisible();
+    await expect(dialog.getByRole('link', { name: /Chope .*Polycarbonate/i })).toBeVisible();
   });
 
   test('fits a narrow mobile viewport without horizontal overflow', async ({ page }) => {

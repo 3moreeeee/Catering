@@ -1,62 +1,37 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { LOCALES } from './shared/models/localized-text.model';
-import { PRODUCTS } from './data/products.data';
-import { CATEGORIES } from './data/categories.data';
 
 /**
- * Prerendering.
+ * Rendering modes.
  *
- * The whole site is statically generated at build time: 18 locale-only pages,
- * Category and product pages are generated from the live catalogue arrays,
- * so newly added commercial universes are automatically indexed.
- * Every product is therefore indexable, and every page has a
- * sub-second TTFB with no server render on the critical path.
+ * Every page that shows catalogue data is rendered per request from the
+ * database, through the API: the home page (showcase, offers, counters), the
+ * catalogue and its pages (`?page=2` is a different page, which a prerendered
+ * file could not honour), the division listings, every product page, and the
+ * brand directory's counts. A product added, edited or deactivated in the back
+ * office is therefore live on the next request — nothing to regenerate and no
+ * catalogue compiled into the application.
  *
- * Catalogue *filter* permutations are deliberately not prerendered — they are
- * canonicalised to the unfiltered list (see `CatalogPage`) and served by SSR,
- * so the index is not flooded with near-duplicate facet URLs.
+ * Pages without catalogue data are prerendered at build time for a
+ * sub-second TTFB. Their header counter loads in the browser.
  */
 
 const localeParams = LOCALES.map((lang) => ({ lang }));
 
-/** Static routes that vary only by locale. */
-const LOCALE_ONLY_ROUTES = [
-  '',
-  'about',
-  'products',
-  'brands',
-  'industries',
-  'contact',
-  'privacy',
-  'terms',
-  '404',
-] as const;
+/** Pages whose content is the same for every request and holds no catalogue data. */
+const STATIC_ROUTES = ['about', 'industries', 'contact', 'privacy', 'terms', '404'] as const;
 
 export const serverRoutes: ServerRoute[] = [
-  ...LOCALE_ONLY_ROUTES.map((segment): ServerRoute => ({
-    path: segment ? `:lang/${segment}` : ':lang',
+  ...STATIC_ROUTES.map((segment): ServerRoute => ({
+    path: `:lang/${segment}`,
     renderMode: RenderMode.Prerender,
-    getPrerenderParams: async () => localeParams,
+    getPrerenderParams: () => Promise.resolve(localeParams),
   })),
-  {
-    path: ':lang/products/:category',
-    renderMode: RenderMode.Prerender,
-    getPrerenderParams: async () =>
-      LOCALES.flatMap((lang) => CATEGORIES.map((category) => ({ lang, category: category.slug }))),
-  },
-  {
-    // Every current product in both locales.
-    path: ':lang/products/:category/:slug',
-    renderMode: RenderMode.Prerender,
-    getPrerenderParams: async () =>
-      LOCALES.flatMap((lang) =>
-        PRODUCTS.map((product) => ({
-          lang,
-          category: CATEGORIES.find((c) => c.id === product.categoryId)?.slug ?? product.categoryId,
-          slug: product.slug,
-        })),
-      ),
-  },
+  { path: ':lang', renderMode: RenderMode.Server },
+  { path: ':lang/products', renderMode: RenderMode.Server },
+  { path: ':lang/products/:category', renderMode: RenderMode.Server },
+  { path: ':lang/products/:category/:slug', renderMode: RenderMode.Server },
+  { path: ':lang/brands', renderMode: RenderMode.Server },
   // Everything else — the bare `/`, legacy WordPress URLs and unknown paths —
   // is server-rendered so the redirect map can run and unknown URLs still
   // receive a real 404 page rather than a static shell.

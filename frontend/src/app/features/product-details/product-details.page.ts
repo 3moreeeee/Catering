@@ -1,15 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  RESPONSE_INIT,
   computed,
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { map, shareReplay, switchMap } from 'rxjs';
 import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { LocaleService } from '../../core/i18n/locale.service';
@@ -27,6 +29,9 @@ import { AuthService } from '../../core/auth/auth.service';
 import { CartService } from '../../core/cart/cart.service';
 import { PricingService } from '../../core/cart/pricing.service';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
+import { ProductFormatService } from '../../shared/utils/product-format.service';
+import { toMillimes } from '../../shared/utils/money';
+import { PackText, packTermsOf } from '../../shared/utils/pack-text.service';
 
 /**
  * Product detail page.
@@ -64,33 +69,59 @@ export class ProductDetailsPage {
   private readonly seo = inject(SeoService);
   private readonly jsonLd = inject(StructuredDataService);
   private readonly pricing = inject(PricingService);
+  private readonly formats = inject(ProductFormatService);
   readonly cart = inject(CartService);
   readonly auth = inject(AuthService);
+  readonly pack = inject(PackText);
 
-  readonly product = toSignal(
-    this.route.paramMap.pipe(
-      switchMap((params) =>
-        this.repo.bySlug(params.get('category') ?? '', params.get('slug') ?? ''),
-      ),
-    ),
-    { initialValue: null },
+  /** One direct slug lookup per route, shared by everything on the page that reads it. */
+  private readonly product$ = this.route.paramMap.pipe(
+    switchMap((params) => this.repo.bySlug(params.get('category') ?? '', params.get('slug') ?? '')),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
+  /** `done` distinguishes "still loading" from "no such product" (both have no product). */
+  private readonly lookup = toSignal(
+    this.product$.pipe(map((product) => ({ done: true, product }))),
+    { initialValue: { done: false, product: null as Product | null } },
+  );
+
+  readonly product = computed(() => this.lookup().product);
+  /** Set during server rendering only: lets a missing product answer 404. */
+  private readonly responseInit = inject(RESPONSE_INIT, { optional: true });
+
+  /**
+   * Four neighbours, scored and limited by the database. Requested from the
+   * route's slug in parallel with the product itself rather than after it.
+   */
   readonly related = toSignal(
     this.route.paramMap.pipe(
-      switchMap((params) =>
-        this.repo.bySlug(params.get('category') ?? '', params.get('slug') ?? ''),
-      ),
-      switchMap((product) => (product ? this.repo.related(product, 4) : [])),
+      switchMap((params) => this.repo.related(params.get('slug') ?? '', 4)),
       map((products) => products ?? []),
     ),
     { initialValue: [] as readonly Product[] },
   );
 
   readonly activeImage = signal(0);
+  /** Same placeholder the product card shows for a reference without a photograph. */
+  readonly placeholderImage = {
+    src: imageKitMediaUrl('/img/products/placeholder.svg'),
+    alt: { en: 'Product image not available', fr: 'Image du produit non disponible' },
+  };
   readonly shareCopied = signal(false);
   readonly quantity = signal(1);
   readonly addState = signal<'idle' | 'adding' | 'added' | 'error'>('idle');
+  readonly selectedColorId = signal<string | null>(null);
+  readonly selectedColor = computed(
+    () =>
+      this.product()?.colorVariants?.find((variant) => variant.id === this.selectedColorId()) ??
+      null,
+  );
+  readonly selectedColorLabel = computed(() => {
+    const variant = this.selectedColor();
+    return variant ? this.locales.text(variant.label) : null;
+  });
+  private lastColorRouteSlug: string | null = null;
   readonly cartUrl = this.links.url('cart');
   readonly loginUrl = this.links.url('login');
 
@@ -102,18 +133,30 @@ export class ProductDetailsPage {
    */
   readonly pricePoint = computed(() => {
     const product = this.product();
-    return product ? this.pricing.priceOf(product.id) : null;
+    return product ? this.pricing.priceOf(this.selectedColorId() ?? product.id) : null;
   });
 
-  /** Price × quantity, shown only once the buyer asks for more than one unit. */
+  /** Set only for a product sold by the pack: the stepper then counts packs. */
+  readonly packTerms = computed(() => packTermsOf(this.pricePoint()));
+
+  /**
+   * Price × quantity in exact millimes. A unit product shows it once the buyer
+   * asks for more than one; a pack product always shows it, beside the pieces
+   * the packs amount to, so a pack count is never read as a piece count.
+   */
   readonly subtotal = computed(() => {
     const point = this.pricePoint();
     const quantity = this.quantity();
-    if (!point || point.price === null || quantity < 2) return null;
-    return `${(point.price * quantity).toFixed(3)} ${point.currency ?? 'TND'}`;
+    if (!point || point.price === null) return null;
+    if (!this.packTerms() && quantity < 2) return null;
+    return this.pack.moneyMillimes(toMillimes(point.price) * quantity, point.currency ?? 'TND');
   });
 
   readonly category = computed(() => CATEGORIES.find((c) => c.id === this.product()?.categoryId));
+  readonly formatVisual = computed(() => {
+    const product = this.product();
+    return product ? this.formats.visual(product) : null;
+  });
 
   readonly subcategory = computed(() => {
     const product = this.product();
@@ -127,22 +170,48 @@ export class ProductDetailsPage {
   );
 
   constructor() {
-    queueMicrotask(() => this.applySeo());
+    // Metadata (and the 404 status) once the database lookup has answered.
+    effect(() => {
+      if (!this.lookup().done) return;
+      untracked(() => this.applySeo());
+    });
+
+    // Existing color-specific links continue to open the consolidated page
+    // with their original, purchasable combination selected.
+    effect(() => {
+      const product = this.product();
+      if (!product) return;
+      const slug = this.route.snapshot.paramMap.get('slug');
+      if (slug === this.lastColorRouteSlug) return;
+      this.lastColorRouteSlug = slug;
+      this.selectedColorId.set(
+        slug === product.slug
+          ? null
+          : (product.colorVariants?.find((variant) => variant.slug === slug)?.id ?? null),
+      );
+    });
 
     // Fetch this reference's price as soon as the route resolves a product.
     effect(() => {
       const product = this.product();
-      if (product) void this.pricing.prime([product.id]);
+      if (product) void this.pricing.prime([this.selectedColorId() ?? product.id]);
     });
+  }
+
+  selectColor(id: string): void {
+    this.selectedColorId.set(id);
+    this.addState.set('idle');
   }
 
   /** Formatted price, or the "prix sur demande" label when there is none. */
   displayPrice(): string {
     const point = this.pricePoint();
-    if (!point || point.price === null) {
-      return this.transloco.translate('cart.priceOnRequest');
-    }
-    return `${point.price.toFixed(3)} ${point.currency ?? 'TND'}`;
+    return this.pack.price(point?.price, point?.currency);
+  }
+
+  /** Original price of an offer, in the same format as the price beside it. */
+  money(amount: number, currency: string | null): string {
+    return this.pack.price(amount, currency);
   }
 
   setQuantity(quantity: number): void {
@@ -153,6 +222,7 @@ export class ProductDetailsPage {
   }
 
   async addToCart(): Promise<void> {
+    if (this.product()?.colorVariants?.length && !this.selectedColor()) return;
     const point = this.pricePoint();
     if (!point) return;
     this.addState.set('adding');
@@ -168,6 +238,8 @@ export class ProductDetailsPage {
     const product = this.product();
     const category = this.category();
     if (!product || !category) {
+      // A missing or deactivated product is a 404 for crawlers, not a 200 page.
+      if (this.responseInit) this.responseInit.status = 404;
       this.seo.apply({
         title: this.transloco.translate('notFound.title'),
         description: '',

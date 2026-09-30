@@ -239,6 +239,13 @@
     "category": "Division",
     "family": "Product family",
     "formats": "Available formats",
+    "format": {
+      "small": "Small format",
+      "standard": "Standard format",
+      "large": "Large format",
+      "plain": "Format",
+      "fit": "Size"
+    },
     "formatsPending": "Formats to be confirmed — contact us for pack sizes.",
     "description": "Description",
     "technical": "Technical information",
@@ -260,6 +267,9 @@
     "verificationNote": "Some details of this reference are pending confirmation by our team.",
     "noPriceNote": "Prices are quoted on request. Contact us with your volumes.",
     "addToCart": "Add to basket",
+    "chooseColor": "Choose a color",
+    "color": "Color",
+    "chooseColorFirst": "Choose a color before adding this product to the basket.",
     "offer": "Offer",
     "adding": "Adding…",
     "added": "Added to basket",
@@ -788,7 +798,16 @@
         "imageAlt": "Image alternative text",
         "imageHint": "JPEG, PNG, WebP, GIF or AVIF — 10 MB maximum. The image will be uploaded to ImageKit.",
         "imageUploading": "Uploading image to ImageKit…",
-        "featured": "Feature on the site"
+        "featured": "Feature on the site",
+        "saleMode": "Sale mode",
+        "saleModeUNIT": "By the unit (price entered directly)",
+        "saleModePACK_ONLY": "By the pack only",
+        "unitPrice": "Unit price (TND)",
+        "unitPriceHint": "Price of one piece, with at most three decimals (e.g. 0.120).",
+        "packQuantity": "Quantity per pack",
+        "packQuantityHint": "Whole number of pieces in one pack sold.",
+        "unitLabel": "Unit",
+        "packPrice": "Calculated pack price"
       },
       "validation": {
         "required": "“{{field}}” is required.",
@@ -797,8 +816,14 @@
         "stock": "The stock must be a whole number.",
         "maxlength": "“{{field}}” cannot exceed {{max}} characters.",
         "summary": "Correct the {{count}} highlighted fields before saving.",
-        "summaryOne": "Correct the highlighted field before saving."
-      }
+        "summaryOne": "Correct the highlighted field before saving.",
+        "unitPrice": "The unit price must be above zero, with at most three decimals (e.g. 0.120).",
+        "packQuantity": "The quantity per pack must be a whole number of at least 1."
+      },
+      "pricingTitle": "Pricing and sales",
+      "packFormula": "{{unitPrice}} × {{pieces}} = {{packPrice}} / pack",
+      "previewTitle": "What the customer will see",
+      "packPriceDerived": "Calculated from the unit price"
     },
     "offers": {
       "create": "Create a product offer",
@@ -836,11 +861,92 @@
       "image_invalid": "Choose a JPEG, PNG, WebP, GIF or AVIF image under 10 MB.",
       "image_upload_failed": "The image could not be uploaded to ImageKit. Please try again.",
       "forbidden": "Administrators only.",
-      "unauthorized": "Your session has expired. Sign in again."
+      "unauthorized": "Your session has expired. Sign in again.",
+      "pack_unit_price_required": "A product sold by the pack needs a unit price above zero.",
+      "pack_quantity_required": "A product sold by the pack needs the number of pieces per pack.",
+      "pack_price_too_large": "The pack price exceeds the maximum allowed value.",
+      "pack_price_derived": "This product’s price is calculated from its unit price: change it in the product form."
     },
     "quoteKind": {
       "ORDER": "Order",
       "QUOTE": "Quote"
     }
+  },
+  "units": {
+    "piece": {
+      "one": "piece",
+      "other": "pieces"
+    },
+    "gobelet": {
+      "one": "cup",
+      "other": "cups"
+    },
+    "barquette": {
+      "one": "tray",
+      "other": "trays"
+    },
+    "sachet": {
+      "one": "bag",
+      "other": "bags"
+    },
+    "boite": {
+      "one": "box",
+      "other": "boxes"
+    },
+    "rouleau": {
+      "one": "roll",
+      "other": "rolls"
+    },
+    "bouteille": {
+      "one": "bottle",
+      "other": "bottles"
+    },
+    "paire": {
+      "one": "pair",
+      "other": "pairs"
+    },
+    "feuille": {
+      "one": "sheet",
+      "other": "sheets"
+    },
+    "bol": {
+      "one": "bowl",
+      "other": "bowls"
+    },
+    "pot": {
+      "one": "pot",
+      "other": "pots"
+    },
+    "paille": {
+      "one": "straw",
+      "other": "straws"
+    },
+    "pique": {
+      "one": "pick",
+      "other": "picks"
+    },
+    "sac": {
+      "one": "bag",
+      "other": "bags"
+    },
+    "can": {
+      "one": "can",
+      "other": "cans"
+    }
+  },
+  "pack": {
+    "packs": {
+      "one": "pack",
+      "other": "packs"
+    },
+    "soldBy": "Sold in packs of {{pieces}}",
+    "unitPrice": "Unit price",
+    "packaging": "Packaging",
+    "calculation": "Calculation",
+    "packPrice": "Pack price",
+    "perPackSuffix": "{{pieces}} / pack",
+    "quantity": "Number of packs",
+    "total": "Total",
+    "totalPieces": "Total quantity"
   }
 }

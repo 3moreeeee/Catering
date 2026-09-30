@@ -7,6 +7,7 @@ import { TranslocoTestingModule } from '@jsverse/transloco';
 import { afterEach, describe, expect, it } from 'vitest';
 import { PRODUCTS } from '../../../data/products.data';
 import { ProductCard } from './product-card';
+import { ProductFormatService } from '../../utils/product-format.service';
 
 /**
  * The live price arrives after the card has rendered, from an API that may be
@@ -31,6 +32,7 @@ describe('ProductCard live price', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
+        { provide: ProductFormatService, useValue: { visual: () => null } },
       ],
     });
     const product = PRODUCTS[0]!;

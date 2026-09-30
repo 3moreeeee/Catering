@@ -47,7 +47,13 @@
         @for (brand of brands(); track brand.id) {
           <li class="brands__item" [id]="brand.slug">
             <article class="brands__card">
-              <img class="brands__logo" [src]="brand.logo" [alt]="brand.name" width="180" height="64" />
+              <img
+                class="brands__logo"
+                [src]="brand.logo"
+                [alt]="brand.name"
+                width="180"
+                height="64"
+              />
 
               <h2 class="h4 brands__name">{{ brand.name }}</h2>
 
@@ -66,7 +72,9 @@
                   [queryParams]="{ brand: brand.id }"
                 >
                   {{ t('brands.viewProducts') }}
-                  <span class="u-nums">({{ productCount(brand.id) }})</span>
+                  @if (productCount(brand.id); as count) {
+                    <span class="u-nums">({{ count }})</span>
+                  }
                 </a>
                 @if (brand.website) {
                   <a
@@ -86,6 +94,5 @@
     } @else {
       <p class="brands__empty">{{ t('brands.empty') }}</p>
     }
-
   </div>
 </ng-container>

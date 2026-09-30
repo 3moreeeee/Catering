@@ -11,28 +11,40 @@ import {
   ProductQuery,
 } from '../../shared/models/catalog.model';
 
+/** Catalogue sizes for counters: in total, per division and per brand. */
+export interface CatalogStats {
+  readonly total: number;
+  readonly categories: Readonly<Partial<Record<CategoryId, number>>>;
+  readonly brands: Readonly<Record<string, number>>;
+}
+
 /**
  * The seam between the application and its content source.
  *
- * Nothing above this interface knows whether data comes from a bundled TypeScript
- * file, a REST endpoint, Strapi, Directus, Sanity or GraphQL. Swapping the whole
- * site onto a live CMS is a provider change in `app.config.ts` — no component,
- * store or route changes.
+ * The catalogue lives in the database: every method is one bounded request —
+ * one page (at most 12 products), one product, a handful of related or
+ * featured products, or aggregate counts. There is deliberately no way to ask
+ * for the whole catalogue; nothing in the storefront needs it in memory.
  *
  * Observables (rather than signals) are used here deliberately: this is an I/O
- * boundary, and a real implementation will be asynchronous. Consumers convert to
- * signals with `toSignal` at the point of use.
+ * boundary. Consumers convert to signals with `toSignal` at the point of use.
  */
 export interface ProductRepository {
+  /** One page, filtered, searched and sorted by the server. `page` is 1-based. */
   list(query: ProductQuery): Observable<Paginated<Product>>;
+  /** A product page: the product only if it belongs to the division in the URL. */
   bySlug(categorySlug: string, slug: string): Observable<Product | null>;
-  byId(id: string): Observable<Product | null>;
-  featured(limit?: number): Observable<readonly Product[]>;
-  related(product: Product, limit?: number): Observable<readonly Product[]>;
+  /** A product by slug alone, for links that carry no division. */
+  byProductSlug(slug: string): Observable<Product | null>;
+  /** Curated products first, then verified ones; optionally within one division. */
+  featured(limit: number, categoryId?: CategoryId): Observable<readonly Product[]>;
+  /** Running and upcoming promotions. */
+  offers(limit: number): Observable<readonly Product[]>;
+  /** Neighbours of the product at `slug`, scored by the server; needs no prior lookup. */
+  related(slug: string, limit?: number): Observable<readonly Product[]>;
   facets(query: ProductQuery): Observable<FacetSet>;
-  /** Every product, for search indexing and prerender param generation. */
-  all(): Observable<readonly Product[]>;
-  countByCategory(): Observable<Readonly<Record<CategoryId, number>>>;
+  /** Null while unknown (prerendering, or the API unreachable). */
+  stats(): Observable<CatalogStats | null>;
 }
 
 export interface CategoryRepository {

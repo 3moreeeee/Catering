@@ -22,10 +22,12 @@
             <dt class="hero__proof-value u-nums">1985</dt>
             <dd>{{ t('home.statement.foundedLabel') }}</dd>
           </div>
-          <div>
-            <dt class="hero__proof-value u-nums">{{ referenceCount() }}</dt>
-            <dd>{{ t('home.statement.referencesLabel') }}</dd>
-          </div>
+          @if (referenceCount(); as count) {
+            <div>
+              <dt class="hero__proof-value u-nums">{{ count }}</dt>
+              <dd>{{ t('home.statement.referencesLabel') }}</dd>
+            </div>
+          }
           <div>
             <dt class="hero__proof-value u-nums">{{ categories().length }}</dt>
             <dd>{{ t('home.statement.divisionsLabel') }}</dd>

@@ -4,14 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build && node scripts/generate-sitemap.mjs",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:fk-catering": "node dist/fk-catering/server/server.mjs",
     "build:only": "ng build",
     "assets": "node scripts/generate-assets.mjs && node scripts/generate-placeholder-art.mjs",
     "fetch:images": "node scripts/fetch-legacy-images.mjs",
-    "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss,json}\" \"scripts/**/*.mjs\"",
@@ -22,7 +21,8 @@
     "art": "node scripts/generate-placeholder-art.mjs",
     "images:normalize": "node scripts/normalize-product-images.mjs",
     "images:products": "node scripts/prepare-product-images.mjs",
-    "media:imagekit": "node scripts/migrate-media-to-imagekit.mjs"
+    "media:imagekit": "node scripts/migrate-media-to-imagekit.mjs",
+    "media:imagekit:upload-only": "node scripts/migrate-media-to-imagekit.mjs --upload-only"
   },
   "private": true,
   "packageManager": "npm@11.3.0",

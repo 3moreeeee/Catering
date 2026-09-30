@@ -6,7 +6,11 @@
  * intact. Photographs with a deliberate non-white backdrop are simply encoded
  * to WebP without destructive segmentation.
  *
- * Usage: node scripts/prepare-product-images.mjs
+ * Usage: node scripts/prepare-product-images.mjs [folder ...]
+ *
+ * With no argument every product folder is processed. Naming folders (for
+ * example `catalogue`) limits the run to them, so adding a few photographs
+ * does not re-encode the whole gallery.
  */
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +18,8 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const productDirectories = ['vinto', 'monin'].map((name) =>
+const requestedFolders = process.argv.slice(2);
+const productDirectories = (requestedFolders.length ? requestedFolders : ['vinto', 'monin', 'catalogue']).map((name) =>
   path.join(root, 'public', 'img', 'products', name),
 );
 

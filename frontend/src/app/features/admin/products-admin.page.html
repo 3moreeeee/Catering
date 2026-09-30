@@ -142,23 +142,147 @@
               <p class="field__error" id="p-ref-err">{{ errorFor('reference') }}</p>
             }
           </div>
-          <div class="field">
-            <label class="field__label" for="p-price">{{
-              t('dashboard.products.fields.price')
-            }}</label>
-            <input
-              id="p-price"
-              class="control u-nums"
-              inputmode="decimal"
-              formControlName="price"
-              [attr.aria-invalid]="hasError('price')"
-              [attr.aria-describedby]="hasError('price') ? 'p-price-err' : null"
-            />
-            @if (hasError('price')) {
-              <p class="field__error" id="p-price-err">{{ errorFor('price') }}</p>
+          <fieldset class="admin-pricing account-form__full">
+            <legend class="admin-pricing__title">{{ t('dashboard.products.pricingTitle') }}</legend>
+            <div class="account-form__grid">
+              <div class="field">
+                <label class="field__label" for="p-sale-mode">{{
+                  t('dashboard.products.fields.saleMode')
+                }}</label>
+                <select
+                  id="p-sale-mode"
+                  class="control"
+                  formControlName="saleMode"
+                  (change)="onSaleModeChange()"
+                >
+                  <option value="UNIT">{{ t('dashboard.products.fields.saleModeUNIT') }}</option>
+                  <option value="PACK_ONLY">
+                    {{ t('dashboard.products.fields.saleModePACK_ONLY') }}
+                  </option>
+                </select>
+              </div>
+
+              @if (packOnly()) {
+                <div class="field">
+                  <label class="field__label" for="p-unit-price">{{
+                    t('dashboard.products.fields.unitPrice')
+                  }}</label>
+                  <input
+                    id="p-unit-price"
+                    class="control u-nums"
+                    inputmode="decimal"
+                    formControlName="unitPrice"
+                    placeholder="0,120"
+                    [attr.aria-invalid]="hasError('unitPrice')"
+                    [attr.aria-describedby]="
+                      hasError('unitPrice') ? 'p-unit-price-err' : 'p-unit-price-hint'
+                    "
+                  />
+                  @if (hasError('unitPrice')) {
+                    <p class="field__error" id="p-unit-price-err">{{ errorFor('unitPrice') }}</p>
+                  }
+                  <small class="field__hint" id="p-unit-price-hint">{{
+                    t('dashboard.products.fields.unitPriceHint')
+                  }}</small>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="p-pack-qty">{{
+                    t('dashboard.products.fields.packQuantity')
+                  }}</label>
+                  <input
+                    id="p-pack-qty"
+                    class="control u-nums"
+                    inputmode="numeric"
+                    formControlName="packQuantity"
+                    placeholder="100"
+                    [attr.aria-invalid]="hasError('packQuantity')"
+                    [attr.aria-describedby]="
+                      hasError('packQuantity') ? 'p-pack-qty-err' : 'p-pack-qty-hint'
+                    "
+                  />
+                  @if (hasError('packQuantity')) {
+                    <p class="field__error" id="p-pack-qty-err">{{ errorFor('packQuantity') }}</p>
+                  }
+                  <small class="field__hint" id="p-pack-qty-hint">{{
+                    t('dashboard.products.fields.packQuantityHint')
+                  }}</small>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="p-unit-label">{{
+                    t('dashboard.products.fields.unitLabel')
+                  }}</label>
+                  <select id="p-unit-label" class="control" formControlName="unitLabel">
+                    @for (code of unitLabels; track code) {
+                      <option [value]="code">{{ t('units.' + code + '.one') }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="field">
+                  <span class="field__label" id="p-pack-price-label">{{
+                    t('dashboard.products.fields.packPrice')
+                  }}</span>
+                  <output
+                    class="control admin-generated-field u-nums admin-pricing__derived"
+                    aria-labelledby="p-pack-price-label"
+                    data-testid="pack-price"
+                    >{{
+                      packPreview() ? pack.moneyMillimes(packPreview()!.packMillimes) : '—'
+                    }}</output
+                  >
+                  <small class="field__hint">{{ t('dashboard.products.packPriceDerived') }}</small>
+                </div>
+              } @else {
+                <div class="field">
+                  <label class="field__label" for="p-price">{{
+                    t('dashboard.products.fields.price')
+                  }}</label>
+                  <input
+                    id="p-price"
+                    class="control u-nums"
+                    inputmode="decimal"
+                    formControlName="price"
+                    [attr.aria-invalid]="hasError('price')"
+                    [attr.aria-describedby]="hasError('price') ? 'p-price-err' : null"
+                  />
+                  @if (hasError('price')) {
+                    <p class="field__error" id="p-price-err">{{ errorFor('price') }}</p>
+                  }
+                  <small class="field__hint">{{ t('dashboard.products.fields.priceHint') }}</small>
+                </div>
+              }
+            </div>
+
+            @if (packPreview(); as preview) {
+              <div class="admin-pricing__preview" aria-live="polite" data-testid="pack-preview">
+                <p class="admin-pricing__formula u-nums">
+                  {{
+                    t('dashboard.products.packFormula', {
+                      unitPrice: pack.money(preview.terms.unitPrice),
+                      pieces: pack.pieces(preview.terms.packQuantity, preview.terms.unitLabel),
+                      packPrice: pack.moneyMillimes(preview.packMillimes),
+                    })
+                  }}
+                </p>
+                <p class="u-label">{{ t('dashboard.products.previewTitle') }}</p>
+                <dl class="admin-pricing__customer u-nums">
+                  <div>
+                    <dt>{{ t('pack.unitPrice') }}</dt>
+                    <dd>{{ pack.perUnit(preview.terms) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ t('pack.packaging') }}</dt>
+                    <dd>{{ pack.soldBy(preview.terms) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ t('pack.packPrice') }}</dt>
+                    <dd>
+                      <strong>{{ pack.moneyMillimes(preview.packMillimes) }}</strong>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
             }
-            <small class="field__hint">{{ t('dashboard.products.fields.priceHint') }}</small>
-          </div>
+          </fieldset>
           <div class="field">
             <label class="field__label" for="p-stock">{{
               t('dashboard.products.fields.stock')
@@ -232,7 +356,7 @@
               @if (form.controls.imageSrc.value) {
                 <img
                   class="admin-image-preview"
-                  [src]="form.controls.imageSrc.value"
+                  [src]="mediaUrl(form.controls.imageSrc.value)"
                   alt=""
                   width="92"
                   height="72"
@@ -380,7 +504,7 @@
                       @if (product.images[0]; as image) {
                         <img
                           class="admin-thumb"
-                          [src]="image.src"
+                          [src]="mediaUrl(image.src)"
                           alt=""
                           width="44"
                           height="44"
@@ -400,23 +524,43 @@
                     <label class="u-visually-hidden" [attr.for]="'price-' + product.id">{{
                       t('dashboard.products.priceOf', { name: product.name.fr })
                     }}</label>
-                    <div class="admin-price">
-                      <input
-                        [id]="'price-' + product.id"
-                        class="control admin-price__input u-nums"
-                        inputmode="decimal"
-                        [value]="product.price === null ? '' : product.price.toFixed(3)"
-                        [placeholder]="t('cart.priceOnRequest')"
-                        [disabled]="priceSaving() === product.id"
-                        (change)="savePrice(product, $any($event.target).value)"
-                      />
-                      <span class="admin-price__unit">TND</span>
-                      @if (priceSaved() === product.id) {
-                        <span class="admin-price__saved" role="status">{{
-                          t('dashboard.products.priceSaved')
-                        }}</span>
-                      }
-                    </div>
+                    @if (
+                      product.saleMode === 'PACK_ONLY' &&
+                      product.unitPrice !== null &&
+                      product.packQuantity !== null
+                    ) {
+                      <!-- Derived price: changed through the unit price in the editor. -->
+                      <div
+                        class="admin-price admin-price--derived u-nums"
+                        data-testid="list-pack-price"
+                      >
+                        <strong>{{ pack.money(product.price ?? 0) }}</strong>
+                        <small
+                          >{{ pack.money(product.unitPrice) }} ×
+                          {{
+                            pack.pieces(product.packQuantity, product.unitLabel ?? 'piece')
+                          }}</small
+                        >
+                      </div>
+                    } @else {
+                      <div class="admin-price">
+                        <input
+                          [id]="'price-' + product.id"
+                          class="control admin-price__input u-nums"
+                          inputmode="decimal"
+                          [value]="product.price === null ? '' : product.price.toFixed(3)"
+                          [placeholder]="t('cart.priceOnRequest')"
+                          [disabled]="priceSaving() === product.id"
+                          (change)="savePrice(product, $any($event.target).value)"
+                        />
+                        <span class="admin-price__unit">TND</span>
+                        @if (priceSaved() === product.id) {
+                          <span class="admin-price__saved" role="status">{{
+                            t('dashboard.products.priceSaved')
+                          }}</span>
+                        }
+                      </div>
+                    }
                   </td>
                   <td class="u-nums">{{ product.stockQuantity ?? '—' }}</td>
                   <td>

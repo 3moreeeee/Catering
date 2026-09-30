@@ -19,6 +19,16 @@ export interface CartItem {
   readonly unitPrice: number | null;
   readonly lineTotal: number | null;
   readonly currency: string | null;
+  /**
+   * Pack terms, set only for a PACK_ONLY product. `quantity` then counts packs
+   * and `unitPrice` is the price of one pack; `piecePrice` is the price of one
+   * piece (null while a promotion discounts the pack).
+   */
+  readonly saleMode?: 'UNIT' | 'PACK_ONLY' | null;
+  readonly packQuantity?: number | null;
+  readonly piecePrice?: number | null;
+  readonly unitLabel?: string | null;
+  readonly totalPieces?: number | null;
 }
 
 export interface Cart {
@@ -49,6 +59,16 @@ export interface QuoteLine {
   readonly quantity: number;
   readonly unitPrice: number | null;
   readonly lineTotal: number | null;
+  /**
+   * Pack terms, set only for a PACK_ONLY product. `quantity` then counts packs
+   * and `unitPrice` is the price of one pack; `piecePrice` is the price of one
+   * piece (null while a promotion discounts the pack).
+   */
+  readonly saleMode?: 'UNIT' | 'PACK_ONLY' | null;
+  readonly packQuantity?: number | null;
+  readonly piecePrice?: number | null;
+  readonly unitLabel?: string | null;
+  readonly totalPieces?: number | null;
 }
 
 export interface Quote {
@@ -97,4 +117,9 @@ export interface ProductPricePoint {
   readonly currency: string | null;
   readonly stockQuantity: number | null;
   readonly active: boolean;
+  /** PACK_ONLY: `price` is the price of one pack of `packQuantity` pieces at `unitPrice`. */
+  readonly saleMode?: 'UNIT' | 'PACK_ONLY';
+  readonly unitPrice?: number | null;
+  readonly packQuantity?: number | null;
+  readonly unitLabel?: string | null;
 }

@@ -1,17 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, REQUEST, inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import {
-  EMPTY,
-  Observable,
-  catchError,
-  concat,
-  forkJoin,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { IDENTITY_API_URL } from '../../core/auth/identity-api.token';
 import { retryWhileWaking } from '../../core/http/retry-while-waking';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
@@ -24,19 +14,39 @@ import {
   ProductQuery,
   SizeBucket,
 } from '../../shared/models/catalog.model';
-import { PRODUCTS } from '../products.data';
-import { ProductRepository } from './catalog.repository';
-import { InMemoryProductRepository } from './in-memory.repository';
+import { CATEGORIES } from '../categories.data';
+import { labelled } from '../catalog-labels';
+import { CatalogStats, ProductRepository } from './catalog.repository';
+import { PricingService } from '../../core/cart/pricing.service';
+import { ProductPricePoint } from '../../core/cart/cart.models';
+
+/** The server's page ceiling; asking for more is pointless, it answers with 12. */
+export const CATALOG_PAGE_SIZE = 12;
 
 interface ApiPage<T> {
   readonly items: readonly T[];
   readonly total: number;
+  /** Zero-based. */
   readonly page: number;
   readonly pageSize: number;
   readonly totalPages: number;
 }
 
+interface ApiFacetValue {
+  readonly id: string;
+  readonly count: number;
+}
+
+interface ApiFacets {
+  readonly categories: readonly ApiFacetValue[];
+  readonly subcategories: readonly ApiFacetValue[];
+  readonly brands: readonly ApiFacetValue[];
+  readonly industries: readonly ApiFacetValue[];
+  readonly sizes: readonly ApiFacetValue[];
+}
+
 interface ApiProduct {
+  readonly id: string;
   readonly sourceId: string;
   readonly slug: string;
   readonly name: { readonly fr: string; readonly en: string | null };
@@ -58,6 +68,18 @@ interface ApiProduct {
     readonly alt: { readonly fr: string | null; readonly en: string | null } | null;
     readonly width: number | null;
     readonly height: number | null;
+    readonly metrics?: {
+      readonly occupancy: number;
+      readonly width: number;
+      readonly bottom: number;
+      readonly reliable: boolean;
+    } | null;
+  }[];
+  readonly colorVariants?: readonly {
+    readonly id: string;
+    readonly slug: string;
+    readonly label: { readonly fr: string; readonly en: string | null };
+    readonly swatch: string;
   }[];
   readonly featured: boolean;
   readonly price: number | null;
@@ -71,98 +93,184 @@ interface ApiProduct {
   readonly seoTitle: { readonly fr: string | null; readonly en: string | null } | null;
   readonly seoDescription: { readonly fr: string | null; readonly en: string | null } | null;
   readonly needsVerification: boolean;
+  readonly active: boolean;
+  readonly stockQuantity: number | null;
+  readonly saleMode: 'UNIT' | 'PACK_ONLY' | null;
+  readonly unitPrice: number | null;
+  readonly packQuantity: number | null;
+  readonly unitLabel: string | null;
 }
 
-/** Live Neon-backed catalogue with the bundled snapshot as an offline/SSR fallback. */
+interface ApiStats {
+  readonly total: number;
+  readonly categories: Readonly<Record<string, number>>;
+  readonly brands: Readonly<Record<string, number>>;
+}
+
+const EMPTY_FACETS: FacetSet = {
+  categories: [],
+  subcategories: [],
+  brands: [],
+  industries: [],
+  sizes: [],
+};
+
+/**
+ * The catalogue, read from the Spring Boot API (Neon) one bounded request at a
+ * time. Server-side rendering performs these requests and Angular's HTTP
+ * transfer cache hands the responses to the hydrating browser, so a page's
+ * data is fetched once.
+ *
+ * During build-time prerendering there is no request and no API to call; the
+ * pages prerendered then (about, contact, legal) show no catalogue data and
+ * load their counters in the browser.
+ */
 @Injectable({ providedIn: 'root' })
 export class ApiProductRepository implements ProductRepository {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = inject(IDENTITY_API_URL);
   private readonly prerendering = isPlatformServer(inject(PLATFORM_ID)) && inject(REQUEST) === null;
+  private readonly pricing = inject(PricingService);
 
-  private readonly bundled = PRODUCTS.map(withHostedImages);
-
-  /**
-   * The bundled snapshot first, synchronously, then the live catalogue once the
-   * API answers. The synchronous first value is what the prerendered HTML was
-   * built from, so the browser's first render matches it and hydration has
-   * nothing to reconcile; the API value then replaces it. If the API fails the
-   * snapshot simply stays.
-   */
-  private readonly catalogue$ = this.prerendering
-    ? of(this.bundled)
-    : concat(
-        of(this.bundled),
-        this.http
-          .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
-            params: { page: 0, pageSize: 100 },
-          })
-          .pipe(retryWhileWaking())
-          .pipe(
-            switchMap((first) => {
-              if (first.totalPages <= 1) return of(first.items);
-              const remaining = Array.from({ length: first.totalPages - 1 }, (_, index) =>
-                this.http
-                  .get<ApiPage<ApiProduct>>(`${this.apiUrl}/products`, {
-                    params: { page: index + 1, pageSize: 100 },
-                  })
-                  .pipe(retryWhileWaking()),
-              );
-              return forkJoin(remaining).pipe(
-                map((pages) => [first.items, ...pages.map((page) => page.items)].flat()),
-              );
-            }),
-            map((products) => products.map(toProduct)),
-            catchError(() => EMPTY),
-          ),
-      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
-
-  all(): Observable<readonly Product[]> {
-    return this.catalogue$;
+  /** Maps API products and hands their price terms to the pricing cache. */
+  private toProducts(items: readonly ApiProduct[]): Product[] {
+    this.pricing.seed(items.map(toPricePoint));
+    return items.map(toProduct);
   }
 
   list(query: ProductQuery): Observable<Paginated<Product>> {
-    return this.withCatalogue((repository) => repository.list(query));
+    const page = Math.max(1, Math.floor(query.page ?? 1));
+    const empty: Paginated<Product> = {
+      items: [],
+      total: 0,
+      page,
+      pageSize: CATALOG_PAGE_SIZE,
+      totalPages: 1,
+    };
+    if (this.prerendering) return of(empty);
+    const params = filterParams(query)
+      .set('page', String(page - 1))
+      .set('pageSize', String(CATALOG_PAGE_SIZE))
+      .set('sort', query.sort ?? 'relevance');
+    return this.get<ApiPage<ApiProduct>>('/products', params).pipe(
+      map((result) => ({
+        items: this.toProducts(result.items),
+        total: result.total,
+        page: result.page + 1,
+        pageSize: result.pageSize,
+        totalPages: result.totalPages,
+      })),
+      catchError(() => of(empty)),
+    );
   }
 
   bySlug(categorySlug: string, slug: string): Observable<Product | null> {
-    return this.withCatalogue((repository) => repository.bySlug(categorySlug, slug));
+    const category = CATEGORIES.find((c) => c.slug === categorySlug);
+    if (!category) return of(null);
+    return this.byProductSlug(slug).pipe(
+      map((product) => (product?.categoryId === category.id ? product : null)),
+    );
   }
 
-  byId(id: string): Observable<Product | null> {
-    return this.withCatalogue((repository) => repository.byId(id));
+  byProductSlug(slug: string): Observable<Product | null> {
+    if (this.prerendering || !slug) return of(null);
+    return this.get<ApiProduct>(`/products/${encodeURIComponent(slug)}`).pipe(
+      map((product) => this.toProducts([product])[0]!),
+      catchError(() => of(null)),
+    );
   }
 
-  featured(limit = 12): Observable<readonly Product[]> {
-    return this.withCatalogue((repository) => repository.featured(limit));
+  featured(limit: number, categoryId?: CategoryId): Observable<readonly Product[]> {
+    if (this.prerendering) return of([]);
+    let params = new HttpParams().set('limit', String(limit));
+    if (categoryId) params = params.set('category', categoryId);
+    return this.products('/products/featured', params);
   }
 
-  related(product: Product, limit = 4): Observable<readonly Product[]> {
-    return this.withCatalogue((repository) => repository.related(product, limit));
+  offers(limit: number): Observable<readonly Product[]> {
+    if (this.prerendering) return of([]);
+    return this.products('/products/offers', new HttpParams().set('limit', String(limit)));
+  }
+
+  related(slug: string, limit = 4): Observable<readonly Product[]> {
+    if (this.prerendering || !slug) return of([]);
+    return this.products(
+      `/products/${encodeURIComponent(slug)}/related`,
+      new HttpParams().set('limit', String(limit)),
+    );
   }
 
   facets(query: ProductQuery): Observable<FacetSet> {
-    return this.withCatalogue((repository) => repository.facets(query));
-  }
-
-  countByCategory(): Observable<Readonly<Record<CategoryId, number>>> {
-    return this.withCatalogue((repository) => repository.countByCategory());
-  }
-
-  private withCatalogue<T>(
-    operation: (repository: InMemoryProductRepository) => Observable<T>,
-  ): Observable<T> {
-    return this.catalogue$.pipe(
-      switchMap((products) => operation(new InMemoryProductRepository(products))),
+    if (this.prerendering) return of(EMPTY_FACETS);
+    return this.get<ApiFacets>('/products/facets', filterParams(query)).pipe(
+      map((facets) => ({
+        categories: labelled('categories', facets.categories),
+        subcategories: labelled('subcategories', facets.subcategories),
+        brands: labelled('brands', facets.brands),
+        industries: labelled('industries', facets.industries),
+        sizes: labelled('sizes', facets.sizes),
+      })),
+      catchError(() => of(EMPTY_FACETS)),
     );
+  }
+
+  stats(): Observable<CatalogStats | null> {
+    if (this.prerendering) return of(null);
+    return this.get<ApiStats>('/products/stats').pipe(
+      map((stats) => ({ total: stats.total, categories: stats.categories, brands: stats.brands })),
+      catchError(() => of(null)),
+    );
+  }
+
+  private products(path: string, params: HttpParams): Observable<readonly Product[]> {
+    return this.get<readonly ApiProduct[]>(path, params).pipe(
+      map((items) => this.toProducts(items)),
+      catchError(() => of([])),
+    );
+  }
+
+  private get<T>(path: string, params?: HttpParams): Observable<T> {
+    return this.http
+      .get<T>(`${this.apiUrl}${path}`, params ? { params } : {})
+      .pipe(retryWhileWaking());
   }
 }
 
-function withHostedImages(product: Product): Product {
+/** The price terms of a catalogue product, as the /prices endpoint would report them. */
+function toPricePoint(value: ApiProduct): ProductPricePoint {
   return {
-    ...product,
-    images: product.images.map((image) => ({ ...image, src: imageKitMediaUrl(image.src) })),
+    sourceId: value.sourceId,
+    id: value.id,
+    slug: value.slug,
+    price: value.offerCurrentlyActive && value.offerPrice !== null ? value.offerPrice : value.price,
+    originalPrice: value.price,
+    offerActive: value.offerCurrentlyActive,
+    currency: value.currency,
+    stockQuantity: value.stockQuantity,
+    active: value.active,
+    saleMode: value.saleMode ?? 'UNIT',
+    unitPrice: value.unitPrice,
+    packQuantity: value.packQuantity,
+    unitLabel: value.unitLabel,
   };
+}
+
+/** The filters of a query as API parameters; multi-valued ones comma-separated. */
+function filterParams(query: ProductQuery): HttpParams {
+  let params = new HttpParams();
+  const q = query.q?.trim();
+  if (q) params = params.set('q', q);
+  const lists: [string, readonly string[] | undefined][] = [
+    ['category', query.categories],
+    ['subcategory', query.subcategories],
+    ['brand', query.brands],
+    ['industry', query.industries],
+    ['size', query.sizes],
+  ];
+  for (const [name, values] of lists) {
+    if (values?.length) params = params.set(name, values.join(','));
+  }
+  return params;
 }
 
 function toProduct(value: ApiProduct): Product {
@@ -190,14 +298,27 @@ function toProduct(value: ApiProduct): Product {
       ...(format.sizeBucket ? { sizeBucket: format.sizeBucket as SizeBucket } : {}),
       ...(format.reference ? { reference: format.reference } : {}),
     })),
+    ...(value.colorVariants?.length
+      ? {
+          colorVariants: value.colorVariants.map((variant) => ({
+            id: variant.id,
+            slug: variant.slug,
+            label: { fr: variant.label.fr, en: variant.label.en || variant.label.fr },
+            swatch: variant.swatch,
+          })),
+        }
+      : {}),
     images: value.images.map((image) => ({
-      src: image.src,
+      // A catalogue path ("/img/products/…") is served from ImageKit; an
+      // absolute URL is left exactly as stored.
+      src: imageKitMediaUrl(image.src),
       alt: {
         fr: image.alt?.fr || name.fr,
         en: image.alt?.en || image.alt?.fr || name.en,
       },
       width: image.width || 800,
       height: image.height || 800,
+      ...(image.metrics ? { metrics: image.metrics } : {}),
     })),
     featured: value.featured,
     ...(value.offerActive &&
@@ -226,7 +347,7 @@ function toProduct(value: ApiProduct): Product {
         en:
           value.seoDescription?.en || value.seoDescription?.fr || value.shortDescription?.en || '',
       },
-      ...(value.images[0]?.src ? { ogImage: value.images[0].src } : {}),
+      ...(value.images[0]?.src ? { ogImage: imageKitMediaUrl(value.images[0].src) } : {}),
     },
     needsVerification: value.needsVerification,
   };

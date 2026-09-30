@@ -8,7 +8,15 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import {
@@ -21,6 +29,34 @@ import {
   ProductPayload,
   UploadedMedia,
 } from '../../core/admin/admin-api.service';
+import { packMillimes, parseMillimes } from '../../shared/utils/money';
+import { PackText, SaleMode, UNIT_LABELS } from '../../shared/utils/pack-text.service';
+import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
+
+/** Required, positive and millime-exact, but only for a product sold by the pack. */
+function unitPriceRule(control: AbstractControl<string>): ValidationErrors | null {
+  if (control.parent?.get('saleMode')?.value !== 'PACK_ONLY') return null;
+  if (control.value.trim() === '') return { required: true };
+  const millimes = parseMillimes(control.value);
+  return millimes === null || millimes <= 0 ? { unitPrice: true } : null;
+}
+
+/** A whole number of pieces, 1 to 100 000, required only for a product sold by the pack. */
+function packQuantityRule(control: AbstractControl<string>): ValidationErrors | null {
+  if (control.parent?.get('saleMode')?.value !== 'PACK_ONLY') return null;
+  return parsePackQuantity(control.value) === null
+    ? control.value.trim() === ''
+      ? { required: true }
+      : { packQuantity: true }
+    : null;
+}
+
+function parsePackQuantity(raw: string): number | null {
+  const trimmed = raw.trim();
+  if (!/^\d{1,6}$/.test(trimmed)) return null;
+  const quantity = Number(trimmed);
+  return quantity >= 1 && quantity <= 100000 ? quantity : null;
+}
 
 /**
  * Product management.
@@ -49,6 +85,10 @@ export class ProductsAdminPage {
   private readonly transloco = inject(TranslocoService);
   private readonly document = inject(DOCUMENT);
   private readonly route = inject(ActivatedRoute);
+  readonly pack = inject(PackText);
+  readonly unitLabels = UNIT_LABELS;
+  /** Display only: a stored catalogue path is served from ImageKit. The form keeps the stored value. */
+  readonly mediaUrl = imageKitMediaUrl;
 
   readonly page = signal<Page<AdminProduct> | null>(null);
   readonly categories = signal<readonly AdminCategory[]>([]);
@@ -98,6 +138,13 @@ export class ProductsAdminPage {
     subcategoryId: [''],
     brandId: [''],
     price: ['', Validators.pattern(/^\d{1,7}([.,]\d{1,3})?$/)],
+    // The assertion types the control as SaleMode rather than string, which
+    // ProductPayload requires; ESLint's checker wrongly reports it as redundant.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    saleMode: ['UNIT' as SaleMode],
+    unitPrice: ['', unitPriceRule],
+    packQuantity: ['', packQuantityRule],
+    unitLabel: ['piece'],
     stockQuantity: ['', Validators.pattern(/^\d+$/)],
     reference: ['', Validators.maxLength(120)],
     shortDescriptionFr: ['', Validators.maxLength(1000)],
@@ -114,6 +161,10 @@ export class ProductsAdminPage {
    */
   private static readonly KNOWN_ERRORS = new Set([
     'invalid_price',
+    'pack_unit_price_required',
+    'pack_quantity_required',
+    'pack_price_too_large',
+    'pack_price_derived',
     'product_slug_exists',
     'product_source_id_exists',
     'product_not_found',
@@ -123,6 +174,31 @@ export class ProductsAdminPage {
     'forbidden',
     'unauthorized',
   ]);
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
+
+  readonly packOnly = computed(() => this.formValue().saleMode === 'PACK_ONLY');
+
+  /**
+   * The pack terms being typed and their pack price, computed in whole millimes
+   * so 0,333 × 100 previews as 33,300 and never as 33,300000000000004. Null
+   * until both factors are valid. The server recomputes the price on save.
+   */
+  readonly packPreview = computed(() => {
+    const value = this.formValue();
+    if (value.saleMode !== 'PACK_ONLY') return null;
+    const unitMillimes = parseMillimes(value.unitPrice ?? '');
+    const quantity = parsePackQuantity(value.packQuantity ?? '');
+    if (unitMillimes === null || unitMillimes <= 0 || quantity === null) return null;
+    const terms = {
+      unitPrice: unitMillimes / 1000,
+      packQuantity: quantity,
+      unitLabel: value.unitLabel ?? 'piece',
+    };
+    return { terms, packMillimes: packMillimes(terms.unitPrice, quantity) };
+  });
+
   readonly errorKey = computed(() =>
     ProductsAdminPage.KNOWN_ERRORS.has(this.error()) ? this.error() : 'unknown',
   );
@@ -244,6 +320,10 @@ export class ProductsAdminPage {
       subcategoryId: '',
       brandId: '',
       price: '',
+      saleMode: 'UNIT',
+      unitPrice: '',
+      packQuantity: '',
+      unitLabel: 'piece',
       stockQuantity: '',
       reference: '',
       shortDescriptionFr: '',
@@ -273,6 +353,10 @@ export class ProductsAdminPage {
         subcategoryId: full.subcategoryId ?? '',
         brandId: full.brandId ?? '',
         price: full.price === null ? '' : full.price.toFixed(3),
+        saleMode: full.saleMode ?? 'UNIT',
+        unitPrice: full.unitPrice === null ? '' : full.unitPrice.toFixed(3),
+        packQuantity: full.packQuantity === null ? '' : String(full.packQuantity),
+        unitLabel: full.unitLabel ?? 'piece',
         stockQuantity: full.stockQuantity === null ? '' : String(full.stockQuantity),
         reference: full.reference ?? '',
         shortDescriptionFr: full.shortDescription?.fr ?? '',
@@ -286,6 +370,12 @@ export class ProductsAdminPage {
     } catch (error) {
       this.error.set(AdminApiService.errorCode(error));
     }
+  }
+
+  /** The pack fields are required only in pack mode, so re-check them when it changes. */
+  onSaleModeChange(): void {
+    this.form.controls.unitPrice.updateValueAndValidity();
+    this.form.controls.packQuantity.updateValueAndValidity();
   }
 
   onCategoryChange(value: string): void {
@@ -364,6 +454,12 @@ export class ProductsAdminPage {
         max: limit.requiredLength,
       });
     }
+    if (control.hasError('unitPrice')) {
+      return this.transloco.translate('dashboard.products.validation.unitPrice');
+    }
+    if (control.hasError('packQuantity')) {
+      return this.transloco.translate('dashboard.products.validation.packQuantity');
+    }
     if (control.hasError('pattern')) {
       // The three patterned fields each need their own explanation: telling an
       // administrator that a price "does not match the expected format" does
@@ -419,8 +515,12 @@ export class ProductsAdminPage {
   private payload(existing: AdminProduct | null): ProductPayload {
     const v = this.form.getRawValue();
     const blank = (value: string) => (value.trim() === '' ? null : value.trim());
-    const price = blank(v.price);
+    const packOnly = v.saleMode === 'PACK_ONLY';
+    // In pack mode the price field is not shown: the server derives the price
+    // from the unit price and the pack size, and ignores any price it is sent.
+    const price = packOnly ? null : blank(v.price);
     const stock = blank(v.stockQuantity);
+    const unitMillimes = packOnly ? parseMillimes(v.unitPrice) : null;
 
     // The first image is the one the editor exposes; any further images are
     // preserved as they were.
@@ -466,8 +566,13 @@ export class ProductsAdminPage {
       subcategoryId: blank(v.subcategoryId),
       brandId: blank(v.brandId),
       industries: existing?.industries ?? [],
-      price: price === null ? null : Number(price.replace(',', '.')),
+      price: price === null ? null : (parseMillimes(price) ?? 0) / 1000,
       currency: price === null ? null : 'TND',
+      saleMode: v.saleMode,
+      unitPrice: unitMillimes === null ? null : unitMillimes / 1000,
+      // Null outside pack mode, so the pack size already on the format is kept.
+      packQuantity: packOnly ? parsePackQuantity(v.packQuantity) : null,
+      unitLabel: packOnly ? v.unitLabel : (existing?.unitLabel ?? null),
       stockQuantity: stock === null ? null : Number(stock),
       reference: blank(v.reference),
       technicalSheetUrl: existing?.technicalSheetUrl ?? null,
@@ -502,6 +607,8 @@ export class ProductsAdminPage {
     brandId: 'p-brand',
     reference: 'p-ref',
     price: 'p-price',
+    unitPrice: 'p-unit-price',
+    packQuantity: 'p-pack-qty',
     stockQuantity: 'p-stock',
     shortDescriptionFr: 'p-short-fr',
     shortDescriptionEn: 'p-short-en',

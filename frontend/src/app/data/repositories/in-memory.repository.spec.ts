@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { firstValueFrom } from 'rxjs';
-import { InMemoryProductRepository, normalize } from './in-memory.repository';
+import { InMemoryProductRepository } from './in-memory-product.repository';
+import { normalize } from './in-memory.repository';
 import { PRODUCTS } from '../products.data';
 import { CATEGORIES } from '../categories.data';
 
@@ -20,7 +21,8 @@ describe('InMemoryProductRepository', () => {
       // than on a number that would have to be edited every time.
       expect(all.length).toBeGreaterThanOrEqual(150);
       expect(all).toEqual(PRODUCTS);
-      expect(all.filter((p) => p.categoryId === 'monin')).toHaveLength(57);
+      // 57 feed records, 3 withdrawn and 37 added by the supplier reconciliation.
+      expect(all.filter((p) => p.categoryId === 'monin')).toHaveLength(91);
     });
 
     it('gives every product a unique slug, so no detail route collides', () => {

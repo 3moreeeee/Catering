@@ -8,6 +8,7 @@ import express from 'express';
 import { join } from 'node:path';
 import { handleEnquiry, handleNewsletter } from './api/enquiry';
 import { handleAssistant } from './api/assistant';
+import { handleSitemap } from './api/sitemap';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -54,6 +55,11 @@ app.use(
     next();
   },
 );
+
+// Generated from the database on each request (cached at the edge for an hour).
+app.get('/sitemap.xml', (req, res) => {
+  void handleSitemap(req, res);
+});
 
 /**
  * Serve static files from /browser

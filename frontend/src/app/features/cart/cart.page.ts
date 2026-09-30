@@ -12,7 +12,9 @@ import { RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { AuthService } from '../../core/auth/auth.service';
 import { CartService } from '../../core/cart/cart.service';
-import { Quote, QuoteKind } from '../../core/cart/cart.models';
+import { CartItem, Quote, QuoteKind } from '../../core/cart/cart.models';
+import { PackTerms, PackText } from '../../shared/utils/pack-text.service';
+import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { QuantityStepper } from '../../shared/components/quantity-stepper/quantity-stepper';
 
@@ -41,6 +43,9 @@ export class CartPage {
   private readonly transloco = inject(TranslocoService);
   readonly auth = inject(AuthService);
   readonly cartService = inject(CartService);
+  readonly pack = inject(PackText);
+  /** A stored catalogue path is served from ImageKit; an absolute URL is kept. */
+  readonly mediaUrl = imageKitMediaUrl;
 
   readonly cart = this.cartService.cart;
   readonly busy = this.cartService.loading;
@@ -83,10 +88,17 @@ export class CartPage {
    * A missing price is never rendered as 0.
    */
   price(value: number | null, currency = 'TND'): string {
-    if (value === null || value === undefined) {
-      return this.transloco.translate('cart.priceOnRequest');
-    }
-    return `${value.toFixed(3)} ${currency}`;
+    return this.pack.price(value, currency);
+  }
+
+  /** Pack terms of a line, when it is sold by the pack; its quantity then counts packs. */
+  packOf(line: CartItem): PackTerms | null {
+    if (line.saleMode !== 'PACK_ONLY' || !line.packQuantity) return null;
+    return {
+      unitPrice: line.piecePrice ?? 0,
+      packQuantity: line.packQuantity,
+      unitLabel: line.unitLabel ?? 'piece',
+    };
   }
 
   /** Opens the order or quote form. An order needs a phone and a delivery city. */

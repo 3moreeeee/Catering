@@ -210,6 +210,14 @@
 
 .cart-line__quantity {
   grid-area: qty;
+  display: grid;
+  gap: var(--sp-1);
+  justify-items: start;
+}
+
+.cart-line__pieces {
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
 }
 
 .cart-line__total {

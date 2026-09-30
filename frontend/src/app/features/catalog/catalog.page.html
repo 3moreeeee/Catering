@@ -3,8 +3,12 @@
     <!-- Breadcrumb -->
     <nav class="catalog__crumbs" [attr.aria-label]="t('nav.breadcrumb')">
       <ol>
-        <li><a [routerLink]="to('')">{{ t('nav.home') }}</a></li>
-        <li><a [routerLink]="to('products')">{{ t('catalog.title') }}</a></li>
+        <li>
+          <a [routerLink]="to('')">{{ t('nav.home') }}</a>
+        </li>
+        <li>
+          <a [routerLink]="to('products')">{{ t('catalog.title') }}</a>
+        </li>
         @if (category(); as cat) {
           <li aria-current="page">{{ heading() }}</li>
         }
@@ -147,25 +151,52 @@
           <!-- Pagination: real links, so crawlers can walk the whole catalogue -->
           @if (store.totalPages() > 1) {
             <nav class="catalog__pagination" [attr.aria-label]="t('common.pagination')">
-              <button
-                type="button"
-                class="btn btn--secondary btn--sm"
-                [disabled]="store.page() <= 1"
-                (click)="store.setPage(store.page() - 1)"
-              >
-                {{ t('common.previous') }}
-              </button>
-              <span class="u-sm u-nums">{{
-                t('common.pageOf', { current: store.page(), total: store.totalPages() })
-              }}</span>
-              <button
-                type="button"
-                class="btn btn--secondary btn--sm"
-                [disabled]="store.page() >= store.totalPages()"
-                (click)="store.setPage(store.page() + 1)"
-              >
-                {{ t('common.next') }}
-              </button>
+              @if (store.page() > 1) {
+                <a
+                  class="btn btn--secondary btn--sm"
+                  rel="prev"
+                  [routerLink]="[]"
+                  [queryParams]="pageParams(store.page() - 1)"
+                  queryParamsHandling="merge"
+                  >{{ t('common.previous') }}</a
+                >
+              }
+              <ol class="catalog__pages">
+                @for (page of pageLinks(); track $index) {
+                  <li>
+                    @if (page === null) {
+                      <span class="catalog__page-gap" aria-hidden="true">…</span>
+                    } @else if (page === store.page()) {
+                      <span
+                        class="catalog__page catalog__page--current u-nums"
+                        aria-current="page"
+                        >{{ page }}</span
+                      >
+                    } @else {
+                      <a
+                        class="catalog__page u-nums"
+                        [routerLink]="[]"
+                        [queryParams]="pageParams(page)"
+                        queryParamsHandling="merge"
+                        [attr.aria-label]="
+                          t('common.pageOf', { current: page, total: store.totalPages() })
+                        "
+                        >{{ page }}</a
+                      >
+                    }
+                  </li>
+                }
+              </ol>
+              @if (store.page() < store.totalPages()) {
+                <a
+                  class="btn btn--secondary btn--sm"
+                  rel="next"
+                  [routerLink]="[]"
+                  [queryParams]="pageParams(store.page() + 1)"
+                  queryParamsHandling="merge"
+                  >{{ t('common.next') }}</a
+                >
+              }
             </nav>
           }
         }

@@ -23,6 +23,7 @@ import {
 import { Product } from '../../../shared/models/catalog.model';
 import { FrenchTypographyPipe } from '../../../shared/pipes/french-typography.pipe';
 import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
+import { PackText } from '../../../shared/utils/pack-text.service';
 
 /** Live and upcoming Neon promotions, placed directly after the homepage showcase. */
 @Component({
@@ -132,10 +133,12 @@ import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 export class OffersSection implements AfterViewInit, OnDestroy {
   @ViewChild('track') private track?: ElementRef<HTMLElement>;
 
-  private readonly products = toSignal(inject(PRODUCT_REPOSITORY).all(), { initialValue: [] });
+  /** Running and upcoming promotions, selected by the database (at most 12). */
+  private readonly products = toSignal(inject(PRODUCT_REPOSITORY).offers(12), { initialValue: [] });
   private readonly categories = toSignal(inject(CATEGORY_REPOSITORY).all(), { initialValue: [] });
   private readonly links = inject(LocalizedRouter);
   private readonly locale = inject(LocaleService);
+  private readonly pack = inject(PackText);
   private readonly platformId = inject(PLATFORM_ID);
   private autoplayTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -212,8 +215,9 @@ export class OffersSection implements AfterViewInit, OnDestroy {
     return Math.round((1 - offer.price / offer.originalPrice) * 100);
   }
 
+  /** Same "12,000 TND" format as the catalogue cards. */
   money(value: number, currency: string): string {
-    return `${value.toFixed(3)} ${currency}`;
+    return this.pack.money(value, currency);
   }
 
   date(value: string): string {

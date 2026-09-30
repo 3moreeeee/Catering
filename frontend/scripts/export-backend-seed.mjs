@@ -13,7 +13,11 @@
 // Prices are never invented. A curated product with no matching crawl record is
 // exported with `price: null`, and the API renders it as "prix sur demande".
 //
-// Run:  node scripts/export-backend-seed.mjs
+// Run:  node scripts/export-backend-seed.mjs [--out <file>]
+//
+// --out writes the records elsewhere, which is how
+// scripts/export-catalog-reconciliation.mjs obtains fresh records without
+// replacing the committed seed (whose image URLs point at ImageKit).
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -22,8 +26,11 @@ import { loadCatalog } from './lib/load-catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RAW_PRODUCTS = path.join(ROOT, 'tmp', 'vinto-import', 'raw-products.json');
-const OUT_DIR = path.join(ROOT, '..', 'backend', 'src', 'main', 'resources', 'seed');
-const OUT_FILE = path.join(OUT_DIR, 'catalog-seed.json');
+const outArgument = process.argv.indexOf('--out');
+const OUT_FILE = outArgument > 0
+  ? path.resolve(process.argv[outArgument + 1])
+  : path.join(ROOT, '..', 'backend', 'src', 'main', 'resources', 'seed', 'catalog-seed.json');
+const OUT_DIR = path.dirname(OUT_FILE);
 
 /**
  * Parses a Vinto price string into a plain decimal string.
@@ -51,8 +58,13 @@ function parsePrice(raw) {
  * second group ("p-vinto-353-67"); there the *first* group is the listing id and
  * the second is a pack size. Candidates are therefore tried in order against the
  * crawl rather than assuming a fixed position.
+ *
+ * Only Vinto-derived ids take part. A supplier-list addition ("p-fk-…") has no
+ * Vinto listing, and the digits of its format ("…-70cl") would otherwise match
+ * an unrelated listing and publish that product's price.
  */
 function vintoId(id, known) {
+  if (!/^p-(vinto|monin)-\d/.test(String(id))) return null;
   const groups = String(id).match(/\d+/g) ?? [];
   return groups.find((group) => known.has(group)) ?? null;
 }
@@ -64,6 +76,9 @@ function localized(value) {
 }
 
 const catalog = await loadCatalog(ROOT);
+// Supplier-list additions carry their own reference and, for a line the list
+// marks "Rupture provisoire", a zero stock.
+const additions = new Map(catalog.CATALOG_ADDITIONS.map((addition) => [addition.id, addition]));
 const rawList = JSON.parse(await readFile(RAW_PRODUCTS, 'utf8'));
 
 const commercial = new Map();
@@ -77,10 +92,19 @@ for (const record of rawList) {
   });
 }
 
+/** Integer millimes as the decimal string a BigDecimal column expects. */
+const decimal = (millimes) => (millimes == null ? null : `${Math.trunc(millimes / 1000)}.${String(millimes % 1000).padStart(3, '0')}`);
+
 let priced = 0;
 const products = catalog.PRODUCTS.map((product) => {
   const trade = commercial.get(vintoId(product.id, commercial)) ?? {};
-  if (trade.price) priced += 1;
+  const addition = additions.get(product.id);
+  // Supplier price lists first (the catalogue is priced from them, HT). The
+  // Vinto price survives only where no supplier line prices the product.
+  const terms = catalog.SALE_TERMS.get(product.id);
+  const supplierPrice = terms?.status === 'PRICED' ? decimal(terms.priceMillimes) : null;
+  const price = supplierPrice ?? trade.price ?? null;
+  if (price) priced += 1;
   const name = localized(product.name);
   const shortDescription = localized(product.shortDescription);
   const description = localized(product.description);
@@ -105,11 +129,15 @@ const products = catalog.PRODUCTS.map((product) => {
     seoTitleEn: localized(product.seo?.title).en,
     seoDescriptionFr: localized(product.seo?.description).fr,
     seoDescriptionEn: localized(product.seo?.description).en,
-    // Commercial fields, from the crawl only. Null when the crawl has no row.
-    price: trade.price ?? null,
-    currency: trade.price ? 'TND' : null,
-    stockQuantity: trade.stockQuantity ?? null,
-    reference: trade.reference ?? null,
+    // Commercial fields. Price, sale mode and unit from the supplier lists;
+    // stock and page from the Vinto crawl; a supplier reference beats Vinto's.
+    price,
+    currency: price ? 'TND' : null,
+    saleMode: supplierPrice ? terms.saleMode : 'UNIT',
+    unitPrice: supplierPrice && terms.saleMode === 'PACK_ONLY' ? decimal(terms.unitMillimes) : null,
+    unitLabel: terms ? terms.unit : null,
+    stockQuantity: terms?.status === 'UNAVAILABLE' ? 0 : (trade.stockQuantity ?? addition?.stockQuantity ?? null),
+    reference: terms?.reference ?? trade.reference ?? addition?.reference ?? null,
     sourceUrl: trade.sourceUrl ?? null,
     formats: (product.formats ?? []).map((format) => ({
       externalId: format.id,

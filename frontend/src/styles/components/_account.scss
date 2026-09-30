@@ -293,7 +293,9 @@
   flex-direction: column;
   min-inline-size: 0;
   color: var(--c-ivory-50);
-  background: radial-gradient(circle at 15% 5%, rgb(255 255 255 / 10%), transparent 17rem), var(--c-forest-900);
+  background:
+    radial-gradient(circle at 15% 5%, rgb(255 255 255 / 10%), transparent 17rem),
+    var(--c-forest-900);
   box-shadow: 10px 0 30px rgb(var(--c-dark-rgb) / 8%);
 
   @include bp(lg) {
@@ -757,6 +759,77 @@
 .admin-price__unit {
   color: var(--text-muted);
   font-size: var(--fs-xs);
+}
+
+.admin-price--derived {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+
+  small {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+}
+
+// Pricing & sales block of the product editor.
+.admin-pricing {
+  display: grid;
+  gap: var(--sp-4);
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--sp-4);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-md);
+}
+
+.admin-pricing__title {
+  padding-inline: var(--sp-2);
+  font-weight: var(--fw-semibold);
+}
+
+.admin-pricing__derived {
+  display: flex;
+  align-items: center;
+  font-weight: var(--fw-semibold);
+}
+
+.admin-pricing__preview {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--surface-alt);
+}
+
+.admin-pricing__formula {
+  margin: 0;
+  font-weight: var(--fw-semibold);
+  overflow-wrap: anywhere;
+}
+
+.admin-pricing__customer {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+
+  @include bp(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  div {
+    display: grid;
+    gap: 2px;
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+
+  dd {
+    margin: 0;
+  }
 }
 
 .admin-price__saved {

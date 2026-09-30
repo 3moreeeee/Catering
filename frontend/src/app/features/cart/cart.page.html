@@ -66,7 +66,7 @@
                     @if (line.images[0]; as image) {
                       <img
                         class="cart-line__image"
-                        [src]="image.src"
+                        [src]="mediaUrl(image.src)"
                         [alt]="image.alt.fr"
                         [width]="image.width"
                         [height]="image.height"
@@ -84,11 +84,27 @@
                       @if (line.formatValue) {
                         <small>{{ line.formatValue }}</small>
                       }
-                      <span class="cart-line__unit">{{
-                        t('cart.unitPrice', {
-                          price: price(line.unitPrice, line.currency ?? 'TND'),
-                        })
-                      }}</span>
+                      @if (packOf(line); as terms) {
+                        <!-- Pack line: quantity counts packs, unitPrice is the pack price. -->
+                        <span class="cart-line__unit" data-testid="cart-pack">
+                          @if (line.piecePrice !== null && line.piecePrice !== undefined) {
+                            {{ t('pack.unitPrice') }} : {{ pack.perUnit(terms) }} ·
+                          }
+                          {{
+                            t('pack.perPackSuffix', {
+                              pieces: pack.pieces(terms.packQuantity, terms.unitLabel),
+                            })
+                          }}
+                          · {{ t('pack.packPrice') }} :
+                          {{ price(line.unitPrice, line.currency ?? 'TND') }}
+                        </span>
+                      } @else {
+                        <span class="cart-line__unit">{{
+                          t('cart.unitPrice', {
+                            price: price(line.unitPrice, line.currency ?? 'TND'),
+                          })
+                        }}</span>
+                      }
                     </div>
 
                     <div class="cart-line__quantity">
@@ -96,11 +112,16 @@
                         [inputId]="'qty-' + line.id"
                         [value]="line.quantity"
                         [disabled]="busy() || mode() !== 'choose'"
-                        [label]="t('cart.quantity')"
+                        [label]="packOf(line) ? t('pack.quantity') : t('cart.quantity')"
                         [decreaseLabel]="t('cart.decrease')"
                         [increaseLabel]="t('cart.increase')"
                         (valueChange)="changeQuantity(line.id, $event)"
                       />
+                      @if (packOf(line); as terms) {
+                        <small class="cart-line__pieces u-nums" data-testid="cart-pieces">{{
+                          pack.packsEqual(line.quantity, terms)
+                        }}</small>
+                      }
                     </div>
 
                     <div class="cart-line__total u-nums">

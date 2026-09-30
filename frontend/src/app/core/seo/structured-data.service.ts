@@ -140,6 +140,20 @@ export class StructuredDataService {
     };
   }
 
+  /** The products listed on one catalogue page, in display order. */
+  itemList(products: readonly Product[], pathOf: (product: Product) => string): JsonLd {
+    const locale = this.locales.locale();
+    return {
+      '@type': 'ItemList',
+      itemListElement: products.map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: product.name[locale],
+        url: `${this.config.origin}${pathOf(product)}`,
+      })),
+    };
+  }
+
   product(product: Product, path: string): JsonLd {
     const locale = this.locales.locale();
     const image = product.images[0];

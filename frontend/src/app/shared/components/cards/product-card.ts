@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { AuthService } from '../../../core/auth/auth.service';
 import { CartService } from '../../../core/cart/cart.service';
 import { PricingService } from '../../../core/cart/pricing.service';
@@ -19,6 +19,8 @@ import { Product } from '../../models/catalog.model';
 import { BRANDS } from '../../../data/brands.data';
 import { CATEGORIES } from '../../../data/categories.data';
 import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
+import { ProductFormatService } from '../../utils/product-format.service';
+import { PackText, packTermsOf } from '../../utils/pack-text.service';
 
 /**
  * Product card.
@@ -52,7 +54,12 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
           <span class="u-visually-hidden">{{ product().name | localized }}</span>
         </a>
 
-        <div class="card__media">
+        <div
+          class="card__media"
+          [class.card__media--normalized]="formatVisual()?.normalizedImage"
+          [style.--format-scale]="formatVisual()?.imageScale ?? 1"
+          [style.--format-shift]="(formatVisual()?.imageShift ?? 0) + '%'"
+        >
           <img
             [src]="imageSrc()"
             (error)="onImageError()"
@@ -73,8 +80,28 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
 
           <h3 class="card__name">{{ product().name | localized | frenchType }}</h3>
 
-          @if (formatLabel(); as formats) {
-            <p class="card__format u-xs u-nums">{{ formats | frenchType }}</p>
+          @if (formatVisual(); as format) {
+            <p
+              class="card__format u-xs u-nums"
+              [class.card__format--packaging]="product().categoryId === 'packaging'"
+              [class.card__format--hygiene]="product().categoryId === 'hygiene'"
+            >
+              @if (format.icon === 'bottle') {
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 2h6v3l-1 2v2l2.5 3.5V21h-9v-8.5L10 9V7L9 5V2Z" />
+                </svg>
+              } @else if (format.icon === 'tray') {
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 9h20l-2.5 10h-15L2 9Zm2 0 3-4h10l3 4" />
+                </svg>
+              }
+              <span
+                >{{ t('product.format.' + format.qualifier) }}
+                <strong>{{ format.value | frenchType }}</strong></span
+              >
+            </p>
+          } @else if (formatLabel(); as formats) {
+            <p class="card__format-fallback u-xs u-nums">{{ formats | frenchType }}</p>
           }
 
           @if (view() === 'list') {
@@ -87,15 +114,33 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
                 <span class="card__offer">{{ t('product.offer') }}</span>
                 <del>{{ displayPrice(point.originalPrice, point.currency) }}</del>
               }
-              <strong>{{ displayPrice(point.price, point.currency) }}</strong>
+              <strong
+                ><span class="card__amount">{{ displayPrice(point.price, point.currency) }}</span>
+                @if (packTerms() && point.price !== null) {
+                  &ngsp;<span class="card__per-pack">/ {{ t('pack.packs.one') }}</span>
+                }
+              </strong>
             </p>
+            @if (packTerms(); as terms) {
+              <!-- Pack price first; what a pack holds and the piece price are secondary. -->
+              <p class="card__pack u-xs u-nums" data-testid="card-pack">
+                <span>{{ pack.soldBy(terms) }}</span>
+                @if (!point.offerActive) {
+                  <span>{{ pack.perUnit(terms) }}</span>
+                }
+              </p>
+            }
           } @else if (pricePending()) {
             <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
           }
         </div>
 
         <div class="card__actions">
-          @if (!auth.authenticated()) {
+          @if (product().colorVariants?.length) {
+            <a class="btn btn--primary btn--sm card__action" [routerLink]="detailLink()">
+              {{ t('product.chooseColor') }}
+            </a>
+          } @else if (!auth.authenticated()) {
             <a class="btn btn--primary btn--sm card__action" [routerLink]="loginLink()">
               {{ t('product.addToCart') }}
             </a>
@@ -137,11 +182,14 @@ export class ProductCard {
   private readonly links = inject(LocalizedRouter);
   private readonly pricing = inject(PricingService);
   private readonly cart = inject(CartService);
-  private readonly transloco = inject(TranslocoService);
+  private readonly formats = inject(ProductFormatService);
   readonly auth = inject(AuthService);
 
   readonly addState = signal<'idle' | 'adding' | 'added' | 'error'>('idle');
+  readonly pack = inject(PackText);
   readonly pricePoint = computed(() => this.pricing.priceOf(this.product().id));
+  /** Set only for a product sold by the pack; one "Ajouter" then adds one pack. */
+  readonly packTerms = computed(() => packTermsOf(this.pricePoint()));
   /** Holds the price's place while it loads, so the card does not jump when it lands. */
   readonly pricePending = computed(() => this.pricing.isPending(this.product().id));
   readonly loginLink = computed(() => this.links.path('login'));
@@ -151,9 +199,7 @@ export class ProductCard {
   }
 
   displayPrice(price: number | null, currency: string | null): string {
-    return price === null
-      ? this.transloco.translate('cart.priceOnRequest')
-      : `${price.toFixed(3)} ${currency ?? 'TND'}`;
+    return this.pack.price(price, currency);
   }
 
   async addToCart(): Promise<void> {
@@ -214,6 +260,8 @@ export class ProductCard {
     const formats = this.product().formats;
     return formats.length ? formats.map((f) => f.value).join(' · ') : null;
   });
+
+  readonly formatVisual = computed(() => this.formats.visual(this.product()));
 
   readonly detailLink = computed(() => {
     const product = this.product();

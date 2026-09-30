@@ -7,7 +7,8 @@ import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { SeoService } from '../../core/seo/seo.service';
 import { StructuredDataService } from '../../core/seo/structured-data.service';
 import { LocalizedTextPipe } from '../../shared/pipes/localized-text.pipe';
-import { BRAND_REPOSITORY, PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
+import { BRAND_REPOSITORY } from '../../data/repositories/catalog.repository';
+import { CatalogStats } from '../../core/catalog/catalog-stats.service';
 import { CategoryId } from '../../shared/models/catalog.model';
 import { CATEGORIES } from '../../data/categories.data';
 import { normalize } from '../../data/repositories/in-memory.repository';
@@ -34,7 +35,7 @@ export class BrandsPage {
   private readonly transloco = inject(TranslocoService);
 
   private readonly allBrands = toSignal(inject(BRAND_REPOSITORY).all(), { initialValue: [] });
-  private readonly products = toSignal(inject(PRODUCT_REPOSITORY).all(), { initialValue: [] });
+  private readonly stats = inject(CatalogStats);
 
   readonly categories = CATEGORIES;
   readonly search = signal('');
@@ -72,8 +73,9 @@ export class BrandsPage {
     });
   }
 
-  productCount(brandId: string): number {
-    return this.products().filter((product) => product.brandId === brandId).length;
+  /** Active products of a brand, counted by the database; null while unknown. */
+  productCount(brandId: string): number | null {
+    return this.stats.brand(brandId);
   }
 
   to(path: string): string[] {
