@@ -1,5 +1,6 @@
 package tn.com.catering.identity.DTO;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,6 +14,7 @@ public record ProductFormatRequest(
         String value,
 
         @Min(value = 1, message = "Le nombre d'unités par colis doit être au moins 1.")
+        @Max(value = 100000, message = "Le nombre d'unités par colis est trop élevé.")
         Integer packQuantity,
 
         @Size(max = 20)

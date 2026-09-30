@@ -46,6 +46,9 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+      # Quantities are whole numbers: without this Jackson truncates 100.5 to 100
+      # instead of rejecting it, silently changing a pack size or a cart quantity.
+      accept-float-as-int: false
   servlet:
     multipart:
       max-file-size: 10MB
@@ -65,6 +68,9 @@ app:
     # Loads classpath:seed/catalog-seed.json when the product table is empty.
     # Regenerate that file with: node scripts/export-backend-seed.mjs
     seed-on-startup: ${APP_CATALOG_SEED:true}
+    # Applies classpath:seed/catalog-reconciliation.json to an existing catalogue
+    # (additions, corrections, deactivations), once. See CatalogReconciliationRunner.
+    reconcile-on-startup: ${APP_CATALOG_RECONCILE:true}
 
 logging:
   level:

@@ -62,6 +62,33 @@ public class CartItem {
         this.unitPrice = product.effectivePrice();
     }
 
+    // Pack view of the line. For a PACK_ONLY product one quantity is one pack and
+    // unitPrice (above) is the pack price; these describe the pack. The pack
+    // itself is read from the product, like the price, so an open cart follows
+    // the catalogue until it is submitted and frozen into a QuoteLine.
+
+    public Integer packQuantity() {
+        return product.isPackOnly() ? product.getPackQuantity() : null;
+    }
+
+    /**
+     * Null while a promotion is running: the offer discounts the pack price, and
+     * showing the catalogue piece price beside it would state a calculation
+     * (piece × pack) that no longer equals what the line charges.
+     */
+    public BigDecimal piecePrice() {
+        return product.isPackOnly() && !product.hasCurrentOffer() ? product.getUnitPrice() : null;
+    }
+
+    public String unitLabel() {
+        return product.isPackOnly() ? product.getUnitLabel() : null;
+    }
+
+    public Long totalPieces() {
+        Integer pack = packQuantity();
+        return pack == null ? null : (long) quantity * pack;
+    }
+
     public UUID getId() { return id; }
     public Cart getCart() { return cart; }
     public void setCart(Cart cart) { this.cart = cart; }

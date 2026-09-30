@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import tn.com.catering.identity.entities.Category;
 import tn.com.catering.identity.entities.Product;
 import tn.com.catering.identity.entities.ProductFormat;
 import tn.com.catering.identity.entities.ProductImage;
+import tn.com.catering.identity.entities.SaleMode;
 import tn.com.catering.identity.repositories.BrandRepository;
 import tn.com.catering.identity.repositories.CategoryRepository;
 import tn.com.catering.identity.repositories.ProductRepository;
@@ -33,9 +35,11 @@ import tn.com.catering.identity.repositories.ProductRepository;
  *
  * <p>The seeder only runs on an empty product table, so restarting the
  * application never overwrites an administrator's edits. To reseed, drop the
- * database file.
+ * database file. An existing database is brought up to date by
+ * {@link CatalogReconciliationRunner}, which runs after this seeder.
  */
 @Component
+@Order(1)
 public class CatalogSeeder implements ApplicationRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogSeeder.class);
@@ -117,7 +121,8 @@ public class CatalogSeeder implements ApplicationRunner {
         return brand;
     }
 
-    private static Product toProduct(SeedProduct row) {
+    /** Shared with {@link CatalogReconciliationRunner}, which adds products in the same shape. */
+    static Product toProduct(SeedProduct row) {
         Product product = new Product(row.sourceId(), row.slug(), row.nameFr(), row.categoryId());
         product.setNameEn(row.nameEn());
         product.setShortDescriptionFr(row.shortDescriptionFr());
@@ -132,6 +137,11 @@ public class CatalogSeeder implements ApplicationRunner {
         product.setPrice(row.price());
         product.setCurrency(row.price() == null ? null : (row.currency() == null ? "TND" : row.currency()));
         product.setStockQuantity(row.stockQuantity());
+        // A PACK_ONLY row carries its unit price; its price is that unit price ×
+        // the pack size on its primary format, checked below once formats exist.
+        product.setSaleMode(row.saleMode() == null ? SaleMode.UNIT : row.saleMode());
+        product.setUnitPrice(row.unitPrice());
+        product.setUnitLabel(row.unitLabel());
         product.setSupplierReference(row.reference());
         product.setSourceUrl(row.sourceUrl());
         product.setTechnicalSheetUrl(row.technicalSheetUrl());
@@ -158,6 +168,15 @@ public class CatalogSeeder implements ApplicationRunner {
             product.addFormat(new ProductFormat(
                     format.externalId(), format.value(), format.packQuantity(),
                     format.sizeBucket(), format.reference(), index));
+        }
+        if (product.isPackOnly()) {
+            BigDecimal packPrice = product.packPrice();
+            if (packPrice == null || row.price() == null || packPrice.compareTo(row.price()) != 0) {
+                // A seed whose pack price disagrees with its factors is a broken
+                // export; refusing it beats publishing a contradictory price.
+                throw new IllegalStateException("Seed " + row.sourceId() + ": price " + row.price()
+                        + " is not unitPrice × packQuantity (" + packPrice + ").");
+            }
         }
         return product;
     }
@@ -187,7 +206,8 @@ public class CatalogSeeder implements ApplicationRunner {
                        String seoDescriptionFr, String seoDescriptionEn,
                        BigDecimal price, String currency, Integer stockQuantity,
                        String reference, String sourceUrl,
-                       List<SeedFormat> formats, List<SeedImage> images) {}
+                       List<SeedFormat> formats, List<SeedImage> images,
+                       SaleMode saleMode, BigDecimal unitPrice, String unitLabel) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     record SeedFormat(String externalId, String value, Integer packQuantity,

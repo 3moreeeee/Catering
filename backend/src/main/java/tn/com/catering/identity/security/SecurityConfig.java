@@ -46,7 +46,7 @@ public class SecurityConfig {
                         // server-rendered for anonymous visitors, so reads are
                         // open. Every catalogue write stays behind hasRole(ADMIN)
                         // on the controller method.
-                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*",
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*", "/api/products/*/related",
                                 "/api/categories", "/api/brands").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(errors -> errors

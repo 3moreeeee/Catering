@@ -20,4 +20,10 @@ public record ProductPricePoint(
         boolean offerActive,
         String currency,
         Integer stockQuantity,
-        boolean active) {}
+        boolean active,
+        /** UNIT or PACK_ONLY. For PACK_ONLY, {@code price} is the price of one pack. */
+        String saleMode,
+        /** Price of one piece; null unless PACK_ONLY. */
+        BigDecimal unitPrice,
+        Integer packQuantity,
+        String unitLabel) {}

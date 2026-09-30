@@ -44,4 +44,15 @@ public record ProductResponse(
         List<ProductImageResponse> images,
         List<ProductFormatResponse> formats,
         Instant createdAt,
-        Instant updatedAt) {}
+        Instant updatedAt,
+        /** UNIT or PACK_ONLY; always present, UNIT for records that predate pack pricing. */
+        String saleMode,
+        /** Price of one piece; null unless PACK_ONLY. */
+        BigDecimal unitPrice,
+        /** Pieces per commercial pack, from the primary format; null when unpublished. */
+        Integer packQuantity,
+        String unitLabel,
+        /** unitPrice × packQuantity, computed on the server; null unless PACK_ONLY. Equal to {@code price}. */
+        BigDecimal packPrice,
+        /** The colours of a supplier line shown once in the catalogue; empty for every other product. */
+        List<ColorVariantResponse> colorVariants) {}

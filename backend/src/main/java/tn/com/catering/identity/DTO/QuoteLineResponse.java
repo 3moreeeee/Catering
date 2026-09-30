@@ -12,4 +12,10 @@ public record QuoteLineResponse(
         String formatValue,
         int quantity,
         BigDecimal unitPrice,
-        BigDecimal lineTotal) {}
+        BigDecimal lineTotal,
+        /** Frozen pack terms; null for a unit line. quantity then counts packs. */
+        String saleMode,
+        Integer packQuantity,
+        BigDecimal piecePrice,
+        String unitLabel,
+        Long totalPieces) {}

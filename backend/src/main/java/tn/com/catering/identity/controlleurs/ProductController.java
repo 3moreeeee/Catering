@@ -17,11 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tn.com.catering.identity.common.PublicCatalogueCache;
+import tn.com.catering.identity.DTO.CatalogQuery;
+import tn.com.catering.identity.DTO.CatalogStatsResponse;
+import tn.com.catering.identity.DTO.FacetSetResponse;
 import tn.com.catering.identity.DTO.PageResponse;
 import tn.com.catering.identity.DTO.ProductPricePoint;
 import tn.com.catering.identity.DTO.ProductPriceRequest;
 import tn.com.catering.identity.DTO.ProductRequest;
 import tn.com.catering.identity.DTO.ProductResponse;
+import tn.com.catering.identity.DTO.SitemapEntryResponse;
+import tn.com.catering.identity.services.CatalogueQueryService;
 import tn.com.catering.identity.services.ProductService;
 
 /**
@@ -35,33 +40,90 @@ import tn.com.catering.identity.services.ProductService;
 public class ProductController {
 
     private final ProductService products;
+    private final CatalogueQueryService catalogue;
 
-    public ProductController(ProductService products) {
+    public ProductController(ProductService products, CatalogueQueryService catalogue) {
         this.products = products;
+        this.catalogue = catalogue;
     }
 
+    /**
+     * One page of the public catalogue, filtered, searched and sorted by the
+     * database. Multi-valued filters accept comma-separated or repeated values.
+     * {@code pageSize} is capped at 12 whatever the caller asks for; pages are
+     * zero-based.
+     */
     @GetMapping
     ResponseEntity<PageResponse<ProductResponse>> search(
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String subcategory,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> subcategory,
+            @RequestParam(required = false) List<String> brand,
+            @RequestParam(required = false) List<String> industry,
+            @RequestParam(required = false) List<String> size,
             @RequestParam(required = false) String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "24") int pageSize) {
-        return PublicCatalogueCache.ok(products.search(q, category, subcategory, brand, featured, sort, page, pageSize));
+            @RequestParam(required = false) String match,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) {
+        return PublicCatalogueCache.ok(catalogue.search(
+                CatalogQuery.of(q, category, subcategory, brand, industry, size, sort, match, page, pageSize)));
+    }
+
+    /** Facet counts for the same filters, each facet counted with its own filter removed. */
+    @GetMapping("/facets")
+    ResponseEntity<FacetSetResponse> facets(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> subcategory,
+            @RequestParam(required = false) List<String> brand,
+            @RequestParam(required = false) List<String> industry,
+            @RequestParam(required = false) List<String> size) {
+        return PublicCatalogueCache.ok(catalogue.facets(
+                CatalogQuery.of(q, category, subcategory, brand, industry, size, null, null, 0, null)));
+    }
+
+    /** Catalogue size in total, per division and per brand. */
+    @GetMapping("/stats")
+    ResponseEntity<CatalogStatsResponse> stats() {
+        return PublicCatalogueCache.ok(catalogue.stats());
+    }
+
+    /** The homepage showcase, at most 12 products, optionally within one division. */
+    @GetMapping("/featured")
+    ResponseEntity<List<ProductResponse>> featured(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer limit) {
+        return PublicCatalogueCache.ok(catalogue.featured(category, limit));
+    }
+
+    /** Running and upcoming promotions, at most 12. */
+    @GetMapping("/offers")
+    ResponseEntity<List<ProductResponse>> offers(@RequestParam(required = false) Integer limit) {
+        return PublicCatalogueCache.ok(catalogue.offers(limit));
+    }
+
+    /** Every public product URL, for the sitemap. Slugs only, no product content. */
+    @GetMapping("/sitemap")
+    ResponseEntity<List<SitemapEntryResponse>> sitemap() {
+        return PublicCatalogueCache.ok(catalogue.sitemap());
     }
 
     @GetMapping("/{slug}")
     ResponseEntity<ProductResponse> bySlug(@PathVariable String slug) {
-        return PublicCatalogueCache.ok(products.bySlug(slug));
+        return PublicCatalogueCache.ok(catalogue.bySlug(slug));
+    }
+
+    /** Related products, scored in the database; 4 by default, at most 12. */
+    @GetMapping("/{slug}/related")
+    ResponseEntity<List<ProductResponse>> related(
+            @PathVariable String slug,
+            @RequestParam(required = false) Integer limit) {
+        return PublicCatalogueCache.ok(catalogue.related(slug, limit));
     }
 
     /**
      * Live prices for a batch of catalogue ids. Public, like the rest of the
-     * catalogue reads, and the bridge the storefront uses while it still browses
-     * the bundled snapshot.
+     * catalogue reads; the cart and pricing read them by catalogue id.
      */
     @GetMapping("/prices")
     ResponseEntity<List<ProductPricePoint>> prices(@RequestParam List<String> sourceIds) {

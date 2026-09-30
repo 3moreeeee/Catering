@@ -7,6 +7,7 @@ import tn.com.catering.identity.entities.Category;
 import tn.com.catering.identity.entities.Product;
 import tn.com.catering.identity.entities.ProductFormat;
 import tn.com.catering.identity.entities.ProductImage;
+import tn.com.catering.identity.services.ProductImageMetrics;
 
 /**
  * Hand-written mapping, deliberately: the entity/DTO shapes differ enough
@@ -16,12 +17,32 @@ import tn.com.catering.identity.entities.ProductImage;
 @Component
 public class ProductMapper {
 
+    private final ProductImageMetrics imageMetrics;
+
+    public ProductMapper(ProductImageMetrics imageMetrics) {
+        this.imageMetrics = imageMetrics;
+    }
+
     public ProductResponse toResponse(Product product) {
+        return toResponse(product, null);
+    }
+
+    /**
+     * @param group the colour line this product represents in the catalogue, or
+     *              null; the line's single designation then replaces the SKU's name.
+     */
+    public ProductResponse toResponse(Product product, ColorGroupView group) {
+        LocalizedText name = group == null
+                ? LocalizedText.of(product.getNameFr(), product.getNameEn())
+                : group.name();
+        LocalizedText seoTitle = group == null
+                ? LocalizedText.of(product.getSeoTitleFr(), product.getSeoTitleEn())
+                : group.name();
         return new ProductResponse(
                 product.getId(),
                 product.getSourceId(),
                 product.getSlug(),
-                LocalizedText.of(product.getNameFr(), product.getNameEn()),
+                name,
                 LocalizedText.of(product.getShortDescriptionFr(), product.getShortDescriptionEn()),
                 LocalizedText.of(product.getDescriptionFr(), product.getDescriptionEn()),
                 product.getCategoryId(),
@@ -41,20 +62,30 @@ public class ProductMapper {
                 product.isFeatured(),
                 product.isActive(),
                 product.isNeedsVerification(),
-                LocalizedText.of(product.getSeoTitleFr(), product.getSeoTitleEn()),
+                seoTitle,
                 LocalizedText.of(product.getSeoDescriptionFr(), product.getSeoDescriptionEn()),
                 product.getImages().stream().map(this::toResponse).toList(),
                 product.getFormats().stream().map(this::toResponse).toList(),
                 product.getCreatedAt(),
-                product.getUpdatedAt());
+                product.getUpdatedAt(),
+                product.getSaleMode().name(),
+                product.isPackOnly() ? product.getUnitPrice() : null,
+                product.getPackQuantity(),
+                product.getUnitLabel(),
+                product.isPackOnly() ? product.packPrice() : null,
+                group == null ? List.of() : group.variants());
     }
+
+    /** A colour line's presentation: its supplier designation and its colours. */
+    public record ColorGroupView(LocalizedText name, List<ColorVariantResponse> variants) {}
 
     public ProductImageResponse toResponse(ProductImage image) {
         return new ProductImageResponse(
                 image.getSrc(),
                 LocalizedText.of(image.getAltFr(), image.getAltEn()),
                 image.getWidth(),
-                image.getHeight());
+                image.getHeight(),
+                imageMetrics.of(image.getSrc()));
     }
 
     public ProductFormatResponse toResponse(ProductFormat format) {

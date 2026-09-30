@@ -42,7 +42,12 @@ public class CartMapper {
                 item.getQuantity(),
                 item.getUnitPrice(),
                 item.lineTotal(),
-                item.getProduct().getCurrency());
+                item.getProduct().getCurrency(),
+                item.getProduct().getSaleMode().name(),
+                item.packQuantity(),
+                item.piecePrice(),
+                item.unitLabel(),
+                item.totalPieces());
     }
 
     /**

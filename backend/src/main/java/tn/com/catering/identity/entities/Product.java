@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,6 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -124,6 +127,27 @@ public class Product {
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
+    /**
+     * Null on every row created before pack pricing existed and read as
+     * {@link SaleMode#UNIT}. The column is nullable on purpose: the schema is
+     * evolved by Hibernate's "update", and a NOT NULL column cannot be added to a
+     * populated table.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sale_mode", length = 20)
+    private SaleMode saleMode;
+
+    /**
+     * Price of one piece of a {@link SaleMode#PACK_ONLY} product. The pack price
+     * ({@code price}) is derived from it and never entered directly.
+     */
+    @Column(name = "unit_price", precision = 10, scale = 3)
+    private BigDecimal unitPrice;
+
+    /** What one piece is called ("piece", "gobelet", "rouleau"…), as a code the storefront translates. */
+    @Column(name = "unit_label", length = 20)
+    private String unitLabel;
+
     @Column(name = "supplier_reference", length = 120)
     private String supplierReference;
 
@@ -196,6 +220,40 @@ public class Product {
     public void clearImages() { images.clear(); }
 
     public void clearFormats() { formats.clear(); }
+
+    public SaleMode getSaleMode() { return saleMode == null ? SaleMode.UNIT : saleMode; }
+    public void setSaleMode(SaleMode saleMode) { this.saleMode = saleMode; }
+    public boolean isPackOnly() { return getSaleMode() == SaleMode.PACK_ONLY; }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
+    public String getUnitLabel() { return unitLabel; }
+    public void setUnitLabel(String unitLabel) { this.unitLabel = unitLabel; }
+
+    /**
+     * Pieces in one commercial pack.
+     *
+     * <p>It lives on the primary {@link ProductFormat}, the field the catalogue
+     * already used for "LES 250 PIÈCES", rather than in a second column that
+     * could disagree with it. Null when no pack size is published.
+     */
+    public Integer getPackQuantity() {
+        return formats.isEmpty() ? null : formats.get(0).getPackQuantity();
+    }
+
+    /**
+     * {@code unitPrice × packQuantity}, exact at three decimals. Null unless the
+     * product is sold by packs and both factors are set.
+     */
+    public BigDecimal packPrice() {
+        return packPrice(unitPrice, getPackQuantity());
+    }
+
+    public static BigDecimal packPrice(BigDecimal unitPrice, Integer packQuantity) {
+        if (unitPrice == null || packQuantity == null) return null;
+        // A millime price times a whole number of pieces is exact; setScale only
+        // normalises the representation to the column's three decimals.
+        return unitPrice.multiply(BigDecimal.valueOf(packQuantity)).setScale(3, RoundingMode.UNNECESSARY);
+    }
 
     public UUID getId() { return id; }
     public String getSourceId() { return sourceId; }

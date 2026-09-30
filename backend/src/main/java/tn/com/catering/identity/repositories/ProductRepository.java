@@ -22,38 +22,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     boolean existsBySourceId(String sourceId);
 
-    /**
-     * The single catalogue-visibility query.
-     *
-     * <p>Every filter is optional and neutralised by passing null, which keeps
-     * one query rather than a Specification tree for what is a flat facet set.
-     * Only active products are ever visible; deactivated ones remain reachable
-     * by id for the admin and by past quotes.
-     */
-    @Query("""
-            select p from Product p
-            where p.active = true
-              and (:category is null or p.categoryId = :category)
-              and (:subcategory is null or p.subcategoryId = :subcategory)
-              and (:brand is null or p.brandId = :brand)
-              and (:featured is null or p.featured = :featured)
-              and (:search = ''
-                   or lower(p.nameFr) like lower(concat('%', :search, '%'))
-                   or lower(p.nameEn) like lower(concat('%', :search, '%'))
-                   or lower(p.supplierReference) like lower(concat('%', :search, '%')))
-            """)
-    Page<Product> findVisible(
-            @Param("search") String search,
-            @Param("category") String category,
-            @Param("subcategory") String subcategory,
-            @Param("brand") String brand,
-            @Param("featured") Boolean featured,
-            Pageable pageable);
-
     List<Product> findBySourceIdIn(Collection<String> sourceIds);
 
     /**
-     * The back-office listing. Unlike {@link #findVisible} it includes
+     * The back-office listing. Unlike the public catalogue ({@link tn.com.catering.identity.services.CatalogueQueryService}) it includes
      * deactivated products, because the administrator must be able to find a
      * product in order to reactivate it. {@code active} null means both.
      */

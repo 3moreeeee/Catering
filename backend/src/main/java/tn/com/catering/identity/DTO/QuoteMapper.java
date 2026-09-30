@@ -38,6 +38,11 @@ public class QuoteMapper {
                 line.getFormatValue(),
                 line.getQuantity(),
                 line.getUnitPrice(),
-                line.getLineTotal());
+                line.getLineTotal(),
+                line.getSaleMode(),
+                line.getPackQuantity(),
+                line.getPiecePrice(),
+                line.getUnitLabel(),
+                line.totalPieces());
     }
 }

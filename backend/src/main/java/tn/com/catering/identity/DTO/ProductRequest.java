@@ -3,12 +3,14 @@ package tn.com.catering.identity.DTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
+import tn.com.catering.identity.entities.SaleMode;
 
 /**
  * Admin payload for creating or replacing a product.
@@ -92,4 +94,20 @@ public record ProductRequest(
 
         @Valid List<ProductImageRequest> images,
 
-        @Valid List<ProductFormatRequest> formats) {}
+        @Valid List<ProductFormatRequest> formats,
+        /** Null is read as UNIT, so clients that predate pack pricing keep working. */
+        SaleMode saleMode,
+        /**
+         * Price of one piece, required for PACK_ONLY. The pack price is computed
+         * from it, and {@code price} is ignored for a PACK_ONLY product.
+         */
+        @DecimalMin(value = "0.001", message = "Le prix unitaire doit être supérieur à zéro.")
+        @Digits(integer = 7, fraction = 3, message = "Le prix unitaire doit être exprimé en dinars avec au plus trois décimales.")
+        BigDecimal unitPrice,
+        /** Pieces per pack. Stored on the primary format, where the catalogue already keeps it. */
+        @Min(value = 1, message = "Un lot contient au moins une pièce.")
+        @Max(value = 100000, message = "La quantité par lot est trop élevée.")
+        Integer packQuantity,
+        @Pattern(regexp = "piece|gobelet|barquette|sachet|boite|rouleau|bouteille|paire|feuille|bol|pot|paille|pique|sac|can",
+                message = "Unité de vente inconnue.")
+        String unitLabel) {}

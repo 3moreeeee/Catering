@@ -56,6 +56,22 @@ public class QuoteLine {
     @Column(name = "line_total", precision = 12, scale = 3)
     private BigDecimal lineTotal;
 
+    // Frozen pack terms of a PACK_ONLY line; null for a unit line and for every
+    // line submitted before pack pricing existed. quantity then counts packs and
+    // unitPrice is the price of one pack.
+
+    @Column(name = "sale_mode", length = 20)
+    private String saleMode;
+
+    @Column(name = "pack_quantity")
+    private Integer packQuantity;
+
+    @Column(name = "piece_price", precision = 10, scale = 3)
+    private BigDecimal piecePrice;
+
+    @Column(name = "unit_label", length = 20)
+    private String unitLabel;
+
     protected QuoteLine() {}
 
     public QuoteLine(CartItem item) {
@@ -67,6 +83,22 @@ public class QuoteLine {
         this.quantity = item.getQuantity();
         this.unitPrice = item.getUnitPrice();
         this.lineTotal = item.lineTotal();
+        if (item.getProduct().isPackOnly()) {
+            this.saleMode = item.getProduct().getSaleMode().name();
+            this.packQuantity = item.packQuantity();
+            this.piecePrice = item.piecePrice();
+            this.unitLabel = item.unitLabel();
+        }
+    }
+
+    public String getSaleMode() { return saleMode; }
+    public Integer getPackQuantity() { return packQuantity; }
+    public BigDecimal getPiecePrice() { return piecePrice; }
+    public String getUnitLabel() { return unitLabel; }
+
+    /** Pieces ordered on a pack line; null for a unit line. */
+    public Long totalPieces() {
+        return packQuantity == null ? null : (long) quantity * packQuantity;
     }
 
     public UUID getId() { return id; }

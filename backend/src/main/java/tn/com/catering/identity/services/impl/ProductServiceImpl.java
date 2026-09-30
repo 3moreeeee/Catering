@@ -1,21 +1,16 @@
 package tn.com.catering.identity.services.impl;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.com.catering.identity.DTO.BrandResponse;
 import tn.com.catering.identity.DTO.CategoryResponse;
-import tn.com.catering.identity.DTO.PageResponse;
 import tn.com.catering.identity.DTO.ProductFormatRequest;
 import tn.com.catering.identity.DTO.ProductImageRequest;
 import tn.com.catering.identity.DTO.ProductMapper;
@@ -28,6 +23,7 @@ import tn.com.catering.identity.entities.Category;
 import tn.com.catering.identity.entities.Product;
 import tn.com.catering.identity.entities.ProductFormat;
 import tn.com.catering.identity.entities.ProductImage;
+import tn.com.catering.identity.entities.SaleMode;
 import tn.com.catering.identity.repositories.BrandRepository;
 import tn.com.catering.identity.repositories.CategoryRepository;
 import tn.com.catering.identity.repositories.ProductRepository;
@@ -37,11 +33,11 @@ import tn.com.catering.identity.services.ProductService;
 @Transactional
 public class ProductServiceImpl implements ProductService {
 
-    /** Guards against a client asking for the whole catalogue in one response. */
-    private static final int MAX_PAGE_SIZE = 100;
     /** One catalogue page of ids at a time; the storefront asks per rendered page. */
     private static final int MAX_PRICE_LOOKUP = 200;
     private static final String DEFAULT_CURRENCY = "TND";
+    /** The largest amount a numeric(10,3) price column holds. */
+    private static final BigDecimal MAX_PRICE = new BigDecimal("9999999.999");
 
     private final ProductRepository products;
     private final CategoryRepository categories;
@@ -58,31 +54,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<ProductResponse> search(String q, String category, String subcategory,
-                                                String brand, Boolean featured, String sort,
-                                                int page, int pageSize) {
-        Pageable pageable = PageRequest.of(
-                Math.max(page, 0),
-                Math.clamp(pageSize, 1, MAX_PAGE_SIZE),
-                sortOf(sort));
-        Page<Product> found = products.findVisible(
-                normalizeSearch(q), blankToNull(category), blankToNull(subcategory),
-                blankToNull(brand), featured, pageable);
-        return PageResponse.of(found.map(mapper::toResponse));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ProductResponse bySlug(String slug) {
-        Product product = products.findBySlug(slug).orElseThrow(ProductServiceImpl::notFound);
-        // A deactivated product is not part of the catalogue any more. It stays
-        // reachable by id for administrators, but the public slug route hides it.
-        if (!product.isActive()) throw notFound();
-        return mapper.toResponse(product);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<ProductPricePoint> prices(List<String> sourceIds) {
         if (sourceIds == null || sourceIds.isEmpty()) return List.of();
         if (sourceIds.size() > MAX_PRICE_LOOKUP) {
@@ -93,7 +64,10 @@ public class ProductServiceImpl implements ProductService {
                 .map(product -> new ProductPricePoint(
                         product.getSourceId(), product.getId(), product.getSlug(),
                         product.effectivePrice(), product.getPrice(), product.hasCurrentOffer(), product.getCurrency(),
-                        product.getStockQuantity(), product.isActive()))
+                        product.getStockQuantity(), product.isActive(),
+                        product.getSaleMode().name(),
+                        product.isPackOnly() ? product.getUnitPrice() : null,
+                        product.getPackQuantity(), product.getUnitLabel()))
                 .toList();
     }
 
@@ -144,6 +118,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updatePrice(UUID id, ProductPriceRequest request) {
         Product product = require(id);
+        if (product.isPackOnly() && !samePrice(product.getPrice(), request.price())) {
+            // The pack price is derived; editing it here would contradict its
+            // unit price. It changes through the unit price or the pack size.
+            throw badRequest("pack_price_derived",
+                    "Le prix d'un produit vendu par lot se modifie via son prix unitaire.");
+        }
         // A null price is a deliberate "prix sur demande", so the currency is
         // cleared with it rather than left dangling on a product with no price.
         product.setPrice(request.price());
@@ -217,10 +197,6 @@ public class ProductServiceImpl implements ProductService {
         product.setBrandId(request.brandId());
         product.setIndustries(new LinkedHashSet<>(
                 request.industries() == null ? List.of() : request.industries()));
-        product.setPrice(request.price());
-        product.setCurrency(request.price() == null
-                ? null
-                : (request.currency() == null ? DEFAULT_CURRENCY : request.currency()));
         product.setStockQuantity(request.stockQuantity());
         product.setSupplierReference(request.reference());
         product.setTechnicalSheetUrl(request.technicalSheetUrl());
@@ -243,38 +219,78 @@ public class ProductServiceImpl implements ProductService {
         List<ProductFormatRequest> formats = request.formats() == null ? List.of() : request.formats();
         for (int index = 0; index < formats.size(); index++) {
             ProductFormatRequest format = formats.get(index);
+            // The pack size lives on the primary format; an explicit top-level
+            // packQuantity is written there rather than stored a second time.
+            Integer packQuantity = index == 0 && request.packQuantity() != null
+                    ? request.packQuantity()
+                    : format.packQuantity();
             product.addFormat(new ProductFormat(
-                    format.id(), format.value(), format.packQuantity(),
+                    format.id(), packLabel(format.value(), packQuantity), packQuantity,
                     format.sizeBucket(), format.reference(), index));
         }
-    }
+        if (formats.isEmpty() && request.packQuantity() != null) {
+            product.addFormat(new ProductFormat(
+                    null, packLabel(null, request.packQuantity()), request.packQuantity(), null, null, 0));
+        }
 
-    private static String blankToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
-    }
-
-    /** PostgreSQL needs a typed string value in the JPQL lower/concat predicate. */
-    private static String normalizeSearch(String value) {
-        return value == null ? "" : value.trim();
+        applyPricing(product, request);
     }
 
     /**
-     * Whitelisted sorts only. The value reaches JPA as a property name, so an
-     * arbitrary string would let a caller order by any mapped field.
+     * Sets the sale mode and the price.
+     *
+     * <p>A PACK_ONLY price is never taken from the request: it is always
+     * {@code unitPrice × packQuantity}, computed here in BigDecimal, so the pack
+     * price the storefront shows, the cart charges and the quote freezes can
+     * never disagree with its two factors.
      */
-    private static Sort sortOf(String sort) {
-        List<Sort.Order> orders = new ArrayList<>();
-        switch (sort == null ? "" : sort) {
-            case "name-desc" -> orders.add(Sort.Order.desc("nameFr").ignoreCase());
-            case "price-asc" -> orders.add(Sort.Order.asc("price").nullsLast());
-            case "price-desc" -> orders.add(Sort.Order.desc("price").nullsLast());
-            case "category" -> {
-                orders.add(Sort.Order.asc("categoryId"));
-                orders.add(Sort.Order.asc("nameFr").ignoreCase());
+    private static void applyPricing(Product product, ProductRequest request) {
+        SaleMode mode = request.saleMode() == null ? SaleMode.UNIT : request.saleMode();
+        product.setSaleMode(mode);
+        if (mode == SaleMode.PACK_ONLY) {
+            if (request.unitPrice() == null) {
+                throw badRequest("pack_unit_price_required",
+                        "Un produit vendu par lot doit avoir un prix unitaire supérieur à zéro.");
             }
-            case "newest" -> orders.add(Sort.Order.desc("createdAt"));
-            default -> orders.add(Sort.Order.asc("nameFr").ignoreCase());
+            Integer packQuantity = product.getPackQuantity();
+            if (packQuantity == null || packQuantity < 1) {
+                throw badRequest("pack_quantity_required",
+                        "Un produit vendu par lot doit indiquer le nombre de pièces par lot.");
+            }
+            BigDecimal packPrice = Product.packPrice(request.unitPrice(), packQuantity);
+            if (packPrice.compareTo(MAX_PRICE) > 0) {
+                throw badRequest("pack_price_too_large", "Le prix du lot dépasse la valeur maximale autorisée.");
+            }
+            product.setUnitPrice(request.unitPrice());
+            product.setUnitLabel(request.unitLabel() == null ? "piece" : request.unitLabel());
+            product.setPrice(packPrice);
+            product.setCurrency(DEFAULT_CURRENCY);
+            return;
         }
-        return Sort.by(orders);
+        product.setUnitPrice(null);
+        product.setUnitLabel(request.unitLabel());
+        product.setPrice(request.price());
+        product.setCurrency(request.price() == null
+                ? null
+                : (request.currency() == null ? DEFAULT_CURRENCY : request.currency()));
+    }
+
+    /**
+     * Keeps a generated "Pack de N" format label in step with its quantity. A
+     * physical format ("70 cl", "114 mm") is left exactly as entered.
+     */
+    private static String packLabel(String value, Integer packQuantity) {
+        if (packQuantity == null) return value;
+        if (value == null || value.isBlank() || value.matches("Pack de \\d+")) return "Pack de " + packQuantity;
+        return value;
+    }
+
+    /** BigDecimal equality ignores scale here: 12.000 and 12 are the same price. */
+    private static boolean samePrice(BigDecimal a, BigDecimal b) {
+        return a == null ? b == null : b != null && a.compareTo(b) == 0;
+    }
+
+    private static ApiException badRequest(String code, String message) {
+        return new ApiException(HttpStatus.BAD_REQUEST, code, message);
     }
 }

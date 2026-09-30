@@ -15,4 +15,16 @@ public record CartItemResponse(
         int quantity,
         BigDecimal unitPrice,
         BigDecimal lineTotal,
-        String currency) {}
+        String currency,
+        /*
+         * Pack fields. For a PACK_ONLY product {@code quantity} counts packs and
+         * {@code unitPrice} is the price of one pack; these say what a pack is.
+         * They are null for a UNIT product.
+         */
+        String saleMode,
+        Integer packQuantity,
+        /** Price of one piece. */
+        BigDecimal piecePrice,
+        String unitLabel,
+        /** quantity × packQuantity. */
+        Long totalPieces) {}

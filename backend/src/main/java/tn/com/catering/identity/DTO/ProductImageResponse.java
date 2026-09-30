@@ -4,4 +4,6 @@ public record ProductImageResponse(
         String src,
         LocalizedText alt,
         Integer width,
-        Integer height) {}
+        Integer height,
+        /** Null when the photograph has not been measured (for example a fresh admin upload). */
+        ImageMetricsResponse metrics) {}

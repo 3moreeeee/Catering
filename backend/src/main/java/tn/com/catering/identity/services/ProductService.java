@@ -4,19 +4,13 @@ import java.util.List;
 import java.util.UUID;
 import tn.com.catering.identity.DTO.BrandResponse;
 import tn.com.catering.identity.DTO.CategoryResponse;
-import tn.com.catering.identity.DTO.PageResponse;
 import tn.com.catering.identity.DTO.ProductPricePoint;
 import tn.com.catering.identity.DTO.ProductPriceRequest;
 import tn.com.catering.identity.DTO.ProductRequest;
 import tn.com.catering.identity.DTO.ProductResponse;
 
+/** Product administration and pricing. Public catalogue reads live in {@link CatalogueQueryService}. */
 public interface ProductService {
-
-    PageResponse<ProductResponse> search(
-            String q, String category, String subcategory, String brand,
-            Boolean featured, String sort, int page, int pageSize);
-
-    ProductResponse bySlug(String slug);
 
     /** Live prices for a batch of catalogue ids, for the storefront bridge. */
     List<ProductPricePoint> prices(List<String> sourceIds);
