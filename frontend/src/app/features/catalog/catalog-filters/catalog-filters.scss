@@ -24,9 +24,13 @@
     box-shadow: var(--e-4);
   }
 
-  // Desktop: a plain sticky sidebar, no dialog behaviour at all.
+  // Desktop: a plain sticky sidebar, no dialog behaviour at all. It gives up
+  // the drawer's z-index: sticky positioning would keep it active, and 400 sits
+  // above the header (200), so the sidebar painted over the open mega menu,
+  // which lives inside the header's stacking context.
   @include bp(lg) {
     position: sticky;
+    z-index: auto;
     top: calc(var(--header-h) + var(--sp-4));
     inline-size: auto;
     max-block-size: calc(100svh - var(--header-h) - var(--sp-8));

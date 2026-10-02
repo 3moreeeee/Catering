@@ -24,6 +24,7 @@
     "account": "Mon compte",
     "adminUsers": "Gestion des utilisateurs",
     "megaMenuHint": "Quatre univers produits, {{count}} références",
+    "exploreUniverse": "Explorer l’univers",
     "cart": "Panier",
     "cartCount": "Panier ({{count}})",
     "adminDashboard": "Tableau de bord"

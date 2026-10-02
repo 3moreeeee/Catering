@@ -24,6 +24,7 @@
     "account": "My account",
     "adminUsers": "User management",
     "megaMenuHint": "Four product universes, {{count}} references",
+    "exploreUniverse": "Explore this universe",
     "cart": "Basket",
     "cartCount": "Basket ({{count}})",
     "adminDashboard": "Dashboard"

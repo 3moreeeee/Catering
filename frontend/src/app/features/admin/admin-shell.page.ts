@@ -21,15 +21,6 @@ import { LocalizedRouter } from '../../core/i18n/localized-router.service';
       <section class="account-page admin-page">
         <div class="admin-layout">
           <aside class="admin-sidebar">
-            <a class="admin-brand" [routerLink]="to('admin')">
-              <img
-                src="/img/logo-on-dark.png"
-                width="700"
-                height="157"
-                alt="Ferid Khemakhem Catering"
-              />
-              <span>Back office</span>
-            </a>
             <nav class="admin-tabs" [attr.aria-label]="t('dashboard.navigation')">
               @for (tab of tabs; track tab.path) {
                 <a

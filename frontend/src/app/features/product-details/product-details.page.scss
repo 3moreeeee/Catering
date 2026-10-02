@@ -217,61 +217,44 @@
   margin: var(--sp-2) 0 0;
 }
 
-.pdp__pending {
-  display: inline-block;
-  padding: var(--sp-2) var(--sp-3);
-  border: 1px dashed var(--border-neutral);
-  border-radius: var(--r-xs);
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.pdp__specs {
+// The price card: the headline price, then what it is made of. One surface so
+// the figures read as a single offer rather than a list of loose rows.
+.pdp__offer {
   display: grid;
   gap: var(--sp-4);
   inline-size: 100%;
-  margin: var(--sp-2) 0;
-  padding-block: var(--sp-5);
-  border-block: 1px solid var(--border-hairline);
-
-  > div {
-    display: grid;
-    gap: var(--sp-2);
-  }
-
-  dd {
-    margin: 0;
-    font-size: var(--fs-sm);
-  }
-
-  a {
-    color: var(--text-primary);
-  }
+  padding: clamp(var(--sp-4), 3vw, var(--sp-6));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-card);
+  container-type: inline-size;
 }
 
-.pdp__formats {
+.pdp__offer-head {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  align-items: center;
+}
+
+.pdp__offer-badge {
+  margin-inline-start: auto;
 }
 
 .pdp__price {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
+  align-items: baseline;
+  gap: var(--sp-1) var(--sp-2);
   font-family: var(--font-display);
+
+  strong {
+    font-size: calc(var(--fs-h3) * 1.15);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+    color: var(--text-primary);
+  }
 
   del {
     color: var(--text-muted);
-  }
-  strong {
-    font-size: var(--fs-h3);
-    color: var(--text-primary);
   }
 }
 
@@ -287,32 +270,88 @@
   background: var(--surface-alt);
 }
 
-.pdp__per-pack {
-  font-size: var(--fs-md, 1rem);
+// Secondary text beside a figure: "/ lot" after the price, "/ bouteille"
+// after the unit price.
+.pdp__per-pack,
+.pdp__fact-unit {
+  font-family: var(--font-body);
   font-weight: var(--fw-regular);
   color: var(--text-secondary);
 }
 
-// Pack terms: unit price, pack content, calculation and pack price, as a
-// compact definition list that wraps to one column on a phone.
+.pdp__fact-unit {
+  font-size: var(--fs-sm);
+}
+
+// The amount and "/ bouteille" never split internally; the only break point
+// between them is the <wbr>, so a narrow tile puts the unit on its own line.
+.pdp__fact dd > span {
+  white-space: nowrap;
+}
+
+// Pack terms: two tiles (unit price, pack content) side by side, and the
+// equation that yields the headline price across the full width. Two explicit
+// columns: with auto-fit, the full-width equation would keep an empty third
+// track alive and the tiles would not reach the card's edge.
 .pdp__pack {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: var(--sp-2) var(--sp-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
   margin: 0;
 
-  div {
-    display: grid;
-    gap: 2px;
+  // A tile must hold its longest label in one line ("CONDITIONNEMENT" is a
+  // single word); below that card width the tiles stack instead.
+  @container (max-width: 23rem) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   dt {
-    color: var(--text-muted);
-    font-size: var(--fs-xs);
+    @include label;
   }
 
   dd {
     margin: 0;
+  }
+}
+
+.pdp__fact {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--surface-alt);
+
+  // Under an offer only the pack content remains; it takes the full row.
+  &:only-child {
+    grid-column: 1 / -1;
+  }
+
+  dd {
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+  }
+}
+
+.pdp__equation {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-1) var(--sp-3);
+  padding-block-start: var(--sp-3);
+  border-block-start: 1px dashed var(--border-neutral);
+
+  dd {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+  }
+
+  strong {
+    color: var(--text-primary);
   }
 }
 
@@ -353,14 +392,6 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
 
-  svg {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
   a {
     margin-inline-start: auto;
     color: var(--text-accent);
@@ -368,15 +399,38 @@
   }
 }
 
+// One primary action on its own row; the enquiry and the share button share
+// the next one, the share button staying compact. When the row is too narrow
+// for both, the share button wraps beneath rather than squeezing the labels.
 .pdp__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   inline-size: 100%;
 
-  .btn {
-    flex: 1 1 auto;
+  .btn--primary {
+    flex: 1 1 100%;
   }
+
+  .btn--secondary {
+    flex: 1 1 15rem;
+  }
+}
+
+// Auto margins centre the share button once it has wrapped to its own row.
+.pdp__share {
+  flex: 0 0 auto;
+  gap: var(--sp-2);
+  margin-inline: auto;
+}
+
+.pdp__added svg,
+.pdp__share svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .pdp__noprice {

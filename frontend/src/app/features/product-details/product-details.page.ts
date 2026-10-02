@@ -158,11 +158,6 @@ export class ProductDetailsPage {
     return product ? this.formats.visual(product) : null;
   });
 
-  readonly subcategory = computed(() => {
-    const product = this.product();
-    return this.category()?.subcategories.find((s) => s.id === product?.subcategoryId) ?? null;
-  });
-
   readonly brand = computed(() => BRANDS.find((b) => b.id === this.product()?.brandId) ?? null);
 
   readonly industries = computed(() =>
