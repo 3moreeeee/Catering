@@ -25,7 +25,7 @@
   min-inline-size: 0;
   max-inline-size: 100%;
   border: 1px solid var(--btn-border);
-  border-radius: var(--r-pill);
+  border-radius: var(--r-sm);
   background-color: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-body);
@@ -97,14 +97,14 @@
 // --- Variants ---------------------------------------------------------------
 
 .btn--primary {
-  --btn-bg: var(--c-forest-600);
+  --btn-bg: var(--c-teal-900);
   --btn-fg: var(--c-ivory-50);
-  --btn-border: var(--c-forest-600);
+  --btn-border: var(--c-teal-900);
 
   &:hover:not(:disabled) {
-    --btn-bg: var(--c-forest-700);
-    --btn-border: var(--c-forest-700);
-    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--c-forest-600) 70%, transparent);
+    --btn-bg: var(--c-teal-800);
+    --btn-border: var(--c-teal-800);
+    box-shadow: 0 10px 24px -10px color-mix(in oklab, var(--c-teal-900) 70%, transparent);
     transform: translateY(-1px);
   }
 

@@ -92,9 +92,10 @@ export class CatalogStore {
   // both requests, and the HTTP transfer cache hands their responses to the
   // hydrating browser, so the first client render reads them without a second
   // request.
+  private readonly notLoaded = this.emptyPage();
   private readonly result = toSignal(
     toObservable(this.query).pipe(switchMap((query) => this.repo.list(query))),
-    { initialValue: this.emptyPage() },
+    { initialValue: this.notLoaded },
   );
   private readonly facetSet = toSignal(
     toObservable(this.query).pipe(switchMap((query) => this.repo.facets(query))),
@@ -107,7 +108,9 @@ export class CatalogStore {
   readonly totalPages = computed(() => this.result().totalPages);
   readonly facets = computed(() => this.facetSet());
 
-  readonly isEmpty = computed(() => this.total() === 0);
+  /** False until the first page answers: "0 products" must never flash while it loads. */
+  readonly loaded = computed(() => this.result() !== this.notLoaded);
+  readonly isEmpty = computed(() => this.loaded() && this.total() === 0);
 
   readonly hasActiveFilters = computed(() => {
     const q = this.query();

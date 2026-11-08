@@ -19,6 +19,7 @@ import { Product } from '../../models/catalog.model';
 import { BRANDS } from '../../../data/brands.data';
 import { CATEGORIES } from '../../../data/categories.data';
 import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
+import { uniformImageFit } from '../../utils/product-image-fit';
 import { ProductFormatService } from '../../utils/product-format.service';
 import { PackText, packTermsOf } from '../../utils/pack-text.service';
 
@@ -49,16 +50,20 @@ import { PackText, packTermsOf } from '../../utils/pack-text.service';
   imports: [RouterLink, TranslocoDirective, LocalizedTextPipe, FrenchTypographyPipe],
   template: `
     <ng-container *transloco="let t">
-      <article class="card" [class.card--list]="view() === 'list'">
+      <article
+        class="card"
+        [class.card--list]="view() === 'list'"
+        [attr.data-tone]="product().categoryId"
+      >
         <a class="card__link" [routerLink]="detailLink()">
           <span class="u-visually-hidden">{{ product().name | localized }}</span>
         </a>
 
         <div
           class="card__media"
-          [class.card__media--normalized]="formatVisual()?.normalizedImage"
-          [style.--format-scale]="formatVisual()?.imageScale ?? 1"
-          [style.--format-shift]="(formatVisual()?.imageShift ?? 0) + '%'"
+          [class.card__media--measured]="imageFit().measured"
+          [style.--fit-scale]="imageFit().scale"
+          [style.--fit-shift]="imageFit().shift + '%'"
         >
           <img
             [src]="imageSrc()"
@@ -108,31 +113,33 @@ import { PackText, packTermsOf } from '../../utils/pack-text.service';
             <p class="card__desc u-sm">{{ product().shortDescription | localized }}</p>
           }
 
-          @if (pricePoint(); as point) {
-            <p class="card__price u-nums">
-              @if (point.offerActive && point.originalPrice !== null) {
-                <span class="card__offer">{{ t('product.offer') }}</span>
-                <del>{{ displayPrice(point.originalPrice, point.currency) }}</del>
-              }
-              <strong
-                ><span class="card__amount">{{ displayPrice(point.price, point.currency) }}</span>
-                @if (packTerms() && point.price !== null) {
-                  &ngsp;<span class="card__per-pack">/ {{ t('pack.packs.one') }}</span>
+          <div class="card__buy">
+            @if (pricePoint(); as point) {
+              <p class="card__price u-nums">
+                @if (point.offerActive && point.originalPrice !== null) {
+                  <span class="card__offer">{{ t('product.offer') }}</span>
+                  <del>{{ displayPrice(point.originalPrice, point.currency) }}</del>
                 }
-              </strong>
-            </p>
-            @if (packTerms(); as terms) {
-              <!-- Pack price first; what a pack holds and the piece price are secondary. -->
-              <p class="card__pack u-xs u-nums" data-testid="card-pack">
-                <span>{{ pack.soldBy(terms) }}</span>
-                @if (!point.offerActive) {
-                  <span>{{ pack.perUnit(terms) }}</span>
-                }
+                <strong
+                  ><span class="card__amount">{{ displayPrice(point.price, point.currency) }}</span>
+                  @if (packTerms() && point.price !== null) {
+                    &ngsp;<span class="card__per-pack">/ {{ t('pack.packs.one') }}</span>
+                  }
+                </strong>
               </p>
+              @if (packTerms(); as terms) {
+                <!-- Pack price first; what a pack holds and the piece price are secondary. -->
+                <p class="card__pack u-xs u-nums" data-testid="card-pack">
+                  <span>{{ pack.soldBy(terms) }}</span>
+                  @if (!point.offerActive) {
+                    <span>{{ pack.perUnit(terms) }}</span>
+                  }
+                </p>
+              }
+            } @else if (pricePending()) {
+              <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
             }
-          } @else if (pricePending()) {
-            <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
-          }
+          </div>
         </div>
 
         <div class="card__actions">
@@ -225,6 +232,7 @@ export class ProductCard {
   };
 
   readonly image = computed(() => this.product().images[0] ?? ProductCard.FALLBACK_IMAGE);
+  readonly imageFit = computed(() => uniformImageFit(this.product().images[0]));
 
   /**
    * Safety net for a dead image URL.

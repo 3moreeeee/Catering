@@ -1,0 +1,53 @@
+<ng-container *transloco="let t">
+  <section class="selection container" aria-labelledby="home-selection-title">
+    <header class="selection__head">
+      <h2 id="home-selection-title" class="selection__title">{{ t('home.featured.heading') }}</h2>
+      <a class="selection__all" [routerLink]="to('products')">
+        {{ t('home.featured.viewCatalogue') }} <span aria-hidden="true">›</span>
+      </a>
+    </header>
+
+    <div class="selection__row">
+      <button
+        type="button"
+        class="selection__arrow"
+        [attr.aria-label]="t('home.featured.previous')"
+        (click)="goTo(page() - 1)"
+      >
+        <span aria-hidden="true">‹</span>
+      </button>
+
+      <ul #track class="selection__track" (scrollend)="measure()" (scroll)="measure()">
+        @for (product of products(); track product.id) {
+          <li class="selection__item"><fk-product-card [product]="product" /></li>
+        }
+      </ul>
+
+      <button
+        type="button"
+        class="selection__arrow"
+        [attr.aria-label]="t('home.featured.next')"
+        (click)="goTo(page() + 1)"
+      >
+        <span aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    @if (pageCount() > 1) {
+      <ul class="selection__dots">
+        @for (index of pages(); track index) {
+          <li>
+            <button
+              type="button"
+              class="selection__dot"
+              [class.is-active]="page() === index"
+              [attr.aria-current]="page() === index ? 'true' : null"
+              [attr.aria-label]="t('home.featured.goToPage', { page: index + 1 })"
+              (click)="goTo(index)"
+            ></button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</ng-container>

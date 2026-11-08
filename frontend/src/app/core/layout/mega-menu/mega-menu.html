@@ -3,31 +3,24 @@
   <div class="mega__backdrop" aria-hidden="true" (click)="dismiss.emit()"></div>
 
   <div class="mega__panel">
-    <div class="container--wide mega__inner">
-      <div class="mega__intro">
-        <p class="u-eyebrow">{{ t('nav.products') }}</p>
-        @if (productCount() !== null) {
-          <p class="mega__hint u-sm u-muted">
-            {{ t('nav.megaMenuHint', { count: productCount() }) }}
-          </p>
-        }
-        <a class="link link--accent mega__all" [routerLink]="to('products')">
-          {{ t('footer.allProducts') }}
-          <span class="link__arrow" aria-hidden="true">→</span>
-        </a>
-      </div>
-
+    <div class="container--wide">
       <ul class="mega__grid">
         @for (category of categories(); track category.id) {
-          <li class="mega__col">
-            <a
-              class="mega__card"
-              [routerLink]="to('products/' + category.slug)"
-              [style.--cat-accent]="category.accent"
-            >
-              <span class="mega__icon" aria-hidden="true"></span>
-              <span class="mega__title">{{ category.name | localized }}</span>
-              <span class="mega__desc u-sm">{{ category.description | localized }}</span>
+          <li class="mega__col" [attr.data-tone]="category.id">
+            <a class="mega__card" [routerLink]="to('products/' + category.slug)">
+              <img
+                class="mega__image"
+                [src]="'/img/home/aisles/' + category.id + '.webp'"
+                width="120"
+                height="96"
+                alt=""
+              />
+              <span class="mega__heading">
+                <span class="mega__title">{{ category.name | localized }}</span>
+                @if (stats.category(category.id); as count) {
+                  <span class="mega__count u-nums">{{ t('catalog.aisleCount', { count }) }}</span>
+                }
+              </span>
             </a>
 
             <!-- Featured subcategories: real links, always present in the DOM. -->
@@ -42,16 +35,20 @@
                   >
                 </li>
               }
-              <li>
-                <a class="mega__sub mega__sub--more" [routerLink]="to('products/' + category.slug)">
-                  {{ t('nav.exploreUniverse') }}
-                  <span aria-hidden="true">→</span>
-                </a>
-              </li>
             </ul>
           </li>
         }
       </ul>
+
+      <div class="mega__foot">
+        <a class="btn btn--primary mega__all" [routerLink]="to('products')">
+          {{ t('footer.allProducts') }}
+          @if (productCount() !== null) {
+            <span class="u-nums">({{ productCount() }})</span>
+          }
+        </a>
+        <a class="mega__quote" [routerLink]="to('contact')">{{ t('home.quote.cta') }}</a>
+      </div>
     </div>
   </div>
 </ng-container>

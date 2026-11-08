@@ -11,13 +11,21 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 import { CatalogStore } from './catalog.store';
 import { CatalogFilters } from './catalog-filters/catalog-filters';
+import { familyImage } from './family-images';
+import { QuoteSection } from '../home/sections/quote-section';
 import { ProductCard } from '../../shared/components/cards/product-card';
+import { CatalogStats } from '../../core/catalog/catalog-stats.service';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { SeoService } from '../../core/seo/seo.service';
 import { StructuredDataService } from '../../core/seo/structured-data.service';
-import { SORT_OPTIONS, SortOption } from '../../shared/models/catalog.model';
+import { ProductImage, SORT_OPTIONS, SortOption } from '../../shared/models/catalog.model';
+import { uniformImageFit } from '../../shared/utils/product-image-fit';
+import { LocalizedTextPipe } from '../../shared/pipes/localized-text.pipe';
 import { CATEGORIES } from '../../data/categories.data';
+
+/** Products shown before the banner: two rows of four. */
+const STORY_AFTER = 8;
 
 /**
  * Catalogue listing.
@@ -31,7 +39,15 @@ import { CATEGORIES } from '../../data/categories.data';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [CatalogStore],
-  imports: [RouterLink, TranslocoDirective, FormsModule, CatalogFilters, ProductCard],
+  imports: [
+    RouterLink,
+    TranslocoDirective,
+    FormsModule,
+    CatalogFilters,
+    ProductCard,
+    LocalizedTextPipe,
+    QuoteSection,
+  ],
   templateUrl: './catalog.page.html',
   styleUrl: './catalog.page.scss',
 })
@@ -44,6 +60,39 @@ export class CatalogPage {
   private readonly jsonLd = inject(StructuredDataService);
 
   readonly sortOptions = SORT_OPTIONS;
+  readonly stats = inject(CatalogStats);
+  readonly aisles = CATEGORIES;
+  readonly heroScenes = ['all', ...CATEGORIES.map((category) => category.id)];
+  readonly heroScene = computed(() => this.category()?.id ?? 'all');
+  readonly families = computed(() => this.store.facets().subcategories);
+  readonly familyImageOf = familyImage;
+
+  readonly activeFilterCount = computed(() => {
+    const query = this.store.query();
+    return (
+      (query.brands?.length ?? 0) + (query.industries?.length ?? 0) + (query.sizes?.length ?? 0)
+    );
+  });
+
+  /** The company's banner opens page one of the grid, once two rows are on screen. */
+  readonly showStory = computed(
+    () =>
+      this.store.page() === 1 &&
+      this.store.view() === 'grid' &&
+      this.store.products().length > STORY_AFTER,
+  );
+  readonly leadingProducts = computed(() =>
+    this.showStory() ? this.store.products().slice(0, STORY_AFTER) : this.store.products(),
+  );
+  readonly remainingProducts = computed(() => this.store.products().slice(STORY_AFTER));
+
+  fitOf(image: ProductImage) {
+    return uniformImageFit(image);
+  }
+
+  isFamilyActive(id: string): boolean {
+    return this.store.query().subcategories?.includes(id) ?? false;
+  }
   readonly filtersOpen = signal(false);
   searchTerm = '';
 
@@ -52,6 +101,9 @@ export class CatalogPage {
     const ids = this.store.query().categories ?? [];
     return ids.length === 1 ? (CATEGORIES.find((c) => c.id === ids[0]) ?? null) : null;
   });
+
+  /** "All products" is the current aisle only when no division filter is set at all. */
+  readonly allActive = computed(() => !this.store.query().categories?.length);
 
   readonly heading = computed(() => {
     const category = this.category();

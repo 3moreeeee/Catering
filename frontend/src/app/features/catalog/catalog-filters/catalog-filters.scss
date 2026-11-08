@@ -5,7 +5,6 @@
 }
 
 .filters {
-  // Mobile: off-canvas drawer.
   position: fixed;
   inset-block: 0;
   inset-inline-start: 0;
@@ -23,22 +22,6 @@
     transform: translateX(0);
     box-shadow: var(--e-4);
   }
-
-  // Desktop: a plain sticky sidebar, no dialog behaviour at all. It gives up
-  // the drawer's z-index: sticky positioning would keep it active, and 400 sits
-  // above the header (200), so the sidebar painted over the open mega menu,
-  // which lives inside the header's stacking context.
-  @include bp(lg) {
-    position: sticky;
-    z-index: auto;
-    top: calc(var(--header-h) + var(--sp-4));
-    inline-size: auto;
-    max-block-size: calc(100svh - var(--header-h) - var(--sp-8));
-    transform: none;
-    border-right: none;
-    box-shadow: none;
-    background: none;
-  }
 }
 
 @include motion-reduce {
@@ -52,10 +35,6 @@
   inset: 0;
   z-index: calc(var(--z-drawer) - 1);
   background-color: rgb(var(--c-dark-rgb) / 0.4);
-
-  @include bp(lg) {
-    display: none;
-  }
 }
 
 .filters__head {
@@ -63,61 +42,118 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-4);
-  padding: var(--sp-5) var(--sp-5) var(--sp-4);
-  border-bottom: 1px solid var(--border-hairline);
-
-  @include bp(lg) {
-    padding-inline: 0;
-  }
+  padding: var(--sp-5) var(--sp-5) var(--sp-3);
 }
 
 .filters__title {
-  font-family: var(--font-body);
-  font-size: var(--fs-label);
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--ls-label);
-  text-transform: uppercase;
-  color: var(--text-muted);
   margin: 0;
-}
-
-.filters__close {
-  @include bp(lg) {
-    display: none;
-  }
+  color: var(--c-teal-900);
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
 }
 
 .filters__body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--sp-5);
-
-  @include bp(lg) {
-    padding-inline: 0;
-  }
+  padding: 0 var(--sp-5);
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-ivory-200) transparent;
 }
 
 .filters__group {
-  border: 0;
-  margin: 0 0 var(--sp-6);
-  padding: 0;
+  border-block-start: 1px solid var(--border-hairline);
 
-  legend {
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: var(--tap-min);
+    color: var(--c-teal-900);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    list-style: none;
+    cursor: pointer;
+
+    @include focusable;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: '';
+      inline-size: 7px;
+      block-size: 7px;
+      margin-inline-end: 3px;
+      border-block-end: 1.5px solid currentcolor;
+      border-inline-end: 1.5px solid currentcolor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+  }
+
+  &[open] summary::after {
+    transform: translateY(2px) rotate(-135deg);
+  }
+
+  fieldset {
+    margin: 0 0 var(--sp-3);
     padding: 0;
-    margin-bottom: var(--sp-2);
+    border: 0;
+    min-inline-size: 0;
   }
 
   ul {
-    list-style: none;
+    display: grid;
     margin: 0;
     padding: 0;
-    display: grid;
+    list-style: none;
+  }
+
+  .checkbox {
+    align-items: center;
+    gap: var(--sp-2);
+    min-block-size: 36px;
+    padding-block: var(--sp-1);
+
+    &:has(input:checked) .checkbox__text {
+      color: var(--c-teal-900);
+      font-weight: var(--fw-semibold);
+    }
+  }
+
+  .checkbox__text {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  // Touch needs the full target; a pointer does not.
+  @media (pointer: coarse) {
+    .checkbox {
+      min-block-size: var(--tap-min);
+    }
   }
 }
 
+.filters__more {
+  min-block-size: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-teal-900);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+
+  @include focusable;
+}
+
 .filters__count {
+  flex: none;
   color: var(--text-muted);
-  margin-left: 2px;
+  font-size: var(--fs-xs);
 }
 
 .filters__foot {
@@ -126,17 +162,8 @@
   gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-5) var(--sp-6);
   border-top: 1px solid var(--border-hairline);
-
-  @include bp(lg) {
-    padding-inline: 0;
-  }
 }
 
 .filters__apply {
   flex: 1;
-
-  // On desktop the list updates live; there is nothing to "apply".
-  @include bp(lg) {
-    display: none;
-  }
 }

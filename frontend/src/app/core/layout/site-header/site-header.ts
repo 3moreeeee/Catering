@@ -27,10 +27,9 @@ import { CatalogStats } from '../../catalog/catalog-stats.service';
 /**
  * Sticky header.
  *
- * Works over both light and dark grounds: the homepage hero is dark, so the
- * header starts transparent-on-dark and swaps to a solid ivory bar once the
- * user scrolls past the hero. The swap is driven by a scroll threshold rather
- * than by which route is active, so it is correct on every page.
+ * A solid white bar: logo, search, account and basket, with the navigation on
+ * a second row. On a route with a dark hero it starts transparent and turns
+ * solid once the user scrolls past a threshold.
  */
 @Component({
   selector: 'fk-site-header',
@@ -105,11 +104,11 @@ export class SiteHeader {
 
   /**
    * Routes whose first section is a dark full-bleed hero the header floats over.
-   * Everything else gets the solid ivory bar from the first pixel.
+   * Everything else gets the solid white bar from the first pixel.
    */
   private hasDarkHero(): boolean {
     const path = this.currentUrl().split('?')[0] ?? '';
-    return /^\/(en|fr)(\/(about)?)?\/?$/.test(path);
+    return /^\/(en|fr)\/about\/?$/.test(path);
   }
 
   @HostListener('document:scroll')

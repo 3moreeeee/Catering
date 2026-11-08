@@ -13,6 +13,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,6 +65,8 @@ public class CatalogueQueryService {
     private static final String ACCENTED = "àáâãäåāçèéêëēìíîïīñòóôõöōùúûüūýÿ";
     private static final String PLAIN = "aaaaaaaceeeeeiiiiinoooooouuuuuyy";
     private static final int DEFAULT_RELATED = 4;
+    /** The merchandised order turns over at midnight for the company's customers. */
+    private static final ZoneId CATALOGUE_ZONE = ZoneId.of("Africa/Tunis");
     /**
      * How long the colour-line folding is reused. It changes only when an
      * administrator (de)activates one of its few SKUs, and public catalogue
@@ -87,6 +91,7 @@ public class CatalogueQueryService {
 
     public PageResponse<ProductResponse> search(CatalogQuery query) {
         Visibility visibility = visibility();
+        if (isBrowsing(query)) return merchandisedPage(query, visibility);
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<UUID> ids = cb.createQuery(UUID.class);
@@ -106,6 +111,66 @@ public class CatalogueQueryService {
 
         int totalPages = (int) Math.max(1, (total + query.pageSize() - 1) / query.pageSize());
         return new PageResponse<>(load(pageIds, visibility), total, query.page(), query.pageSize(), totalPages);
+    }
+
+    /** The default view: no search to rank by and no sort chosen by the visitor. */
+    private static boolean isBrowsing(CatalogQuery query) {
+        return "relevance".equals(query.sort()) && query.terms().isEmpty();
+    }
+
+    /**
+     * One page of the merchandised order. The order is computed here rather than
+     * in SQL because it weaves groups together; it reads a few columns of the
+     * filtered products, and only the requested page is loaded in full.
+     */
+    private PageResponse<ProductResponse> merchandisedPage(CatalogQuery query, Visibility visibility) {
+        List<UUID> arranged = CatalogueMerchandising.arrange(
+                merchandisingItems(query, visibility), LocalDate.now(CATALOGUE_ZONE));
+        int from = Math.min(arranged.size(), query.page() * query.pageSize());
+        int to = Math.min(arranged.size(), from + query.pageSize());
+        int totalPages = Math.max(1, (arranged.size() + query.pageSize() - 1) / query.pageSize());
+        return new PageResponse<>(load(arranged.subList(from, to), visibility),
+                arranged.size(), query.page(), query.pageSize(), totalPages);
+    }
+
+    private List<CatalogueMerchandising.Item> merchandisingItems(CatalogQuery query, Visibility visibility) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> rows = cb.createTupleQuery();
+        Root<Product> product = rows.from(Product.class);
+        Expression<List<Object>> images = product.get("images");
+        rows.multiselect(
+                        product.get("id").alias("id"),
+                        product.get("categoryId").alias("division"),
+                        product.get("subcategoryId").alias("family"),
+                        product.get("nameFr").alias("name"),
+                        product.get("featured").alias("featured"),
+                        product.get("price").alias("price"),
+                        product.get("offerActive").alias("offerActive"),
+                        product.get("offerPrice").alias("offerPrice"),
+                        product.get("offerStartsAt").alias("offerStartsAt"),
+                        product.get("offerEndsAt").alias("offerEndsAt"),
+                        product.get("stockQuantity").alias("stock"),
+                        cb.<Integer>selectCase().when(cb.isNotEmpty(images), 1).otherwise(0).alias("hasImage"))
+                .where(filters(cb, rows, product, query, visibility));
+        Instant now = Instant.now();
+        return entityManager.createQuery(rows).getResultList().stream().map(row -> {
+            java.math.BigDecimal price = row.get("price", java.math.BigDecimal.class);
+            Integer stock = row.get("stock", Integer.class);
+            boolean orderable = price != null && row.get("hasImage", Integer.class) == 1 && (stock == null || stock > 0);
+            boolean promoted = row.get("featured", Boolean.class) || offerIsLive(row, price, now);
+            return new CatalogueMerchandising.Item(row.get("id", UUID.class), row.get("division", String.class),
+                    row.get("family", String.class), row.get("name", String.class), promoted, orderable);
+        }).toList();
+    }
+
+    private static boolean offerIsLive(Tuple row, java.math.BigDecimal price, Instant now) {
+        java.math.BigDecimal offer = row.get("offerPrice", java.math.BigDecimal.class);
+        Instant starts = row.get("offerStartsAt", Instant.class);
+        Instant ends = row.get("offerEndsAt", Instant.class);
+        return row.get("offerActive", Boolean.class)
+                && price != null && offer != null && offer.compareTo(price) < 0
+                && (starts == null || !starts.isAfter(now))
+                && (ends == null || ends.isAfter(now));
     }
 
     public FacetSetResponse facets(CatalogQuery query) {
@@ -299,12 +364,10 @@ public class CatalogueQueryService {
             case "name-desc" -> List.of(cb.desc(name), byId);
             case "category" -> List.of(cb.asc(product.get("categoryId")),
                     cb.asc(cb.coalesce(product.<String>get("subcategoryId"), "")), cb.asc(name), byId);
-            // A search ranks its matches, so the closest ones open the first page;
-            // browsing without one leads with the curated products.
-            default -> query.terms().isEmpty()
-                    ? List.of(cb.desc(product.get("featured")), cb.asc(nameFr), byId)
-                    : List.of(cb.desc(relevance(cb, product, query.terms())),
-                            cb.desc(product.get("featured")), cb.asc(nameFr), byId);
+            // A search ranks its matches, so the closest ones open the first page.
+            // Browsing without one never gets here: see merchandisedPage.
+            default -> List.of(cb.desc(relevance(cb, product, query.terms())),
+                    cb.desc(product.get("featured")), cb.asc(nameFr), byId);
         };
     }
 

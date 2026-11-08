@@ -1,33 +1,90 @@
 @use '../../../styles/abstracts/mixins' as *;
 
-.catalog {
-  padding-block: var(--sp-8) var(--sp-20);
-}
+// -----------------------------------------------------------------------------
+// HERO: one scene per division, with the aisles set into its lower edge.
+// -----------------------------------------------------------------------------
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--c-teal-900);
+  color: var(--c-white);
 
-@include bp('3xl') {
-  .catalog {
-    padding-block-start: var(--sp-12);
+  // Legibility over the photograph, strongest where the text sits.
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: color-mix(in oklab, var(--c-teal-900) 78%, transparent);
+
+    @include bp(md) {
+      background: linear-gradient(to top, rgb(var(--c-dark-rgb) / 0.5), transparent 34%);
+    }
   }
 }
 
-.catalog__crumbs {
-  margin-bottom: var(--sp-6);
+.hero__image {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: 78% 62%;
+  opacity: 0;
+  transition: opacity var(--d-reveal) var(--ease-in-out);
 
+  &.is-active {
+    opacity: 1;
+  }
+
+  @include motion-reduce {
+    transition: none;
+  }
+
+  // From tablet up the scene's left side dissolves into the section's colour,
+  // leaving the text its own calm column and the products untouched.
+  @include bp(md) {
+    object-position: 100% 62%;
+    mask-image: linear-gradient(to right, transparent var(--fade), #000 calc(var(--fade) + 4%));
+  }
+
+  // Where each scene's wall ends, so the fade hides that edge exactly.
+  --fade: 30%;
+
+  &[data-scene='monin'] {
+    --fade: 39.6%;
+  }
+
+  &[data-scene='hygiene'] {
+    --fade: 37.6%;
+  }
+}
+
+.hero__inner {
+  display: flex;
+  flex-direction: column;
+  min-block-size: clamp(25rem, 36vw, 34rem);
+  padding-block: var(--sp-5);
+}
+
+.hero__crumbs {
   ol {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2);
-    list-style: none;
     margin: 0;
     padding: 0;
+    color: rgb(255 255 255 / 0.82);
     font-size: var(--fs-xs);
-    color: var(--text-muted);
+    list-style: none;
   }
 
   li + li::before {
     content: '/';
-    margin-right: var(--sp-2);
-    color: var(--text-disabled);
+    margin-inline-end: var(--sp-2);
+    opacity: 0.6;
   }
 
   a {
@@ -35,52 +92,345 @@
     text-decoration: none;
 
     &:hover {
-      color: var(--text-primary);
+      color: var(--c-white);
       text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--c-white);
+      outline-offset: 2px;
     }
   }
 }
 
-.catalog__head {
-  margin-bottom: var(--sp-8);
-}
+.hero__text {
+  margin-block: auto;
+  padding-block: var(--sp-8);
 
-.catalog__title {
-  margin: 0 0 var(--sp-3);
-}
-
-.catalog__layout {
-  display: grid;
-  gap: var(--sp-8);
-
-  @include bp(lg) {
-    grid-template-columns: 16rem minmax(0, 1fr);
-    gap: var(--sp-10);
+  @include bp(md) {
+    max-inline-size: min(38vw, 36rem);
   }
 }
 
-.catalog__main {
-  min-inline-size: 0;
+.hero__title {
+  @include display(clamp(2.125rem, 0.6rem + 3.2vw, 4.25rem));
+  margin: 0 0 var(--sp-3);
+  color: inherit;
 }
 
+.hero__lead {
+  max-inline-size: 46ch;
+  margin: 0;
+  color: rgb(255 255 255 / 0.9);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-snug);
+}
+
+.aisles ul {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(10.5rem, 1fr);
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  overflow-x: auto;
+  border-radius: var(--r-md);
+  background-color: rgb(var(--c-dark-rgb) / 0.72);
+  backdrop-filter: blur(14px);
+  list-style: none;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include bp(lg) {
+    overflow: visible;
+  }
+}
+
+.aisles li {
+  display: flex;
+  scroll-snap-align: start;
+}
+
+.aisle {
+  --tone: var(--c-white);
+  display: grid;
+  gap: 1px;
+  inline-size: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: calc(var(--r-md) - 3px);
+  color: var(--c-white);
+  text-decoration: none;
+  transition:
+    background-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out);
+
+  &:focus-visible {
+    outline: 2px solid var(--c-white);
+    outline-offset: -2px;
+  }
+
+  &:hover {
+    background-color: rgb(255 255 255 / 0.12);
+  }
+
+  &.is-active {
+    background-color: var(--c-white);
+    color: var(--c-teal-900);
+  }
+}
+
+.aisle__name {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    flex: none;
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background-color: var(--tone);
+  }
+}
+
+.aisle.is-active:not([data-tone]) .aisle__name::before {
+  background-color: var(--c-teal-900);
+}
+
+.aisle__count {
+  padding-inline-start: 1rem;
+  color: rgb(255 255 255 / 0.78);
+  font-size: var(--fs-xs);
+
+  .is-active & {
+    color: var(--text-muted);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FAMILIES: a shelf of real products.
+// -----------------------------------------------------------------------------
+.catalog {
+  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10)) var(--sp-16);
+}
+
+.families {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-block-end: clamp(var(--sp-4), 2.5vw, var(--sp-8));
+}
+
+.families__arrow {
+  display: none;
+
+  @include bp(lg) {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    padding-block-end: 3px;
+    border: 1px solid var(--border-neutral);
+    border-radius: 50%;
+    background-color: var(--c-white);
+    color: var(--c-teal-900);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+
+    @include focusable;
+
+    &:hover {
+      border-color: var(--c-teal-900);
+    }
+  }
+}
+
+.families__rail {
+  flex: 1;
+  display: flex;
+  gap: var(--sp-2);
+  min-inline-size: 0;
+  justify-content: safe center;
+  padding-block: var(--sp-1);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.family {
+  flex: 0 0 8.25rem;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-1) var(--sp-2);
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--c-teal-900);
+  text-align: center;
+  cursor: pointer;
+  scroll-snap-align: start;
+
+  @include focusable;
+
+  &:hover .family__photo {
+    box-shadow: inset 0 0 0 1.5px var(--c-teal-900);
+  }
+
+  &.is-active .family__photo {
+    box-shadow: inset 0 0 0 2px var(--c-teal-900);
+  }
+
+  &.is-active .family__name {
+    font-weight: var(--fw-bold);
+  }
+}
+
+.family__photo {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  margin-block-end: var(--sp-1);
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background-color: var(--c-ivory-100);
+  transition: box-shadow var(--d-fast) var(--ease-out);
+
+  img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: var(--sp-3);
+    object-fit: contain;
+    background: none;
+    mix-blend-mode: multiply;
+
+    &.is-measured {
+      padding: 0;
+      transform: translateY(var(--fit-shift)) scale(calc(var(--fit-scale) * 0.82));
+    }
+  }
+}
+
+.family__name {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+}
+
+.family__count {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+// -----------------------------------------------------------------------------
+// TOOLBAR: stays reachable while scrolling a long list.
+// -----------------------------------------------------------------------------
 .catalog__toolbar {
+  // On a phone it wraps to three rows: pinned, it would take half the screen.
+  @include bp(md) {
+    position: sticky;
+    z-index: var(--z-sticky);
+    inset-block-start: var(--header-h);
+  }
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
-  padding-bottom: var(--sp-4);
-  border-bottom: 1px solid var(--border-hairline);
+  margin-block-end: var(--sp-5);
+  padding-block: var(--sp-3);
+  border-block-end: 1px solid var(--border-hairline);
+  background-color: var(--c-white);
 }
 
+.catalog__count {
+  flex: none;
+  min-block-size: 1lh;
+  margin: 0;
+  color: var(--c-teal-900);
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+}
+
+// The header carries the search field from tablet up; a second one directly
+// beneath it only competes. Phones have an icon there, so they keep this one.
 .catalog__search {
+  position: relative;
   flex: 1 1 14rem;
   min-inline-size: 0;
+
+  @include bp(md) {
+    display: none;
+  }
+
+  svg {
+    position: absolute;
+    inset-inline-start: var(--sp-3);
+    inset-block-start: 50%;
+    color: var(--text-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .control {
+    padding-inline-start: var(--sp-10);
+  }
 }
 
 .catalog__filter-toggle {
-  @include bp(lg) {
-    display: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--sp-4);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-sm);
+  background-color: var(--c-white);
+  color: var(--c-teal-900);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+
+  @include focusable;
+
+  &:hover {
+    border-color: var(--c-teal-900);
   }
+
+  @include bp(md) {
+    margin-inline-start: auto;
+  }
+}
+
+.catalog__filter-count {
+  min-inline-size: 1.25rem;
+  border-radius: var(--r-pill);
+  background-color: var(--c-teal-900);
+  color: var(--c-white);
+  font-size: var(--fs-xs);
+  line-height: 1.25rem;
+  text-align: center;
 }
 
 .catalog__sort .control {
@@ -91,9 +441,9 @@
 .catalog__view {
   display: flex;
   gap: var(--sp-1);
+  padding: 2px;
   border: 1px solid var(--border-neutral);
   border-radius: var(--r-sm);
-  padding: 2px;
 
   .btn--icon {
     inline-size: 38px;
@@ -112,29 +462,28 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2);
-  margin-top: var(--sp-4);
+  margin-block-end: var(--sp-5);
 
   ul {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2);
-    list-style: none;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 }
 
-.catalog__count {
-  margin: var(--sp-4) 0 var(--sp-5);
-}
-
+// -----------------------------------------------------------------------------
+// RESULTS
+// -----------------------------------------------------------------------------
 .catalog__results {
   display: grid;
-  gap: var(--sp-5);
-  list-style: none;
+  gap: clamp(var(--sp-4), 2vw, var(--sp-6)) var(--sp-5);
   margin: 0;
   padding: 0;
-  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  list-style: none;
+  grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
   grid-auto-rows: 1fr;
   // Product cards switch to their single-column shelf row by this grid's width
   // (see product-card.scss), so the grid is their size container.
@@ -144,14 +493,8 @@
     block-size: 100%;
   }
 
-  // No forced two-column override on phones: two 170px tracks squeezed the
-  // card's name to a 19px column. The auto-fill tracks already fall to one
-  // column below 31.25rem, and the card becomes a shelf row there.
   @include bp-down(sm) {
     gap: var(--sp-3);
-    // One column: equal-height rows would only pad every card to the
-    // tallest one on the page.
-    grid-auto-rows: auto;
   }
 }
 
@@ -161,15 +504,82 @@
   gap: var(--sp-3);
 }
 
+// A pause in the list: the company itself, between two runs of products.
+.story {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-block-size: clamp(20rem, 28vw, 26rem);
+  margin-block: clamp(var(--sp-6), 3vw, var(--sp-10));
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background-color: var(--c-teal-900);
+  color: var(--c-white);
+
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(to right, rgb(var(--c-dark-rgb) / 0.9), transparent 68%);
+  }
+}
+
+.story__image {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: 80% 18%;
+}
+
+.story__text {
+  max-inline-size: 30rem;
+  padding: clamp(var(--sp-6), 4vw, var(--sp-12));
+
+  h2 {
+    @include display(clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem));
+    margin: 0 0 var(--sp-3);
+    color: inherit;
+  }
+
+  p {
+    margin: 0 0 var(--sp-5);
+    font-size: var(--fs-body);
+    line-height: var(--lh-snug);
+  }
+}
+
+.story__cta {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-min);
+  padding-inline: var(--sp-6);
+  border-radius: var(--r-sm);
+  background-color: var(--c-white);
+  color: var(--c-teal-900);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--c-white);
+    outline-offset: 2px;
+  }
+}
+
 .catalog__empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--sp-4);
   padding: var(--sp-20) var(--sp-6);
-  text-align: center;
   border: 1px dashed var(--border-neutral);
   border-radius: var(--r-sm);
+  text-align: center;
 
   h2,
   p {
@@ -179,13 +589,13 @@
 
 .catalog__pagination {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--sp-5);
-  flex-wrap: wrap;
-  margin-top: var(--sp-10);
-  padding-top: var(--sp-6);
-  border-top: 1px solid var(--border-hairline);
+  margin-block-start: var(--sp-10);
+  padding-block-start: var(--sp-6);
+  border-block-start: 1px solid var(--border-hairline);
 }
 
 .catalog__pages {
@@ -203,8 +613,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
   padding: 0 var(--sp-2);
   border-radius: var(--r-sm);
 }
@@ -220,8 +630,14 @@
 }
 
 .catalog__page--current {
-  border-color: var(--text-primary);
+  border-color: var(--c-teal-900);
+  background-color: var(--c-teal-900);
+  color: var(--c-white);
   font-weight: 600;
+
+  &:hover {
+    background-color: var(--c-teal-900);
+  }
 }
 
 .catalog__page-gap {

@@ -34,21 +34,25 @@ test.describe('without WebGL', () => {
     await page.goto('/fr');
 
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    // The opening frame is a poster image, never a canvas and never a video
-    // element: the hero's LCP candidate is an AVIF still that decodes on its
-    // own, so the hero is complete before any enhancement arrives.
-    const poster = page.locator('fk-hero-section .cm__poster img');
+    // The opening frame is a plain banner image, never a canvas or a video.
+    const poster = page.locator('fk-hero-section .slide.is-active img');
     await expect(poster).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(0);
 
     expect(threeRequests, 'three.js must not be fetched when WebGL is unavailable').toEqual([]);
   });
 
-  test('the three divisions are still reachable as real links', async ({ page }) => {
+  test('only the first banner is requested on first paint', async ({ page }) => {
+    const response = await page.request.get('/fr');
+    const html = await response.text();
+    expect(html.match(/<picture/g)).toHaveLength(1);
+    // Every slide's text and link is still in the server-rendered page.
+    expect(html.match(/class="[^"]*slide__cta/g)).toHaveLength(8);
+  });
+
+  test('the four divisions are still reachable as real links', async ({ page }) => {
     await page.goto('/fr');
-    // Everything the opening film depicts is stated in adjacent HTML: the
-    // category index labels each division and links straight into it.
-    await expect(page.locator('.hero__category')).toHaveCount(3);
+    await expect(page.locator('.hero__category')).toHaveCount(4);
     await page.locator('.hero__category').first().click();
     await expect(page).toHaveURL(/\/products\//);
   });

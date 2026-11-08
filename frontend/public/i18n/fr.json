@@ -27,7 +27,9 @@
     "exploreUniverse": "Explorer l’univers",
     "cart": "Panier",
     "cartCount": "Panier ({{count}})",
-    "adminDashboard": "Tableau de bord"
+    "adminDashboard": "Tableau de bord",
+    "catalogue": "Catalogue",
+    "ourBrands": "Nos marques"
   },
   "language": {
     "label": "Langue",
@@ -48,7 +50,64 @@
       "mediaAlt": "Une sélection animée de produits professionnels du catalogue Catering.",
       "professionalBadge": "Fourniture professionnelle",
       "coverage": "Au service des entreprises partout en Tunisie",
-      "proofLabel": "Repères de l'entreprise"
+      "proofLabel": "Repères de l'entreprise",
+      "carouselLabel": "Produits à la une",
+      "slideLabel": "{{current}} sur {{total}}",
+      "goTo": "Aller à la diapositive {{current}} : {{name}}",
+      "previous": "Diapositive précédente",
+      "next": "Diapositive suivante",
+      "pause": "Mettre le défilement en pause",
+      "play": "Reprendre le défilement",
+      "slides": {
+        "dijona": {
+          "product": "Moutarde forte de Dijon Dijona · 200 g",
+          "title": "Le goût qui relève vos créations",
+          "cta": "Découvrir la moutarde",
+          "alt": "Pot de moutarde forte de Dijon Dijona 200 g à côté d’un sandwich au rôti de bœuf."
+        },
+        "mayor": {
+          "product": "Mayonnaise Mayor · 350 ml",
+          "title": "L’essentiel des pauses gourmandes",
+          "cta": "Découvrir la mayonnaise",
+          "alt": "Flacon de mayonnaise Mayor 350 ml à côté d’un burger et de frites."
+        },
+        "moninFraise": {
+          "product": "Sirop de fraise MONIN · 1 L",
+          "title": "De la couleur dans chaque boisson",
+          "cta": "Découvrir MONIN",
+          "alt": "Bouteille de sirop de fraise MONIN 1 L à côté d’une boisson glacée à la fraise."
+        },
+        "moninPassion": {
+          "product": "Sirop fruit de la passion MONIN · 1 L",
+          "title": "Une touche tropicale à votre carte",
+          "cta": "Voir le sirop",
+          "alt": "Bouteille de sirop fruit de la passion MONIN 1 L à côté d’une boisson glacée."
+        },
+        "bolKraft": {
+          "product": "Bol à salade kraft 500 ml, couvercle PET · lot de 50",
+          "title": "Une belle présentation, même à emporter",
+          "cta": "Voir les bols",
+          "alt": "Bol à salade en kraft brun avec couvercle transparent en PET, à côté d’une salade composée."
+        },
+        "gobeletsPet": {
+          "product": "Gobelet PET 350 ml et couvercle · lot de 50",
+          "title": "Vos boissons, prêtes à servir",
+          "cta": "Voir les gobelets",
+          "alt": "Piles de gobelets transparents en PET avec couvercles, et un smoothie aux fruits rouges."
+        },
+        "gantsNitrile": {
+          "product": "Gants en nitrile · lot de 100",
+          "title": "Équipez vos équipes au quotidien",
+          "cta": "Voir les gants",
+          "alt": "Main portant un gant en nitrile bleu dans une cuisine professionnelle."
+        },
+        "coiffes": {
+          "product": "Coiffes bouffant en non-tissé · lot de 100",
+          "title": "Les essentiels de la préparation",
+          "cta": "Voir les coiffes",
+          "alt": "Coiffes jetables en non-tissé blanc sur un plan de travail en inox."
+        }
+      }
     },
     "showcase": {
       "eyebrow": "Tout ce dont votre exploitation a besoin",
@@ -82,7 +141,13 @@
       "eyebrow": "Références sélectionnées",
       "title": "Extrait de notre catalogue.",
       "viewAll": "Voir les {{count}} références",
-      "tabsLabel": "Filtrer les produits en vedette par division"
+      "tabsLabel": "Filtrer les produits en vedette par division",
+      "heading": "À découvrir dans le catalogue",
+      "viewCatalogue": "Voir tout le catalogue",
+      "promo": "Promo",
+      "previous": "Produits précédents",
+      "next": "Produits suivants",
+      "goToPage": "Aller à la page {{page}}"
     },
     "offers": {
       "eyebrow": "Prix promotionnels",
@@ -108,7 +173,9 @@
       "title": "Un sourcing international.",
       "lead": "Nous représentons en Tunisie des fabricants internationaux sélectionnés.",
       "viewAll": "Voir toutes les marques",
-      "marqueeLabel": "Marques partenaires"
+      "marqueeLabel": "Marques partenaires",
+      "heading": "Nos marques",
+      "bandLead": "Des marques reconnues et adaptées aux professionnels de la restauration."
     },
     "contact": {
       "eyebrow": "Demande d'offre professionnelle",
@@ -168,7 +235,56 @@
     "sectors": {
       "title": "Dites-nous ce que vous faites. Nous savons ce que vous consommez.",
       "listLabel": "Choisir un secteur professionnel",
-      "draws": "Puise dans nos divisions"
+      "draws": "Puise dans nos divisions",
+      "heading": "Une gamme, plusieurs métiers",
+      "discover": "Découvrir l’offre",
+      "discoverAbout": "Découvrir l’offre : {{name}}",
+      "cards": {
+        "restaurants": {
+          "title": "Restaurants & cafés",
+          "lead": "Des produits alimentaires et des consommables adaptés au service quotidien.",
+          "cta": "Voir les produits pour restaurants",
+          "alt": "Comptoir de restaurant avec la mayonnaise Mayor, la moutarde Dijona et le sirop de fraise MONIN, près d’une caisse de livraison Ferid Khemakhem Catering."
+        },
+        "hotels": {
+          "title": "Hôtels & traiteurs",
+          "lead": "Une sélection fiable et complète pour vos prestations et événements.",
+          "cta": "Voir les produits pour hôtels",
+          "alt": "Buffet d’hôtel avec bols kraft, gobelets PET et sirop de passion MONIN, près d’une caisse de livraison Ferid Khemakhem Catering."
+        },
+        "industry": {
+          "title": "Industrie alimentaire",
+          "lead": "Des ingrédients, emballages et consommables pour vos besoins de production.",
+          "cta": "Voir les produits pour l’industrie",
+          "alt": "Plan de travail en inox avec gants en nitrile, coiffes et barquettes, près d’une caisse de livraison Ferid Khemakhem Catering."
+        }
+      },
+      "idea": {
+        "badge": "Idée recette",
+        "title": "Le dessert en verrine",
+        "lead": "Un dressage simple et soigné pour vos desserts à l’assiette ou à emporter.",
+        "cta": "Voir les verrines",
+        "alt": "Plan de pâtisserie avec purée de fraise MONIN, verrines et cuillères, près d’une caisse de livraison Ferid Khemakhem Catering."
+      }
+    },
+    "quote": {
+      "title": "Besoin d’un devis ?",
+      "lead": "Transmettez-nous vos besoins et recevez rapidement une offre professionnelle.",
+      "cta": "Demander un devis",
+      "benefits": {
+        "range": {
+          "title": "Une gamme complète",
+          "body": "Alimentaire, MONIN, emballage et hygiène"
+        },
+        "formats": {
+          "title": "Formats professionnels",
+          "body": "Conditionnements adaptés aux pros"
+        },
+        "coverage": {
+          "title": "Partout en Tunisie",
+          "body": "Au service des entreprises sur tout le territoire"
+        }
+      }
     }
   },
   "about": {
@@ -233,7 +349,18 @@
       "body": "Une erreur est survenue de notre côté. Merci de réessayer.",
       "action": "Réessayer"
     },
-    "loading": "Chargement des produits…"
+    "loading": "Chargement des produits…",
+    "guide": "Choisissez un univers, puis affinez par format, marque ou secteur.",
+    "aislesLabel": "Univers du catalogue",
+    "aisleCount": "{{count}} références",
+    "showMore": "Afficher {{count}} de plus",
+    "familiesLabel": "Familles de produits",
+    "familiesPrevious": "Familles précédentes",
+    "familiesNext": "Familles suivantes",
+    "story": {
+      "title": "De notre dépôt à votre service",
+      "lead": "Passez commande dans les formats qu’il vous faut : notre équipe confirme avec vous la disponibilité et la livraison, partout en Tunisie."
+    }
   },
   "product": {
     "brand": "Marque",
@@ -278,7 +405,10 @@
     "signInToOrder": "Se connecter pour commander",
     "addToCartAbout": "Ajouter {{name}} au panier",
     "addFailed": "Échec, réessayer",
-    "subtotal": "Sous-total pour {{quantity}} unités : {{price}}"
+    "subtotal": "Sous-total pour {{quantity}} unités : {{price}}",
+    "factsTitle": "Informations produit",
+    "formatLabel": "Format",
+    "reference": "Référence"
   },
   "brands": {
     "title": "Marques",
@@ -396,7 +526,7 @@
     },
     "viewAll": "Voir tous les résultats pour « {{query}} »",
     "keyboardHint": "Utilisez les flèches pour naviguer, Entrée pour valider, Échap pour fermer.",
-    "headerPlaceholder": "Rechercher un produit…"
+    "headerPlaceholder": "Rechercher un produit, une catégorie, un conditionnement…"
   },
   "assistant": {
     "eyebrow": "Assistant catalogue",

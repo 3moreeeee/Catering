@@ -1,74 +1,202 @@
 <ng-container *transloco="let t">
   <section class="hero" aria-labelledby="home-title">
-    <div class="hero__glow" aria-hidden="true"></div>
+    <h1 id="home-title" class="u-visually-hidden">{{ t('home.hero.title') }}</h1>
 
-    <div class="container--wide hero__inner">
-      <div class="hero__content">
-        <p class="hero__eyebrow">{{ t('home.hero.eyebrow') }}</p>
-        <h1 id="home-title" class="hero__title">{{ t('home.hero.title') }}</h1>
-        <p class="hero__lead">{{ t('home.hero.lead') }}</p>
-
-        <div class="hero__actions">
-          <a class="btn btn--primary btn--lg" [routerLink]="to('products')">
-            {{ t('home.hero.primaryCta') }}
-          </a>
-          <a class="btn btn--secondary btn--lg" [routerLink]="to('contact')">
-            {{ t('home.hero.secondaryCta') }}
-          </a>
-        </div>
-
-        <dl class="hero__proof" [attr.aria-label]="t('home.hero.proofLabel')">
-          <div>
-            <dt class="hero__proof-value u-nums">1985</dt>
-            <dd>{{ t('home.statement.foundedLabel') }}</dd>
-          </div>
-          @if (referenceCount(); as count) {
-            <div>
-              <dt class="hero__proof-value u-nums">{{ count }}</dt>
-              <dd>{{ t('home.statement.referencesLabel') }}</dd>
+    <div
+      class="hero__carousel"
+      role="group"
+      aria-roledescription="carousel"
+      [attr.aria-label]="t('home.hero.carouselLabel')"
+      (mouseenter)="setHovered(true)"
+      (mouseleave)="setHovered(false)"
+      (focusin)="onFocusIn($event)"
+      (focusout)="onFocusOut($event)"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+    >
+      <div class="hero__slides" [attr.aria-live]="autoplaying() ? 'off' : 'polite'">
+        @for (slide of slides; track slide.id; let i = $index) {
+          @let copy = 'home.hero.slides.' + slide.id;
+          <div
+            class="slide"
+            role="group"
+            aria-roledescription="slide"
+            [attr.aria-label]="t('home.hero.slideLabel', { current: i + 1, total: slides.length })"
+            [class.is-active]="active() === i"
+            [attr.aria-hidden]="active() === i ? null : 'true'"
+            [attr.inert]="active() === i ? null : ''"
+            [attr.data-tone]="slide.categoryId"
+          >
+            <div class="slide__media">
+              @if (mounted().has(i)) {
+                <picture>
+                  <source
+                    media="(max-width: 1023.98px), (max-aspect-ratio: 1/1)"
+                    [attr.srcset]="'/img/home/banners/' + slide.image + '-mobile.webp'"
+                    width="900"
+                    height="600"
+                  />
+                  <img
+                    [src]="'/img/home/banners/' + slide.image + '-2000.webp'"
+                    [attr.srcset]="
+                      '/img/home/banners/' +
+                      slide.image +
+                      '-1280.webp 1280w, /img/home/banners/' +
+                      slide.image +
+                      '-2000.webp 2000w'
+                    "
+                    sizes="min(100vw, 2000px)"
+                    width="2000"
+                    height="667"
+                    [alt]="t(copy + '.alt')"
+                    [attr.fetchpriority]="i === 0 ? 'high' : null"
+                    decoding="async"
+                  />
+                </picture>
+              }
             </div>
-          }
-          <div>
-            <dt class="hero__proof-value u-nums">{{ categories().length }}</dt>
-            <dd>{{ t('home.statement.divisionsLabel') }}</dd>
+
+            <div class="slide__copy">
+              <p class="slide__tag">
+                <span class="slide__dot" aria-hidden="true"></span>
+                {{ t(copy + '.product') }}
+              </p>
+              <h2 class="slide__title">{{ t(copy + '.title') }}</h2>
+              <a class="btn btn--lg slide__cta" [routerLink]="slideLink(slide, i)">
+                {{ t(copy + '.cta') }}
+                <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true">
+                  <path
+                    d="m1.5 1 5 5-5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+            </div>
           </div>
-        </dl>
+        }
       </div>
 
-      <div class="hero__visual">
-        <div class="hero__image-wrap">
-          <fk-cinematic-media
-            class="hero__image"
-            slug="hero-products"
-            [alt]="t('home.hero.mediaAlt')"
-            [priority]="true"
-            [once]="true"
-            [mediaWidth]="1280"
-            [mediaHeight]="720"
-          />
-          <div class="hero__image-shade" aria-hidden="true"></div>
-        </div>
+      <div class="hero__controls">
+        <button
+          type="button"
+          class="hero__arrow"
+          [attr.aria-label]="t('home.hero.previous')"
+          (click)="previous()"
+        >
+          <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true">
+            <path
+              d="M6.5 1l-5 5 5 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
 
-        <div class="hero__availability">
-          <span class="hero__availability-dot" aria-hidden="true"></span>
-          <span>
-            <strong>{{ t('home.hero.professionalBadge') }}</strong>
-            <small>{{ t('home.hero.coverage') }}</small>
-          </span>
-        </div>
+        <ul class="hero__dots">
+          @for (slide of slides; track slide.id; let i = $index) {
+            <li>
+              <button
+                type="button"
+                class="hero__dot"
+                [class.is-active]="active() === i"
+                [attr.aria-current]="active() === i ? 'true' : null"
+                [attr.aria-label]="
+                  t('home.hero.goTo', {
+                    current: i + 1,
+                    name: t('home.hero.slides.' + slide.id + '.product'),
+                  })
+                "
+                (click)="active.set(i)"
+              ></button>
+            </li>
+          }
+        </ul>
+
+        <button
+          type="button"
+          class="hero__arrow"
+          [attr.aria-label]="t('home.hero.next')"
+          (click)="next()"
+        >
+          <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true">
+            <path
+              d="m1.5 1 5 5-5 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        @if (!reducedMotion()) {
+          <button
+            type="button"
+            class="hero__arrow hero__pause"
+            [attr.aria-label]="userPaused() ? t('home.hero.play') : t('home.hero.pause')"
+            (click)="togglePause()"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="currentColor">
+              @if (userPaused()) {
+                <path d="M3 1.5v9l7-4.5-7-4.5Z" />
+              } @else {
+                <rect x="2" y="1.5" width="3" height="9" rx="0.75" />
+                <rect x="7" y="1.5" width="3" height="9" rx="0.75" />
+              }
+            </svg>
+          </button>
+        }
       </div>
     </div>
 
-    <nav class="container--wide hero__categories" [attr.aria-label]="t('home.hero.divisionsLabel')">
-      @for (category of categories(); track category.id; let i = $index) {
+    <nav class="hero__categories" [attr.aria-label]="t('home.hero.divisionsLabel')">
+      @for (category of categories(); track category.id) {
         <a
           class="hero__category"
+          [attr.data-tone]="category.id"
           [routerLink]="to('products/' + category.slug)"
-          [style.--cat-accent]="category.accent"
         >
-          <span class="hero__category-num u-nums">0{{ i + 1 }}</span>
-          <span class="hero__category-name">{{ category.name | localized }}</span>
-          <span class="hero__category-arrow" aria-hidden="true">→</span>
+          <svg
+            class="hero__category-icon"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              [attr.d]="icon(category.id)"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>{{ category.shortName | localized }}</span>
+          <svg
+            class="hero__category-arrow"
+            width="7"
+            height="11"
+            viewBox="0 0 8 12"
+            aria-hidden="true"
+          >
+            <path
+              d="m1.5 1 5 5-5 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </a>
       }
     </nav>

@@ -2,122 +2,144 @@
 
 :host {
   display: block;
-  background-color: var(--surface-alt);
-  padding-block: var(--section-y);
+  background-color: var(--surface-page);
 }
 
-.featured__head {
+.selection {
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.selection__head {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: baseline;
   justify-content: space-between;
-  gap: clamp(var(--sp-4), 2vw, var(--sp-6));
-  margin-bottom: clamp(var(--sp-6), 4vw, var(--sp-10));
+  gap: var(--sp-2) var(--sp-6);
+  margin-block-end: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-.featured__title {
-  margin: var(--sp-3) 0 0;
+.selection__title {
+  @include display(clamp(1.625rem, 1.2rem + 1.5vw, 2.5rem));
+  margin: 0;
+  color: var(--c-teal-900);
 }
 
-.featured__tabs {
-  display: flex;
+.selection__all {
+  display: inline-flex;
+  align-items: center;
   gap: var(--sp-2);
-  overflow-x: auto;
-  padding-bottom: var(--sp-1);
-  // Never let the tab strip create page-level horizontal scroll.
-  max-inline-size: 100%;
-  scrollbar-width: thin;
+  min-block-size: var(--tap-min);
+  color: var(--c-teal-900);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-underline-offset: 0.25em;
 
-  // At 320px the third division sat half outside the screen inside a scroller
-  // nobody could see was scrollable. Three short words wrap onto two rows
-  // perfectly well, and all three are then visible without a gesture.
-  @include bp-down(sm) {
-    flex-wrap: wrap;
-    overflow-x: visible;
-  }
+  @include focusable;
 }
 
-.featured__tab {
-  flex: none;
+.selection__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
 
-  &:nth-child(1) {
-    --tab-accent: var(--c-cat-food);
-  }
+.selection__arrow {
+  display: none;
 
-  &:nth-child(2) {
-    --tab-accent: var(--c-cat-monin);
-  }
+  @include bp(md) {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    padding-block-end: 3px;
+    border: 0;
+    border-radius: 50%;
+    background-color: var(--surface-inset);
+    color: var(--c-teal-900);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
 
-  &:nth-child(3) {
-    --tab-accent: var(--c-cat-packaging);
-  }
-
-  &:nth-child(4) {
-    --tab-accent: var(--c-cat-hygiene);
-  }
-
-  &.chip--active {
-    border-color: var(--tab-accent);
-    color: var(--c-white);
-    background-color: var(--tab-accent);
+    @include focusable;
 
     &:hover {
-      border-color: var(--tab-accent);
-      color: var(--c-white);
-      background-color: var(--tab-accent);
+      background-color: var(--c-ivory-200);
     }
   }
 }
 
-.featured__grid {
+.selection__track {
+  flex: 1;
   display: grid;
-  gap: var(--sp-5);
-  list-style: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 72%;
+  gap: var(--sp-4);
+  min-inline-size: 0;
   margin: 0;
+  padding: var(--sp-1);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include motion-reduce {
+    scroll-behavior: auto;
+  }
+
+  @include bp(sm) {
+    grid-auto-columns: calc((100% - var(--sp-4)) / 2);
+  }
+
+  @include bp(lg) {
+    grid-auto-columns: calc((100% - 3 * var(--sp-4)) / 4);
+  }
+}
+
+.selection__item {
+  scroll-snap-align: start;
+}
+
+.selection__dots {
+  display: none;
+
+  @include bp(md) {
+    display: flex;
+    justify-content: center;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.selection__dot {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: var(--tap-min);
   padding: 0;
-  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
-  // Every card in the grid gets the same height, so a one-line and a two-line
-  // product name do not produce two different frames.
-  grid-auto-rows: 1fr;
-  // Product cards switch to their single-column shelf row by this grid's width
-  // (see product-card.scss), so the grid is their size container.
-  container: product-grid / inline-size;
+  border: 0;
+  background: none;
+  cursor: pointer;
 
-  li {
-    block-size: 100%;
+  @include focusable;
+
+  &::before {
+    content: '';
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background-color: var(--c-ivory-200);
+    transition: background-color var(--d-fast) var(--ease-out);
   }
 
-  // No two-column override below 480px. Two columns gave each card 168px, and
-  // the enquiry button needs 198px — the grid was the cause of the CTA hanging
-  // off the side of the screen. Below 520px the card itself becomes a shelf row
-  // (see product-card.scss), which is both narrower-friendly and shorter, so a
-  // single column is the right and only track count down there.
-  @media (max-width: 519.98px) {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-3);
-    grid-auto-rows: auto;
-
-    // Three on a phone. Five stacked shelf rows is most of a screen spent on a
-    // sample of a catalogue the visitor has not asked for yet; three makes the
-    // point and the button underneath opens all 150. All five stay in the
-    // markup so the server and the client render the same tree and a crawler
-    // still sees the full selection.
-    li:nth-child(n + 4) {
-      display: none;
-    }
+  &.is-active::before,
+  &:hover::before {
+    background-color: var(--c-teal-900);
   }
-}
-
-// Panels are focusable containers; the focus ring belongs on the cards inside.
-[role='tabpanel']:focus {
-  outline: none;
-}
-[role='tabpanel']:focus-visible {
-  @include focus-ring;
-}
-
-.featured__foot {
-  display: flex;
-  justify-content: center;
-  margin-top: clamp(var(--sp-6), 4vw, var(--sp-10));
 }

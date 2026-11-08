@@ -8,22 +8,20 @@
 }
 
 .header__bar {
-  background-color: var(--c-ivory-50);
+  background-color: var(--c-white);
   border-bottom: 1px solid var(--c-ivory-200);
-  backdrop-filter: blur(18px) saturate(1.2);
   transition:
     background-color var(--d-base) var(--ease-out),
     border-color var(--d-base) var(--ease-out);
 }
 
-// Over the dark hero, before any scroll.
+// Over a dark hero, before any scroll.
 :host(.is-transparent) .header__bar {
   background-color: transparent;
   border-bottom-color: transparent;
 
   .header__nav-link,
   .header__lang,
-  .header__action,
   .header__search-link,
   .header__account,
   .header__cart,
@@ -63,15 +61,9 @@
   .header__lang {
     border-color: rgb(255 255 255 / 0.32);
   }
-  .btn--primary {
-    --btn-bg: var(--c-ivory-50);
-    --btn-fg: var(--c-forest-900);
-    --btn-border: var(--c-ivory-50);
-  }
 }
 
 :host(.is-scrolled) .header__bar {
-  background-color: color-mix(in oklab, var(--c-ivory-50) 92%, transparent);
   box-shadow: var(--e-2);
 }
 
@@ -79,14 +71,14 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  min-height: var(--header-h);
+  min-height: var(--header-row);
 
   @include bp(md) {
-    gap: var(--sp-4);
+    gap: var(--sp-6);
   }
 
   @include bp(xl) {
-    gap: var(--sp-6);
+    gap: var(--sp-10);
   }
 }
 
@@ -96,25 +88,16 @@
 }
 
 .header__logo {
-  // The logo no longer shrinks to make room. It used to carry `flex: 0 1 auto`
-  // with no floor, and at 1024px — where the desktop navigation, the search
-  // field, the language switch and the call to action all appear at once — it
-  // was squeezed to 24px wide: an unreadable sliver, and a link below the
-  // minimum target size. The search field is the flexible element instead
-  // (see .header__search), because a text input is designed to be resized and
-  // a wordmark is not.
+  // The search field is the flexible element in this row: a text input is
+  // designed to be resized and a wordmark is not.
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-
-  // The two variants are stacked, so the dark-header version is already
-  // decoded when the user scrolls and there is never a moment without a logo.
   display: grid;
+  align-items: center;
 
   img {
     grid-area: 1 / 1;
     // Scales with the viewport rather than jumping at a breakpoint, so the
-    // lockup always fits beside the actions — 30px at 320, 50px from 640 up.
+    // lockup always fits beside the actions: 30px at 320, 50px from 640 up.
     block-size: clamp(30px, 6.5vw, 50px);
     inline-size: auto;
     background: none;
@@ -130,22 +113,31 @@
   }
 }
 
+// -----------------------------------------------------------------------------
+// NAVIGATION ROW (desktop)
+// -----------------------------------------------------------------------------
 .header__nav {
   display: none;
-  margin-inline: auto;
 
   @include bp(lg) {
     display: block;
+    min-block-size: var(--header-nav);
+    border-block-start: 1px solid var(--c-ivory-200);
   }
+}
+
+:host(.is-transparent) .header__nav {
+  border-block-start-color: rgb(255 255 255 / 0.18);
 }
 
 .header__nav-list {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  list-style: none;
+  gap: clamp(var(--sp-6), 4vw, var(--sp-16));
+  block-size: var(--header-nav);
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .header__nav-link {
@@ -153,42 +145,41 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-2);
-  color: var(--text-secondary);
+  block-size: var(--header-nav);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-teal-900);
+  font-family: var(--font-body);
   font-size: var(--fs-sm);
-
-  @include bp(xl) {
-    padding-inline: var(--sp-4);
-  }
   font-weight: var(--fw-medium);
   text-decoration: none;
   white-space: nowrap;
-  transition: color var(--d-fast) var(--ease-out);
+  cursor: pointer;
 
   @include focusable;
 
-  // Animated underline — the header's only decorative motion.
   &::after {
     content: '';
     position: absolute;
-    left: var(--sp-4);
-    right: var(--sp-4);
-    bottom: var(--sp-2);
-    block-size: 1px;
+    inset-inline: 0;
+    inset-block-end: 6px;
+    block-size: 2px;
+    border-radius: 1px;
     background-color: currentcolor;
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--d-fast) var(--ease-out);
   }
 
-  &:hover,
-  &.is-active,
-  &[aria-expanded='true'] {
-    color: var(--text-primary);
+  &:hover::after,
+  &.is-active::after,
+  &[aria-expanded='true']::after {
+    transform: scaleX(1);
+  }
 
-    &::after {
-      transform: scaleX(1);
-    }
+  &.is-active {
+    font-weight: var(--fw-semibold);
   }
 }
 
@@ -200,48 +191,31 @@
   }
 }
 
+// -----------------------------------------------------------------------------
+// ACTIONS
+// -----------------------------------------------------------------------------
 .header__actions {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
   gap: 2px;
-  // Shrinkable so the search field inside it can give way (see .header__search).
-  // With `flex: none` here the field's own `flex-shrink` never came into play,
-  // and at 1280px the French bar ran 85px past the edge of the screen.
-  flex: 0 1 auto;
-  min-inline-size: 0;
-  margin-left: auto;
-
-  // Every control keeps its size; only the search field is allowed to
-  // shrink. Without this the call to action took the squeeze and wrapped
-  // "Nous contacter" onto two lines.
-  > :not(.header__search) {
-    flex-shrink: 0;
-  }
+  margin-inline-start: auto;
 
   @include bp(sm) {
     gap: var(--sp-2);
   }
 
-  @include bp(lg) {
-    margin-left: 0;
-  }
-}
-
-.header__action {
-  color: var(--text-secondary);
-
-  &:hover {
-    color: var(--text-primary);
+  @include bp(md) {
+    margin-inline-start: 0;
   }
 }
 
 .header__cart {
-  color: var(--text-primary);
   position: relative;
+  color: var(--c-teal-900);
 
-  // Same reasoning as .header__account: below 480px the bar cannot carry
-  // another 44px target without pushing the burger off the edge, and the drawer
-  // already links to the panier.
+  // Below 480px the bar cannot carry another 44px target without pushing the
+  // burger off the edge, and the drawer already links to the panier.
   display: none;
 
   @include bp(sm) {
@@ -249,35 +223,56 @@
   }
 }
 
-// The count rides the icon rather than sitting beside it, so adding it does not
-// widen the bar. It is aria-hidden because the link's own label already states
-// the count.
+// The count rides the icon rather than sitting beside it, so a change does not
+// widen the bar. It is aria-hidden because the link's own label states the count.
 .header__cart-count {
   position: absolute;
   inset-block-start: 2px;
-  inset-inline-end: 2px;
-  min-width: 15px;
+  inset-inline-end: 0;
+  min-inline-size: 17px;
   padding: 0 4px;
-  border-radius: 999px;
-  background-color: var(--c-accent, var(--c-forest-600));
-  color: var(--c-ivory-50, #fff);
+  border-radius: var(--r-pill);
+  background-color: var(--c-teal-900);
+  color: var(--c-white);
   font-size: 10px;
-  line-height: 15px;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
+  line-height: 17px;
   text-align: center;
 }
 
 .header__account {
-  color: var(--text-primary);
-
-  // Below 480px the bar carries the logo plus four 44px targets and runs 33px
-  // past a 320px screen, taking the burger with it. The drawer already offers
-  // the account and sign-in links, so the icon stands down on the narrowest
-  // screens rather than pushing navigation off the edge.
   display: none;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  min-inline-size: var(--tap-min);
+  justify-content: center;
+  color: var(--c-teal-900);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
 
+  @include focusable;
+
+  &:hover .header__account-label {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  // Same reasoning as the basket; the drawer offers account and sign-in links.
   @include bp(sm) {
     display: inline-flex;
+  }
+}
+
+.header__account-label {
+  @include bp-down(lg) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
@@ -287,125 +282,88 @@
   min-inline-size: var(--tap-min);
   min-block-size: var(--tap-min);
   padding-inline: var(--sp-3);
-  border: 1px solid var(--border-neutral);
+  border: 1px solid transparent;
   border-radius: var(--r-pill);
-  color: var(--text-secondary);
+  color: var(--c-teal-900);
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.06em;
   text-decoration: none;
-  transition:
-    border-color var(--d-fast) var(--ease-out),
-    color var(--d-fast) var(--ease-out);
+  transition: border-color var(--d-fast) var(--ease-out);
 
   @include focusable;
 
   &:hover {
-    border-color: var(--border-strong);
-    color: var(--text-primary);
+    border-color: var(--border-neutral);
   }
 }
 
 // -----------------------------------------------------------------------------
-// SEARCH
-//
-// A first-class control rather than an icon: on a 150-reference B2B catalogue,
-// a buyer who knows what they want should never have to find search first.
-// The field appears where the desktop navigation does; below that the same
-// destination stays reachable as an icon link, so the control is never dead.
+// SEARCH: the centre of the bar from tablet up.
 // -----------------------------------------------------------------------------
-
 .header__search {
   display: none;
 
-  @include bp(xl) {
-    display: inline-flex;
+  @include bp(md) {
+    display: flex;
     align-items: center;
-    gap: var(--sp-2);
-    // Allowed to give way before anything else in the bar does.
-    flex: 0 1 15.5rem;
+    flex: 1 1 auto;
+    gap: var(--sp-3);
+    max-inline-size: 42rem;
     min-inline-size: 0;
-    min-block-size: 40px;
-    padding-inline: var(--sp-3);
+    margin-inline: auto;
+    padding-inline: var(--sp-4);
     border: 1px solid var(--border-neutral);
-    border-radius: var(--r-pill);
-    background-color: var(--surface-card);
-    color: var(--text-secondary);
+    border-radius: var(--r-sm);
+    background-color: var(--c-white);
+    color: var(--c-ink-700);
     transition:
-      inline-size var(--d-base) var(--ease-out),
       border-color var(--d-fast) var(--ease-out),
       background-color var(--d-fast) var(--ease-out);
 
     &:focus-within {
-      inline-size: 17rem;
-      border-color: var(--text-primary);
+      border-color: var(--c-teal-900);
     }
-  }
-
-  @include motion-reduce {
-    transition: none;
   }
 }
 
 .header__search-icon {
   flex-shrink: 0;
-  opacity: 0.7;
 }
 
 .header__search-input {
   inline-size: 100%;
   min-inline-size: 0;
-  // Fills the field so the whole 40px well is clickable. Left at its intrinsic
-  // height the actual target was a 20px band inside a control that looked twice
-  // that size, which is both a pointer-accuracy problem and a WCAG 2.2 target
-  // failure on the one control that has no other affordance.
-  block-size: 40px;
+  // Fills the field so the whole well is clickable.
+  block-size: 44px;
   border: 0;
   background: none;
   color: inherit;
   font-family: var(--font-body);
   font-size: var(--fs-sm);
   line-height: 1.2;
+  text-overflow: ellipsis;
 
   &:focus {
     outline: none;
   }
 
-  // The UA clear affordance collides with the pill's right padding.
+  // The UA clear affordance collides with the field's right padding.
   &::-webkit-search-cancel-button {
     appearance: none;
   }
 }
 
 .header__search-link {
-  color: var(--text-primary);
+  color: var(--c-teal-900);
 
-  @include bp(xl) {
+  @include bp(md) {
     display: none;
   }
 }
 
-.header__cta {
-  display: none;
-
-  @include bp(md) {
-    display: inline-flex;
-  }
-
-  // From 1024px to 1279px the desktop navigation is on screen with its own
-  // "Contact" link, and there is no flexible element left in the bar: logo,
-  // five links and this button needed 1075px in French. The duplicate button
-  // steps aside there instead of pushing the bar off the screen; from 1280px
-  // the search field gives way and the button returns.
-  @include bp(lg) {
-    @include bp-down(xl) {
-      display: none;
-    }
-  }
-}
-
 .header__burger {
-  color: var(--text-primary);
+  color: var(--c-teal-900);
 
   @include bp(lg) {
     display: none;

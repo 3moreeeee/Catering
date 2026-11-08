@@ -2,7 +2,8 @@
 
 :host {
   display: block;
-  background-color: var(--c-forest-900);
+  background-color: var(--c-white);
+  border-block-start: 1px solid var(--border-hairline);
   color: var(--text-primary);
 }
 
@@ -41,7 +42,7 @@
 }
 
 .footer__brand img {
-  block-size: 30px;
+  block-size: 44px;
   inline-size: auto;
   background: none;
   margin-bottom: var(--sp-4);
@@ -83,7 +84,7 @@
   @include focusable;
 
   &:hover {
-    color: var(--c-copper-400);
+    color: var(--c-teal-900);
     text-decoration: underline;
     text-underline-offset: 0.25em;
   }
@@ -113,7 +114,7 @@
 
   .control {
     flex: 1 1 12rem;
-    background-color: rgb(255 255 255 / 0.06);
+    background-color: var(--surface-card);
     border-color: var(--border-neutral);
     color: var(--text-primary);
 
@@ -125,7 +126,7 @@
 
 .footer__notice {
   font-size: var(--fs-sm);
-  color: var(--c-forest-300);
+  color: var(--c-teal-900);
   margin: 0;
 }
 
@@ -165,7 +166,7 @@
   @include focusable;
 
   &:hover {
-    color: var(--c-forest-300);
+    color: var(--c-teal-900);
   }
 
   span {

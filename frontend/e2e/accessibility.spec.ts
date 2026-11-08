@@ -66,7 +66,7 @@ test.describe('accessibility guarantees', () => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/fr');
 
-    const trigger = page.getByRole('button', { name: 'Produits', exact: true });
+    const trigger = page.getByRole('button', { name: 'Catalogue', exact: true });
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('#fk-mega-menu')).toBeVisible();
@@ -89,49 +89,72 @@ test.describe('accessibility guarantees', () => {
     expect(inside).toBe(true);
   });
 
-  test('featured tabs implement the ARIA tabs pattern with arrow keys', async ({ page }) => {
+  test('the hero carousel shows one slide and is operable from the keyboard', async ({ page }) => {
     await page.goto('/fr');
-    // The featured section is behind `@defer (on viewport)`; scroll it into
-    // the viewport after hydration so the trigger fires.
     await page.waitForLoadState('networkidle');
-    await page.evaluate(() => window.scrollTo(0, 3000));
-    // Scoped to the section under test: the sector index further up the page is
-    // also a tablist, and an unscoped `.first()` picks that one up instead.
-    const tablist = page.locator('fk-featured-section').getByRole('tablist');
-    await expect(tablist).toBeVisible({ timeout: 15_000 });
 
-    const tabs = tablist.getByRole('tab');
-    await tabs.first().focus();
-    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
+    const heading = page.locator('.slide.is-active h2');
+    await expect(heading).toHaveCount(1);
+    await expect(heading).toContainText('Le goût qui relève');
 
-    await page.keyboard.press('ArrowRight');
-    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+    await page.getByRole('button', { name: 'Diapositive suivante' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(heading).toContainText('L’essentiel des pauses');
+
+    // A slide that is not showing must not be reachable.
+    await expect(page.locator('.slide[inert]')).toHaveCount(7);
   });
 
-  test('the sector index is operable from the keyboard', async ({ page }) => {
+  test('the hero carousel advances by itself and stops when paused', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'reduced-motion', 'autoplay is off under reduced motion');
     await page.goto('/fr');
     await page.waitForLoadState('networkidle');
 
-    const list = page.locator('fk-sector-index [role="tablist"]');
-    for (let i = 0; i < 20 && (await list.count()) === 0; i++) {
-      await page.evaluate(() => window.scrollBy(0, window.innerHeight * 0.8));
+    const heading = page.locator('.slide.is-active h2');
+    await expect(heading).toContainText('L’essentiel des pauses', { timeout: 9_000 });
+
+    await page.getByRole('button', { name: 'Mettre le défilement en pause' }).click();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(7_000);
+    await expect(heading).toContainText('L’essentiel des pauses');
+  });
+
+  test('the showcase links real products and switches trade from the keyboard', async ({
+    page,
+  }) => {
+    await page.goto('/fr');
+    await page.waitForLoadState('networkidle');
+
+    const section = page.locator('fk-sectors-section');
+    for (let i = 0; i < 12 && (await section.count()) === 0; i++) {
+      await page.evaluate(() => window.scrollBy(0, 400));
       await page.waitForTimeout(250);
     }
-    await expect(list).toBeVisible({ timeout: 15_000 });
-    await expect(list).toHaveAttribute('aria-orientation', 'vertical');
+    await section.scrollIntoViewIfNeeded();
 
-    const sectors = list.getByRole('tab');
-    await sectors.first().focus();
-    await expect(sectors.first()).toHaveAttribute('aria-selected', 'true');
+    const cta = section.locator('.vitrine__cta');
+    await expect(cta).toHaveAttribute('href', '/fr/products?industry=restaurants', {
+      timeout: 15_000,
+    });
+    await expect(section.locator('.pin__card').first()).toHaveAttribute(
+      'href',
+      '/fr/products/food/vinto-mayonnaise-mayor-350-ml-384',
+      { timeout: 15_000 },
+    );
 
-    // Down moves to the next sector and its account opens with it.
-    await page.keyboard.press('ArrowDown');
-    await expect(sectors.nth(1)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('fk-sector-index [role="tabpanel"]:not([hidden])')).toHaveCount(1);
+    const tabs = section.getByRole('tab');
+    await tabs.first().focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+    await expect(cta).toHaveAttribute('href', '/fr/products?industry=hotels');
 
-    // End reaches the last sector without tabbing through the ones between.
     await page.keyboard.press('End');
-    await expect(sectors.last()).toHaveAttribute('aria-selected', 'true');
+    await expect(cta).toHaveAttribute('href', '/fr/products?q=verrine');
+    await expect(section.locator('.pin__card').first()).toHaveAttribute(
+      'href',
+      '/fr/products/monin/monin-puree-fraise-1l-268',
+      { timeout: 15_000 },
+    );
   });
 
   test('every interactive target meets the 44px minimum on mobile', async ({ page }) => {

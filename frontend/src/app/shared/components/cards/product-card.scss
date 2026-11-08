@@ -16,35 +16,11 @@
   display: flex;
   flex-direction: column;
   block-size: 100%;
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--r-md);
-  box-shadow: var(--e-1);
-  overflow: hidden;
-  transition:
-    border-color var(--d-base) var(--ease-out),
-    transform var(--d-base) var(--ease-out),
-    box-shadow var(--d-base) var(--ease-out);
-
-  &:hover {
-    border-color: color-mix(in oklab, var(--c-copper-500) 35%, var(--border-neutral));
-    box-shadow: var(--e-3);
-
-    @include fine-pointer {
-      transform: translateY(-4px);
-    }
-  }
 
   // Focus ring is drawn on the card, driven by the overlay link's focus.
   &:has(.card__link:focus-visible) {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
-  }
-}
-
-@include motion-reduce {
-  .card:hover {
-    transform: none;
   }
 }
 
@@ -61,18 +37,21 @@
 }
 
 .card__media {
-  --format-scale: 1;
-  --format-shift: 0%;
+  --fit-scale: 1;
+  --fit-shift: 0%;
   position: relative;
   aspect-ratio: 1 / 1;
-  background:
-    radial-gradient(
-      circle at 50% 44%,
-      color-mix(in oklab, var(--surface-card) 86%, white),
-      transparent 66%
-    ),
-    var(--surface-alt);
+  border-radius: var(--r-md);
+  // A studio backdrop: `multiply` below melts each photograph's white canvas
+  // into it, so every product appears on one and the same surface.
+  background-color: var(--c-ivory-100);
+  box-shadow: inset 0 0 0 1px transparent;
   overflow: hidden;
+  transition: box-shadow var(--d-fast) var(--ease-out);
+
+  .card:hover & {
+    box-shadow: inset 0 0 0 1.5px var(--c-teal-900);
+  }
 
   img {
     // Absolutely positioned, NOT in flow. An in-flow child sized at 100% of an
@@ -83,25 +62,16 @@
     inset: 0;
     inline-size: 100%;
     block-size: 100%;
-    padding: var(--sp-5);
+    padding: var(--sp-6);
     object-fit: contain;
     background: none;
-    // White studio canvases retained by the safety check disappear into the
-    // warm card surface, while pale products keep all of their original detail.
     mix-blend-mode: multiply;
-    transform: translateY(var(--format-shift)) scale(var(--format-scale));
-    transform-origin: center bottom;
-    transition: transform var(--d-slow) var(--ease-out);
-  }
-
-  .card:hover & img {
-    @include fine-pointer {
-      transform: translateY(var(--format-shift)) scale(calc(var(--format-scale) * 1.04));
-    }
+    transform: translateY(var(--fit-shift)) scale(var(--fit-scale));
   }
 }
 
-.card__media--normalized img {
+// Measured photographs are sized by their transform; padding would shrink them.
+.card__media--measured img {
   padding: 0;
 }
 
@@ -113,14 +83,28 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  padding: var(--sp-4) var(--sp-5) var(--sp-2);
-  border-top: 1px solid var(--border-hairline);
+  padding: var(--sp-3) var(--sp-1) var(--sp-2);
 }
 
 .card__brand {
-  color: var(--text-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+
+  &::before {
+    content: '';
+    flex: none;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background-color: var(--tone);
+  }
 }
 
 .card__brand--none {
@@ -128,12 +112,14 @@
 }
 
 .card__name {
-  font-family: var(--font-display);
-  font-size: var(--fs-h4);
+  // Three lines reserved, so name length does not change the size of the card.
+  min-block-size: calc(3 * var(--lh-snug) * 1em);
+  margin: 0;
+  color: var(--c-teal-900);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-snug);
-  letter-spacing: -0.01em;
-  margin: 0;
   // Trade names carry dimensions and pack sizes: the name is shown whole, never
   // clamped. The grids give every card of a row the height of the tallest.
   overflow-wrap: anywhere;
@@ -145,37 +131,24 @@
   align-self: flex-start;
   gap: var(--sp-2);
   max-inline-size: 100%;
-  padding: 0.3rem var(--sp-3);
-  border-radius: var(--r-pill);
-  background: color-mix(in oklab, var(--c-cat-monin) 9%, var(--surface-card));
-  color: var(--c-cat-monin);
-  font-weight: var(--fw-semibold);
-  line-height: 1.35;
   margin: 0;
+  color: var(--text-muted);
+  line-height: 1.35;
 
   svg {
-    flex: 0 0 1.1rem;
-    inline-size: 1.1rem;
-    block-size: 1.1rem;
+    flex: 0 0 1rem;
+    inline-size: 1rem;
+    block-size: 1rem;
     fill: none;
-    stroke: currentColor;
+    stroke: var(--tone);
     stroke-width: 1.6;
     stroke-linejoin: round;
   }
 
   strong {
-    font-weight: var(--fw-bold);
+    color: var(--text-secondary);
+    font-weight: var(--fw-semibold);
   }
-}
-
-.card__format--packaging {
-  background: color-mix(in oklab, var(--c-cat-packaging) 9%, var(--surface-card));
-  color: var(--c-cat-packaging);
-}
-
-.card__format--hygiene {
-  background: color-mix(in oklab, var(--c-cat-hygiene) 9%, var(--surface-card));
-  color: var(--c-cat-hygiene);
 }
 
 .card__format-fallback {
@@ -183,11 +156,16 @@
   margin: 0;
 }
 
-.card__price {
-  // Pushed to the bottom of the body: names wrap to one to four lines, and a
-  // price that followed the name would sit at a different height on each card.
-  margin: auto 0 0;
+// Pushed to the bottom of the body, with room held for the pack lines, so the
+// price sits at one height on every card whatever the product is sold by.
+.card__buy {
+  margin-block-start: auto;
   padding-block-start: var(--sp-3);
+  min-block-size: 6rem;
+}
+
+.card__price {
+  margin: 0;
   font-family: var(--font-display);
   font-size: var(--fs-h4);
   font-weight: var(--fw-semibold);
@@ -277,14 +255,34 @@
   position: relative;
   z-index: 2;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-5) var(--sp-5);
+  padding: var(--sp-2) var(--sp-1) var(--sp-1);
 }
 
 .card__action {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   justify-content: center;
+}
+
+// One button per card carries weight; the enquiry reads as a quiet link, so a
+// page of twelve products is not a page of twenty-four buttons.
+.card__action.btn--secondary {
+  --btn-bg: transparent;
+  --btn-border: transparent;
+  --btn-fg: var(--c-teal-900);
+  min-block-size: 32px;
+  padding-block: var(--sp-1);
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+
+  &:hover:not(:disabled) {
+    --btn-bg: transparent;
+    --btn-border: transparent;
+    box-shadow: none;
+    transform: none;
+  }
 }
 
 // --- Single column: a shelf row, not a stretched tile ------------------------
@@ -311,6 +309,7 @@ $list-row-min: 40rem;
 @mixin shelf-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
   grid-template-areas:
     'media body'
     'actions actions';
@@ -338,7 +337,11 @@ $list-row-min: 40rem;
   }
 
   .card__name {
-    font-size: var(--fs-body);
+    min-block-size: 0;
+  }
+
+  .card__buy {
+    min-block-size: 0;
   }
 
   .card__actions {
@@ -390,6 +393,11 @@ $list-row-min: 40rem;
       border-top: none;
       padding-block: var(--sp-4);
       min-inline-size: 0;
+    }
+
+    .card__name,
+    .card__buy {
+      min-block-size: 0;
     }
 
     .card__actions {

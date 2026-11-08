@@ -1,11 +1,11 @@
 @use '../../../styles/abstracts/mixins' as *;
 
 .pdp {
-  padding-block: var(--sp-8) var(--sp-20);
+  padding-block: var(--sp-6) var(--sp-8);
 }
 
 .pdp__crumbs {
-  margin-bottom: var(--sp-8);
+  margin-bottom: var(--sp-6);
 
   ol {
     display: flex;
@@ -34,42 +34,47 @@
 
 .pdp__layout {
   display: grid;
-  gap: var(--sp-10);
+  gap: var(--sp-8);
 
   @include bp(lg) {
-    grid-template-columns: 6fr 5fr;
-    gap: var(--sp-16);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(var(--sp-8), 4vw, var(--sp-16));
     align-items: start;
   }
 }
 
+.pdp__gallery {
+  @include bp(lg) {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+  }
+}
+
 .pdp__stage {
+  --fit-scale: 1;
+  --fit-shift: 0%;
   position: relative;
-  background:
-    radial-gradient(
-      circle at 50% 44%,
-      color-mix(in oklab, var(--surface-card) 86%, white),
-      transparent 66%
-    ),
-    var(--surface-alt);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--r-sm);
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+  background-color: var(--c-white);
 
   img {
-    // Out of flow for the same reason as the product card — see
-    // product-card.scss. Keeps every product framed identically regardless of
-    // the source photo's aspect ratio.
+    // Out of flow for the same reason as the product card: see product-card.scss.
     position: absolute;
     inset: 0;
     inline-size: 100%;
     block-size: 100%;
-    padding: var(--sp-8);
+    padding: var(--sp-10);
     object-fit: contain;
     background: none;
-    mix-blend-mode: multiply;
+    transform: translateY(var(--fit-shift)) scale(var(--fit-scale));
   }
+}
+
+.pdp__stage--measured img {
+  padding: 0;
 }
 
 .pdp__thumbs {
@@ -87,13 +92,13 @@
   padding: var(--sp-2);
   border: 1px solid var(--border-hairline);
   border-radius: var(--r-xs);
-  background-color: var(--surface-alt);
+  background-color: var(--c-white);
 
   @include focusable;
   @include tap-target;
 
   &[aria-pressed='true'] {
-    border-color: var(--text-primary);
+    border-color: var(--c-teal-900);
   }
 
   img {
@@ -101,7 +106,6 @@
     block-size: 100%;
     object-fit: contain;
     background: none;
-    mix-blend-mode: multiply;
   }
 }
 
@@ -110,50 +114,74 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-4);
+}
 
-  @include bp(lg) {
-    position: sticky;
-    top: calc(var(--header-h) + var(--sp-6));
+.pdp__tag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    @include focusable;
+
+    &:hover {
+      color: var(--c-teal-900);
+      text-decoration: underline;
+    }
   }
 }
 
-.pdp__brand {
-  color: var(--text-accent);
-  text-decoration: none;
-
-  @include focusable;
-
-  &:hover {
-    text-decoration: underline;
-  }
+.pdp__dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background-color: var(--tone);
 }
 
 .pdp__title {
+  @include display(clamp(1.625rem, 1.25rem + 1.5vw, 2.5rem));
   margin: 0;
+  color: var(--c-teal-900);
+  overflow-wrap: anywhere;
 }
 
 .pdp__format {
   margin: 0;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-pill);
-  background: color-mix(in oklab, var(--c-cat-monin) 9%, var(--surface-card));
-  color: var(--c-cat-monin);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--tone);
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--tone) 6%, var(--c-white));
+  color: var(--c-teal-900);
   font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-}
-
-.pdp__format--packaging {
-  background: color-mix(in oklab, var(--c-cat-packaging) 9%, var(--surface-card));
-  color: var(--c-cat-packaging);
-}
-
-.pdp__format--hygiene {
-  background: color-mix(in oklab, var(--c-cat-hygiene) 9%, var(--surface-card));
-  color: var(--c-cat-hygiene);
+  font-weight: var(--fw-medium);
 }
 
 .pdp__lead {
   margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+// Price, quantity and actions read as one buying panel.
+.pdp__panel {
+  display: grid;
+  gap: var(--sp-5);
+  inline-size: 100%;
+  margin-block-start: var(--sp-2);
+  padding: clamp(var(--sp-4), 2.5vw, var(--sp-6));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
+  background-color: var(--c-white);
+  box-shadow: var(--e-1);
 }
 
 .pdp__colors {
@@ -223,10 +251,6 @@
   display: grid;
   gap: var(--sp-4);
   inline-size: 100%;
-  padding: clamp(var(--sp-4), 3vw, var(--sp-6));
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--r-lg);
-  background: var(--surface-card);
   container-type: inline-size;
 }
 
@@ -250,7 +274,7 @@
     font-size: calc(var(--fs-h3) * 1.15);
     font-weight: var(--fw-bold);
     line-height: 1;
-    color: var(--text-primary);
+    color: var(--c-teal-900);
   }
 
   del {
@@ -264,10 +288,6 @@
   display: grid;
   gap: var(--sp-2);
   inline-size: 100%;
-  padding: var(--sp-5);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--r-md);
-  background: var(--surface-alt);
 }
 
 // Secondary text beside a figure: "/ lot" after the price, "/ bouteille"
@@ -319,8 +339,8 @@
   align-content: start;
   gap: var(--sp-1);
   padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--surface-alt);
+  border-radius: var(--r-sm);
+  background: var(--c-warm-100);
 
   // Under an offer only the pack content remains; it takes the full row.
   &:only-child {
@@ -439,24 +459,77 @@
 
 .pdp__sections {
   display: grid;
-  gap: var(--sp-10);
-  margin-top: var(--sp-16);
-  padding-top: var(--sp-10);
-  border-top: 1px solid var(--border-hairline);
+  gap: var(--sp-4);
+  margin-top: clamp(var(--sp-8), 5vw, var(--sp-12));
+
+  @include bp(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
   @include bp(lg) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-12);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .pdp__section {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   align-content: start;
+  padding: clamp(var(--sp-4), 2.5vw, var(--sp-6));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--r-md);
 
   h2 {
     margin: 0;
+    color: var(--c-teal-900);
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-heading);
+  }
+
+  .prose p {
+    margin: 0;
+  }
+}
+
+.pdp__section--wide {
+  @include bp(md) {
+    grid-column: 1 / -1;
+  }
+
+  @include bp(lg) {
+    grid-column: span 2;
+  }
+}
+
+.pdp__facts {
+  display: grid;
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-block: var(--sp-2);
+    border-block-end: 1px solid var(--border-hairline);
+
+    &:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    text-align: end;
   }
 }
 
@@ -474,23 +547,28 @@
 }
 
 .pdp__related {
-  margin-top: var(--sp-16);
-  padding-top: var(--sp-10);
-  border-top: 1px solid var(--border-hairline);
+  margin-top: clamp(var(--sp-8), 5vw, var(--sp-12));
 
   h2 {
-    margin: 0 0 var(--sp-6);
+    @include display(clamp(1.625rem, 1.2rem + 1.5vw, 2.5rem));
+    margin: 0 0 clamp(1.25rem, 2.5vw, 2rem);
+    color: var(--c-teal-900);
   }
 }
 
 .pdp__related-grid {
   display: grid;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
   list-style: none;
   margin: 0;
   padding: 0;
   grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
   grid-auto-rows: 1fr;
+
+  @include bp(xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   // Product cards switch to their single-column shelf row by this grid's width
   // (see product-card.scss), so the grid is their size container.
   container: product-grid / inline-size;
@@ -503,9 +581,6 @@
   // card's name to a 19px column.
   @include bp-down(sm) {
     gap: var(--sp-3);
-    // One column: equal-height rows would only pad every card to the
-    // tallest one on the page.
-    grid-auto-rows: auto;
   }
 }
 

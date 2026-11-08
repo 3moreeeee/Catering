@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { A11yModule } from '@angular/cdk/a11y';
 import { CatalogStore } from '../catalog.store';
@@ -11,12 +11,15 @@ interface FacetGroup {
   readonly values: readonly FacetValue[];
 }
 
+/** Facet rows shown before "show more". */
+const COLLAPSED_FACETS = 7;
+
 /**
- * Faceted filters.
+ * Faceted filters. Divisions are chosen in the aisle strip above, not here.
  *
- * Desktop: a sticky sidebar, always visible, no dialog semantics.
- * Mobile: a full-height drawer with a focus trap and an explicit close, so the
- * result list never re-flows under the user's thumb while they are choosing.
+ * A full-height drawer with a focus trap and an explicit close, so the result
+ * list never re-flows while the visitor is choosing. Product families are
+ * chosen on the page itself, in the shelf above the results.
  *
  * Each facet is a real `<input type="checkbox">` inside a `<fieldset>` with a
  * `<legend>` — screen readers get the grouping for free, and it works before
@@ -60,29 +63,33 @@ interface FacetGroup {
         </div>
 
         <div class="filters__body">
-          @for (group of groups(); track group.key) {
-            @if (group.values.length) {
-              <fieldset class="filters__group">
-                <legend class="u-label">{{ t(group.labelKey) }}</legend>
+          @for (group of visibleGroups(); track group.key) {
+            <details class="filters__group" open>
+              <summary>{{ t(group.labelKey) }}</summary>
+              <fieldset>
+                <legend class="u-visually-hidden">{{ t(group.labelKey) }}</legend>
                 <ul>
-                  @for (facet of group.values; track facet.id) {
+                  @for (facet of shownValues(group); track facet.id) {
                     <li>
-                      <label class="checkbox" [attr.data-category]="group.key === 'category' ? facet.id : null">
+                      <label class="checkbox">
                         <input
                           type="checkbox"
                           [checked]="isChecked(group.key, facet.id)"
                           (change)="store().toggle(group.key, facet.id)"
                         />
-                        <span class="checkbox__text">
-                          {{ facet.label | localized }}
-                          <span class="filters__count u-nums">({{ facet.count }})</span>
-                        </span>
+                        <span class="checkbox__text">{{ facet.label | localized }}</span>
+                        <span class="filters__count u-nums">{{ facet.count }}</span>
                       </label>
                     </li>
                   }
                 </ul>
+                @if (hiddenCount(group); as count) {
+                  <button type="button" class="filters__more" (click)="showAll(group.key)">
+                    {{ t('catalog.showMore', { count }) }}
+                  </button>
+                }
               </fieldset>
-            }
+            </details>
           }
         </div>
 
@@ -110,32 +117,50 @@ export class CatalogFilters {
   readonly open = input(false);
   readonly dismiss = output<void>();
 
+  private readonly expanded = signal<ReadonlySet<string>>(new Set());
+
+  /** Long lists start short; one with a selection shows everything, so it stays visible. */
+  shownValues(group: FacetGroup): readonly FacetValue[] {
+    return this.expanded().has(group.key) || this.hasActive(group.key)
+      ? group.values
+      : group.values.slice(0, COLLAPSED_FACETS);
+  }
+
+  hiddenCount(group: FacetGroup): number {
+    return group.values.length - this.shownValues(group).length;
+  }
+
+  showAll(key: string): void {
+    this.expanded.update((keys) => new Set(keys).add(key));
+  }
+
+  visibleGroups(): readonly FacetGroup[] {
+    return this.groups().filter((group) => group.values.length > 0);
+  }
+
   groups(): readonly FacetGroup[] {
     const facets = this.store().facets();
     return [
-      { key: 'category', labelKey: 'catalog.facet.categories', values: facets.categories },
-      { key: 'sub', labelKey: 'catalog.facet.subcategories', values: facets.subcategories },
       { key: 'brand', labelKey: 'catalog.facet.brands', values: facets.brands },
       { key: 'industry', labelKey: 'catalog.facet.industries', values: facets.industries },
       { key: 'size', labelKey: 'catalog.facet.sizes', values: facets.sizes },
     ];
   }
 
-  /**
-   * On mobile the drawer stays in the DOM (translated off-canvas) so it can
-   * animate. Without `inert`, its checkboxes remain in the tab order while the
-   * drawer is closed — a keyboard user would tab into invisible controls.
-   * Desktop shows the sidebar permanently, so it is never inert there.
-   */
+  /** The drawer stays in the DOM to animate; closed, it must be out of the tab order. */
   inertWhenClosed(): true | null {
-    return this.open() || this.isDesktop() ? null : true;
+    return this.open() ? null : true;
   }
 
-  private isDesktop(): boolean {
-    return typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
+  hasActive(key: string): boolean {
+    return this.selected(key).length > 0;
   }
 
   isChecked(key: string, id: string): boolean {
+    return this.selected(key).includes(id);
+  }
+
+  private selected(key: string): readonly string[] {
     const query = this.store().query();
     const map: Record<string, readonly string[] | undefined> = {
       category: query.categories,
@@ -144,6 +169,6 @@ export class CatalogFilters {
       industry: query.industries,
       size: query.sizes,
     };
-    return (map[key] ?? []).includes(id);
+    return map[key] ?? [];
   }
 }

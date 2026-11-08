@@ -40,15 +40,14 @@ test.describe('catalogue discovery', () => {
     const total = await count();
     expect(total).toBeGreaterThan(0);
     await page
-      .getByRole('checkbox', { name: /Hygiène/i })
-      .first()
-      .check();
+      .locator('.aisles')
+      .getByRole('link', { name: /Hygiène/i })
+      .click();
 
-    await expect(page).toHaveURL(/category=hygiene/);
+    await expect(page).toHaveURL(/\/fr\/products\/hygiene$/);
     // Filtering, done by the server, must reduce the result set below the
     // unfiltered total once the new page arrives.
-    await expect.poll(count).toBeLessThan(total);
-    expect(await count()).toBeGreaterThan(0);
+    await expect.poll(async () => (await count()) > 0 && (await count()) < total).toBe(true);
   });
 
   test('switches division from the top products menu without leaving the catalogue', async ({
@@ -57,7 +56,7 @@ test.describe('catalogue discovery', () => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/fr/products/food');
 
-    await page.getByRole('button', { name: 'Produits', exact: true }).click();
+    await page.getByRole('button', { name: 'Catalogue', exact: true }).click();
     await page
       .locator('#fk-mega-menu .mega__card')
       .filter({ hasText: /Hygiène et jetable/i })
@@ -84,15 +83,15 @@ test.describe('catalogue discovery', () => {
     await expect(page.getByRole('status')).toContainText(/\d+/);
   });
 
-  test('switches division with the category filters after entering from the top menu', async ({
+  test('switches division with the aisle strip after entering from the top menu', async ({
     page,
   }) => {
     await page.goto('/fr/products/food');
 
     await page
-      .getByRole('checkbox', { name: /Hygiène/i })
-      .first()
-      .check();
+      .locator('.aisles')
+      .getByRole('link', { name: /Hygiène/i })
+      .click();
 
     await expect(page).toHaveURL(/\/fr\/products\/hygiene$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Hygiène et jetable/i);
@@ -109,8 +108,8 @@ test.describe('catalogue discovery', () => {
   test('clear-all removes every filter', async ({ page }) => {
     await page.goto('/fr/products?category=hygiene&sub=gloves');
     await page
+      .locator('.catalog__chips')
       .getByRole('button', { name: /Effacer tous les filtres/i })
-      .first()
       .click();
     await expect(page).toHaveURL(/\/fr\/products$/);
     // 295 records after the supplier reconciliation, shown as 293 cards: the two

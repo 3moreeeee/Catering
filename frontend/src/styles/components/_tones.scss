@@ -1,0 +1,19 @@
+// =============================================================================
+// TONES: the homepage's colour language. A `data-tone` attribute hands `--tone`
+// to small icons, borders, labels and subtle tints; it is never a large fill.
+// =============================================================================
+[data-tone='food'] {
+  --tone: var(--c-tone-food);
+}
+[data-tone='monin'] {
+  --tone: var(--c-tone-monin);
+}
+[data-tone='packaging'] {
+  --tone: var(--c-tone-packaging);
+}
+[data-tone='hygiene'] {
+  --tone: var(--c-tone-hygiene);
+}
+[data-tone='recipes'] {
+  --tone: var(--c-tone-recipes);
+}

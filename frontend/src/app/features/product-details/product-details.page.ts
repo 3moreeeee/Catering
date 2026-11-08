@@ -30,6 +30,8 @@ import { CartService } from '../../core/cart/cart.service';
 import { PricingService } from '../../core/cart/pricing.service';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
 import { ProductFormatService } from '../../shared/utils/product-format.service';
+import { uniformImageFit } from '../../shared/utils/product-image-fit';
+import { QuoteSection } from '../home/sections/quote-section';
 import { toMillimes } from '../../shared/utils/money';
 import { PackText, packTermsOf } from '../../shared/utils/pack-text.service';
 
@@ -56,6 +58,7 @@ import { PackText, packTermsOf } from '../../shared/utils/pack-text.service';
     FrenchTypographyPipe,
     ProductCard,
     QuantityStepper,
+    QuoteSection,
   ],
   templateUrl: './product-details.page.html',
   styleUrl: './product-details.page.scss',
@@ -102,7 +105,13 @@ export class ProductDetailsPage {
     { initialValue: [] as readonly Product[] },
   );
 
+  /** The brand, unless the division already carries its name (MONIN). */
+  readonly separateBrand = computed(() => {
+    const brand = this.brand();
+    return brand && brand.id !== this.product()?.categoryId ? brand : null;
+  });
   readonly activeImage = signal(0);
+  readonly imageFit = computed(() => uniformImageFit(this.product()?.images[this.activeImage()]));
   /** Same placeholder the product card shows for a reference without a photograph. */
   readonly placeholderImage = {
     src: imageKitMediaUrl('/img/products/placeholder.svg'),

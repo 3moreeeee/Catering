@@ -135,12 +135,16 @@ class CataloguePaginationIntegrationTest {
     }
 
     @Test
-    void relevanceListsFeaturedProductsFirst() throws Exception {
+    void browsingLeadsWithFeaturedProductsAndEveryDivision() throws Exception {
         JsonNode items = read("/api/products").get("items");
         List<Boolean> featured = new ArrayList<>();
-        items.forEach(item -> featured.add(item.get("featured").asBoolean()));
-        assertThat(featured.subList(0, 5)).containsOnly(true);
-        assertThat(featured.subList(5, 12)).containsOnly(false);
+        Set<String> divisions = new HashSet<>();
+        items.forEach(item -> {
+            featured.add(item.get("featured").asBoolean());
+            divisions.add(item.get("categoryId").asText());
+        });
+        assertThat(featured.subList(0, 4)).containsOnly(true);
+        assertThat(divisions).containsExactlyInAnyOrderElementsOf(CATEGORIES);
     }
 
     // --- Visibility -------------------------------------------------------------------

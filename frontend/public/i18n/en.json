@@ -27,7 +27,9 @@
     "exploreUniverse": "Explore this universe",
     "cart": "Basket",
     "cartCount": "Basket ({{count}})",
-    "adminDashboard": "Dashboard"
+    "adminDashboard": "Dashboard",
+    "catalogue": "Catalogue",
+    "ourBrands": "Our brands"
   },
   "language": {
     "label": "Language",
@@ -48,7 +50,64 @@
       "mediaAlt": "An animated selection of professional products from the Catering catalogue.",
       "professionalBadge": "Professional supply",
       "coverage": "Serving businesses across Tunisia",
-      "proofLabel": "Company facts"
+      "proofLabel": "Company facts",
+      "carouselLabel": "Featured products",
+      "slideLabel": "{{current}} of {{total}}",
+      "goTo": "Go to slide {{current}}: {{name}}",
+      "previous": "Previous slide",
+      "next": "Next slide",
+      "pause": "Pause slideshow",
+      "play": "Resume slideshow",
+      "slides": {
+        "dijona": {
+          "product": "Dijona strong Dijon mustard · 200 g",
+          "title": "The flavour that lifts your creations",
+          "cta": "Discover the mustard",
+          "alt": "Jar of Dijona strong Dijon mustard 200 g next to a roast beef sandwich."
+        },
+        "mayor": {
+          "product": "Mayor mayonnaise · 350 ml",
+          "title": "The essential for indulgent breaks",
+          "cta": "Discover the mayonnaise",
+          "alt": "Bottle of Mayor mayonnaise 350 ml next to a burger and fries."
+        },
+        "moninFraise": {
+          "product": "MONIN strawberry syrup · 1 L",
+          "title": "Colour in every drink",
+          "cta": "Discover MONIN",
+          "alt": "Bottle of MONIN strawberry syrup 1 L next to an iced strawberry drink."
+        },
+        "moninPassion": {
+          "product": "MONIN passion fruit syrup · 1 L",
+          "title": "A tropical touch for your menu",
+          "cta": "See the syrup",
+          "alt": "Bottle of MONIN passion fruit syrup 1 L next to an iced drink."
+        },
+        "bolKraft": {
+          "product": "Kraft salad bowl 500 ml, PET lid · pack of 50",
+          "title": "Beautiful presentation, even to go",
+          "cta": "See the bowls",
+          "alt": "Brown kraft salad bowl with a clear PET lid, next to a mixed salad."
+        },
+        "gobeletsPet": {
+          "product": "PET cup 350 ml with lid · pack of 50",
+          "title": "Your drinks, ready to serve",
+          "cta": "See the cups",
+          "alt": "Stacks of clear PET cups with lids, and a berry smoothie."
+        },
+        "gantsNitrile": {
+          "product": "Nitrile gloves · pack of 100",
+          "title": "Equip your teams every day",
+          "cta": "See the gloves",
+          "alt": "Hand wearing a blue nitrile glove in a professional kitchen."
+        },
+        "coiffes": {
+          "product": "Non-woven bouffant caps · pack of 100",
+          "title": "The essentials of food prep",
+          "cta": "See the caps",
+          "alt": "White non-woven disposable caps on a stainless steel worktop."
+        }
+      }
     },
     "showcase": {
       "eyebrow": "Everything your operation needs",
@@ -82,7 +141,13 @@
       "eyebrow": "Selected references",
       "title": "From our catalogue.",
       "viewAll": "View all {{count}} references",
-      "tabsLabel": "Filter featured products by division"
+      "tabsLabel": "Filter featured products by division",
+      "heading": "Discover in the catalogue",
+      "viewCatalogue": "View the full catalogue",
+      "promo": "Promo",
+      "previous": "Previous products",
+      "next": "Next products",
+      "goToPage": "Go to page {{page}}"
     },
     "offers": {
       "eyebrow": "Promotional prices",
@@ -108,7 +173,9 @@
       "title": "International sourcing.",
       "lead": "We represent selected international manufacturers in Tunisia.",
       "viewAll": "View all brands",
-      "marqueeLabel": "Partner brands"
+      "marqueeLabel": "Partner brands",
+      "heading": "Our brands",
+      "bandLead": "Recognised brands suited to food-service professionals."
     },
     "contact": {
       "eyebrow": "Professional quote request",
@@ -168,7 +235,56 @@
     "sectors": {
       "title": "Tell us what you run. We know what it consumes.",
       "listLabel": "Choose a professional sector",
-      "draws": "Draws on our divisions"
+      "draws": "Draws on our divisions",
+      "heading": "One range, many trades",
+      "discover": "Explore the offer",
+      "discoverAbout": "Explore the offer: {{name}}",
+      "cards": {
+        "restaurants": {
+          "title": "Restaurants & cafés",
+          "lead": "Food products and consumables suited to daily service.",
+          "cta": "See products for restaurants",
+          "alt": "Restaurant counter with Mayor mayonnaise, Dijona mustard and MONIN strawberry syrup, beside a Ferid Khemakhem Catering delivery crate."
+        },
+        "hotels": {
+          "title": "Hotels & caterers",
+          "lead": "A reliable, complete selection for your functions and events.",
+          "cta": "See products for hotels",
+          "alt": "Hotel buffet with kraft bowls, PET cups and MONIN passion fruit syrup, beside a Ferid Khemakhem Catering delivery crate."
+        },
+        "industry": {
+          "title": "Food industry",
+          "lead": "Ingredients, packaging and consumables for your production needs.",
+          "cta": "See products for industry",
+          "alt": "Stainless steel worktop with nitrile gloves, hair caps and trays, beside a Ferid Khemakhem Catering delivery crate."
+        }
+      },
+      "idea": {
+        "badge": "Recipe idea",
+        "title": "Desserts in verrines",
+        "lead": "A simple, polished presentation for desserts plated or to go.",
+        "cta": "See the verrines",
+        "alt": "Pastry bench with MONIN strawberry purée, verrines and spoons, beside a Ferid Khemakhem Catering delivery crate."
+      }
+    },
+    "quote": {
+      "title": "Need a quote?",
+      "lead": "Tell us what you need and quickly receive a professional offer.",
+      "cta": "Request a quote",
+      "benefits": {
+        "range": {
+          "title": "A complete range",
+          "body": "Food, MONIN, packaging and hygiene"
+        },
+        "formats": {
+          "title": "Professional formats",
+          "body": "Pack sizes made for professionals"
+        },
+        "coverage": {
+          "title": "Across Tunisia",
+          "body": "Serving businesses nationwide"
+        }
+      }
     }
   },
   "about": {
@@ -233,7 +349,18 @@
       "body": "Something went wrong on our side. Please try again.",
       "action": "Try again"
     },
-    "loading": "Loading products…"
+    "loading": "Loading products…",
+    "guide": "Choose a range, then refine by format, brand or sector.",
+    "aislesLabel": "Catalogue ranges",
+    "aisleCount": "{{count}} references",
+    "showMore": "Show {{count}} more",
+    "familiesLabel": "Product families",
+    "familiesPrevious": "Previous families",
+    "familiesNext": "Next families",
+    "story": {
+      "title": "From our warehouse to your service",
+      "lead": "Order in the formats you need: our team confirms availability and delivery with you, anywhere in Tunisia."
+    }
   },
   "product": {
     "brand": "Brand",
@@ -278,7 +405,10 @@
     "signInToOrder": "Sign in to order",
     "addToCartAbout": "Add {{name}} to basket",
     "addFailed": "Failed, try again",
-    "subtotal": "Subtotal for {{quantity}} units: {{price}}"
+    "subtotal": "Subtotal for {{quantity}} units: {{price}}",
+    "factsTitle": "Product details",
+    "formatLabel": "Format",
+    "reference": "Reference"
   },
   "brands": {
     "title": "Brands",
@@ -396,7 +526,7 @@
     },
     "viewAll": "View all results for “{{query}}”",
     "keyboardHint": "Use arrow keys to navigate, Enter to select, Escape to close.",
-    "headerPlaceholder": "Search products…"
+    "headerPlaceholder": "Search for a product, category or pack size…"
   },
   "assistant": {
     "eyebrow": "Catalogue assistant",

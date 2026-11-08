@@ -1,0 +1,138 @@
+<ng-container *transloco="let t">
+  <section class="vitrine" aria-labelledby="home-sectors-title">
+    <div class="container vitrine__inner">
+      <header class="vitrine__head">
+        <h2 id="home-sectors-title" class="vitrine__title">{{ t('home.sectors.heading') }}</h2>
+
+        <div class="vitrine__tabs" role="tablist" [attr.aria-label]="t('home.sectors.listLabel')">
+          @for (scene of scenes; track scene.key) {
+            <button
+              type="button"
+              role="tab"
+              class="vitrine__tab"
+              [id]="'scene-tab-' + scene.key"
+              [class.is-active]="activeKey() === scene.key"
+              [attr.aria-selected]="activeKey() === scene.key"
+              [attr.tabindex]="activeKey() === scene.key ? 0 : -1"
+              aria-controls="scene-panel"
+              (click)="select(scene.key)"
+              (keydown)="onTabKeydown($event)"
+            >
+              {{ t(scene.copy + '.title') }}
+            </button>
+          }
+        </div>
+      </header>
+
+      <div id="scene-panel" role="tabpanel" [attr.aria-labelledby]="'scene-tab-' + current().key">
+        <div class="stage">
+          <!-- All four stay stacked so a change of trade cross-fades without a wait. -->
+          @for (scene of scenes; track scene.key) {
+            <img
+              class="stage__image"
+              [class.is-active]="activeKey() === scene.key"
+              [src]="'/img/home/vitrine/' + scene.image + '.webp'"
+              [attr.srcset]="
+                '/img/home/vitrine/' +
+                scene.image +
+                '-1000.webp 1000w, /img/home/vitrine/' +
+                scene.image +
+                '.webp 1800w'
+              "
+              sizes="(min-width: 1480px) 1416px, 96vw"
+              width="1800"
+              height="1005"
+              [alt]="activeKey() === scene.key ? t(scene.copy + '.alt') : ''"
+              loading="lazy"
+              decoding="async"
+            />
+          }
+
+          @for (spot of placed(); track spot.slug) {
+            <div
+              class="pin"
+              [class.is-open]="openSlug() === spot.slug"
+              [class.pin--left]="spot.x > 45"
+              [style.left.%]="spot.x"
+              [style.top.%]="spot.y"
+              (mouseenter)="openSlug.set(spot.slug)"
+              (focusin)="openSlug.set(spot.slug)"
+            >
+              <button
+                type="button"
+                class="pin__dot"
+                [attr.aria-expanded]="openSlug() === spot.slug"
+                [attr.aria-label]="spot.product.name | localized"
+                (click)="openSlug.set(spot.slug)"
+              ></button>
+
+              <a class="pin__card" [routerLink]="link(spot.product)">
+                <span class="thumb" [class.is-measured]="fit(spot.product).measured">
+                  <img
+                    [src]="spot.product.images[0]?.src"
+                    [style.--fit-scale]="fit(spot.product).scale"
+                    [style.--fit-shift]="fit(spot.product).shift + '%'"
+                    alt=""
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                  />
+                </span>
+                <span class="info">
+                  <span class="info__name">{{ spot.product.name | localized | frenchType }}</span>
+                  @if (priceLabel(spot.product); as price) {
+                    <span class="info__price u-nums">
+                      <strong>{{ price }}</strong>
+                      @if (isPack(spot.product)) {
+                        / {{ t('pack.packs.one') }}
+                      }
+                    </span>
+                  }
+                  <span class="info__go">{{ t('home.offers.viewProduct') }}</span>
+                </span>
+              </a>
+            </div>
+          }
+        </div>
+
+        <ul class="shelf">
+          @for (spot of placed(); track spot.slug) {
+            <li>
+              <a class="shelf__row" [routerLink]="link(spot.product)">
+                <span class="thumb" [class.is-measured]="fit(spot.product).measured">
+                  <img
+                    [src]="spot.product.images[0]?.src"
+                    [style.--fit-scale]="fit(spot.product).scale"
+                    [style.--fit-shift]="fit(spot.product).shift + '%'"
+                    alt=""
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                  />
+                </span>
+                <span class="info">
+                  <span class="info__name">{{ spot.product.name | localized | frenchType }}</span>
+                  @if (priceLabel(spot.product); as price) {
+                    <span class="info__price u-nums">
+                      <strong>{{ price }}</strong>
+                      @if (isPack(spot.product)) {
+                        / {{ t('pack.packs.one') }}
+                      }
+                    </span>
+                  }
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+
+        <div class="vitrine__foot">
+          <p>{{ t(current().copy + '.lead') }}</p>
+          <a class="vitrine__cta" [routerLink]="to('products')" [queryParams]="current().params">
+            {{ t(current().copy + '.cta') }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>

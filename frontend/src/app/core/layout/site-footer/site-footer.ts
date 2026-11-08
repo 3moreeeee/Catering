@@ -26,7 +26,7 @@ type NewsletterState = 'idle' | 'submitting' | 'success' | 'error';
   styleUrl: './site-footer.scss',
   // The host is a custom element, so the landmark role must be declared
   // explicitly — otherwise there is no contentinfo landmark on any page.
-  host: { class: 'on-dark', role: 'contentinfo' },
+  host: { role: 'contentinfo' },
 })
 export class SiteFooter {
   private readonly document = inject(DOCUMENT);

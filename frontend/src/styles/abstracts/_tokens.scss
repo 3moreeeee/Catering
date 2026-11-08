@@ -66,6 +66,19 @@
   --c-hygiene-100: #fff3e5;
   --c-hygiene-50: #fffbf5;
   --c-cat-horeca: var(--c-horeca-700);
+
+  // Homepage palette: deep teal for headings and calls to action, one tone per
+  // division for small accents. The two text values pass AA under white type.
+  --c-teal-900: #0d4a46;
+  --c-teal-800: #136059;
+  --c-warm-100: #fbf5ee;
+  --c-tone-food: #3f9a4b;
+  --c-tone-monin: #e8604c;
+  --c-tone-packaging: #e8ad1a;
+  --c-tone-hygiene: #8257c9;
+  --c-tone-recipes: #5ba3e6;
+  --c-recipes-text: #1f67b1;
+  --c-promo-text: #c9560f;
   --c-dark-rgb: 16 59 45;
   --c-ui-rgb: 33 104 63;
   --c-light-rgb: 250 247 239;
@@ -204,7 +217,11 @@
   --container-max: 1480px;
   --container-narrow: 768px;
   --container-wide: 1680px;
-  --header-h: 72px;
+  // The bar is the logo/search row plus, from 1024px, the navigation row.
+  // `--header-h` stays the full sticky height that page offsets rely on.
+  --header-row: 72px;
+  --header-nav: 0px;
+  --header-h: calc(var(--header-row) + var(--header-nav));
   --tap-min: 44px;
 
   // ---------------------------------------------------------------------------
@@ -251,7 +268,13 @@
 @media (min-width: 768px) {
   :root {
     --gutter: 2rem;
-    --header-h: 80px;
+    --header-row: 80px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-nav: 46px;
   }
 }
 

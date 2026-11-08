@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { CatalogStats } from '../../catalog/catalog-stats.service';
 import { LocalizedRouter } from '../../i18n/localized-router.service';
 import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 import { Category } from '../../../shared/models/catalog.model';
@@ -22,11 +23,12 @@ import { Category } from '../../../shared/models/catalog.model';
 })
 export class MegaMenu {
   readonly categories = input.required<readonly Category[]>();
-  /** Null while unknown; the hint is then left out rather than showing a wrong number. */
+  /** Null while unknown; the number is then left out rather than showing a wrong one. */
   readonly productCount = input.required<number | null>();
   readonly dismiss = output<void>();
 
   private readonly links = inject(LocalizedRouter);
+  readonly stats = inject(CatalogStats);
 
   to(path: string): string[] {
     return this.links.path(path);

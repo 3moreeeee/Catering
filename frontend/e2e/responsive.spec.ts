@@ -154,7 +154,7 @@ for (const locale of LOCALES) {
       await page.setViewportSize({ width: 320, height: 720 });
       await page.goto(`/${locale}`);
 
-      const cta = page.locator('.hero__actions .btn--primary');
+      const cta = page.locator('.slide.is-active .slide__cta');
       await expect(cta).toBeVisible();
 
       const box = (await cta.boundingBox())!;
@@ -170,7 +170,7 @@ for (const locale of LOCALES) {
 
     test('every product card enquiry button fits and reads in full', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto(`/${locale}`);
+      await page.goto(`/${locale}/products`);
       await settle(page, 844);
 
       const actions = page.locator('fk-product-card .card__action');
@@ -227,7 +227,7 @@ test.describe('header', () => {
 
   test('the wordmark and the burger are legible over the dark hero', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/fr');
+    await page.goto('/fr/about');
     await page.waitForTimeout(300);
 
     // The supplied logo's wordmark is dark grey; over the hero the ivory
@@ -244,7 +244,7 @@ test.describe('header', () => {
     const bars = await page.evaluate(
       () => getComputedStyle(document.querySelector('.header__burger-lines span')!).backgroundColor,
     );
-    expect(bars).toBe('rgb(255, 250, 242)');
+    expect(bars).toBe('rgb(255, 255, 255)');
 
     await page.evaluate(() => window.scrollTo(0, 700));
     await page.waitForTimeout(400);

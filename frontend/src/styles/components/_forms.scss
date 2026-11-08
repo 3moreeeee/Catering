@@ -115,7 +115,7 @@ select.control {
     inline-size: 20px;
     block-size: 20px;
     margin: 2px 0 0;
-    accent-color: var(--c-forest-600);
+    accent-color: var(--c-teal-900);
     cursor: pointer;
 
     @include focusable;
@@ -158,13 +158,13 @@ select.control {
 
 .chip--active,
 .chip[aria-pressed='true'] {
-  background-color: var(--c-forest-600);
-  border-color: var(--c-forest-600);
+  background-color: var(--c-teal-900);
+  border-color: var(--c-teal-900);
   color: var(--c-ivory-50);
 
   &:hover {
-    background-color: var(--c-forest-500);
-    border-color: var(--c-forest-500);
+    background-color: var(--c-teal-800);
+    border-color: var(--c-teal-800);
     color: var(--c-ivory-50);
   }
 }
