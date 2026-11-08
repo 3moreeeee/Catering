@@ -36,7 +36,7 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
   border: 1px solid rgb(255 255 255 / 0.16);
   border-radius: var(--r-pill);
   color: var(--c-ivory-50);
-  background: var(--c-forest-900);
+  background: var(--c-help-red);
   box-shadow: var(--e-4);
   font: var(--fw-semibold) var(--fs-sm) / 1 var(--font-body);
   cursor: pointer;
@@ -48,7 +48,7 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
 
   &:hover {
     transform: translateY(-2px);
-    background: var(--c-forest-700);
+    background: var(--c-help-red-hover);
   }
 
   &.is-open {
@@ -61,7 +61,7 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
     inset: 4px 4px auto auto;
     inline-size: 8px;
     block-size: 8px;
-    border: 2px solid var(--c-forest-900);
+    border: 2px solid var(--c-help-red);
     border-radius: 50%;
     background: var(--c-success);
   }
@@ -75,7 +75,7 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
   inline-size: 40px;
   block-size: 40px;
   border-radius: 50%;
-  color: var(--c-forest-900);
+  color: var(--c-help-red);
   background: var(--surface-inset);
 
   svg {
@@ -262,7 +262,7 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
       border-color: var(--c-forest-700);
       border-radius: var(--r-md) var(--r-md) 0 var(--r-md);
       color: var(--c-ivory-50);
-      background: var(--c-forest-700);
+      background: var(--c-help-red-hover);
     }
   }
 }
@@ -473,6 +473,10 @@ body:has(.mnav__panel, .filters.is-open) .assistant__launcher {
     // rendered edge to edge; the plain offset otherwise.
     inset-inline-end: max(var(--sp-3), env(safe-area-inset-right, 0px));
     inset-block-end: max(var(--sp-3), env(safe-area-inset-bottom, 0px));
+    // The label is hidden here, so the pill closes up into a circle.
+    justify-content: center;
+    inline-size: 56px;
+    padding: var(--sp-2);
 
     > span:last-of-type {
       @include visually-hidden;

@@ -1,11 +1,8 @@
 @use '../../../styles/abstracts/mixins' as *;
 
 .about__hero {
-  background-color: var(--c-forest-900);
-  // Same reason as the homepage hero: slide under the in-flow sticky header
-  // so its transparent-over-dark variant has dark ground to sit on.
-  margin-block-start: calc(var(--header-h) * -1);
-  padding-block: calc(var(--header-h) + var(--sp-12)) var(--sp-16);
+  background-color: var(--c-orange-600);
+  padding-block: var(--sp-12) var(--sp-16);
 }
 
 .about__title {
@@ -189,7 +186,7 @@
 }
 
 .about__cta {
-  background-color: var(--c-forest-900);
+  background-color: var(--c-orange-600);
   padding-block: var(--section-y);
 
   h2 {

@@ -17,11 +17,11 @@
 
   // Kept under the legacy `forest` API so every component stays compatible;
   // Deep botanical greens bring warmth to the food-service brand surfaces.
-  --c-forest-900: #103b2d;
-  --c-forest-800: #174b36;
-  --c-forest-700: #1b5736;
-  --c-forest-600: #21683f;
-  --c-forest-500: #397d50;
+  --c-forest-900: #22964c;
+  --c-forest-800: #22964c;
+  --c-forest-700: #22964c;
+  --c-forest-600: #22964c;
+  --c-forest-500: #2aa35a;
   --c-forest-300: #c8ddca;
 
   // Legacy accent API shares the botanical global CTA hierarchy.
@@ -41,9 +41,9 @@
   // Vinto menu hues sampled 2026-09-23; remapped to Catering categories.
   // 600 = reference; darker shades support readable white text.
   // Hygiene uses burnt orange; MONIN uses bottle green, never HoReCa violet.
-  --c-food-900: #0f4422;
-  --c-food-800: #145a2e;
-  --c-food-700: #1a7139;
+  --c-food-900: #22964c;
+  --c-food-800: #22964c;
+  --c-food-700: #22964c;
   --c-food-600: #22964c;
   --c-food-100: #e2f1e8;
   --c-food-50: #f4faf6;
@@ -69,9 +69,20 @@
 
   // Homepage palette: deep teal for headings and calls to action, one tone per
   // division for small accents. The two text values pass AA under white type.
-  --c-teal-900: #0d4a46;
-  --c-teal-800: #136059;
+  --c-teal-900: #22964c;
+  --c-teal-800: #1f8a46;
   --c-warm-100: #fbf5ee;
+  // Large coloured surfaces, and the assistant button.
+  --c-orange-600: #e06a00;
+  --c-orange-700: #c75e00;
+  --c-orange-500: #ee8420;
+  --c-help-red: #d92d20;
+  // The four solid cells of the homepage division bar.
+  --c-bar-food: #22964c;
+  --c-bar-packaging: #f1cd5a;
+  --c-bar-monin: #f5384e;
+  --c-bar-hygiene: #8f5fd6;
+  --c-help-red-hover: #b9241a;
   --c-tone-food: #3f9a4b;
   --c-tone-monin: #e8604c;
   --c-tone-packaging: #e8ad1a;
@@ -79,23 +90,23 @@
   --c-tone-recipes: #5ba3e6;
   --c-recipes-text: #1f67b1;
   --c-promo-text: #c9560f;
-  --c-dark-rgb: 16 59 45;
-  --c-ui-rgb: 33 104 63;
+  --c-dark-rgb: 66 40 16;
+  --c-ui-rgb: 34 150 76;
   --c-light-rgb: 250 247 239;
   --c-dark-secondary: #edf1e7;
   --c-dark-muted: #d5e0ce;
   --c-dark-disabled: #a6bda5;
-  --c-hero-mid: #1c5038;
-  --c-hero-end: #0b3026;
+  --c-hero-mid: #e06a00;
+  --c-hero-end: #c75e00;
 
   // Category identity — coordinated, never used as a large fill
   --c-cat-food: var(--c-food-700);
-  --c-cat-monin: #102f29;
+  --c-cat-monin: var(--c-tone-monin);
   --c-cat-packaging: var(--c-packaging-700);
   --c-cat-hygiene: var(--c-hygiene-700);
 
   // Semantic
-  --c-success: #2d7d31;
+  --c-success: #22964c;
   --c-error: #b72f24;
   --c-warning: var(--c-hygiene-800);
   --c-info: var(--c-packaging-700);
@@ -243,10 +254,10 @@
 // Applied to any section rendered on forest. Components inside need no changes.
 // -----------------------------------------------------------------------------
 .on-dark {
-  --surface-page: var(--c-forest-900);
-  --surface-alt: var(--c-forest-800);
-  --surface-card: var(--c-forest-700);
-  --surface-inset: var(--c-forest-800);
+  --surface-page: var(--c-orange-600);
+  --surface-alt: var(--c-orange-700);
+  --surface-card: var(--c-orange-500);
+  --surface-inset: var(--c-orange-700);
 
   --text-primary: var(--c-ivory-50);
   --text-secondary: var(--c-dark-secondary);
@@ -259,7 +270,7 @@
   --border-neutral: rgb(255 255 255 / 0.16);
   --border-strong: rgb(255 255 255 / 0.32);
 
-  --focus-offset-color: var(--c-forest-900);
+  --focus-offset-color: var(--c-orange-600);
 
   color: var(--text-primary);
   background-color: var(--surface-page);

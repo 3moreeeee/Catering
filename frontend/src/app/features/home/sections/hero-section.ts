@@ -44,7 +44,13 @@ export class HeroSection implements OnDestroy {
   private readonly links = inject(LocalizedRouter);
   private readonly document = inject(DOCUMENT);
 
-  readonly categories = toSignal(inject(CATEGORY_REPOSITORY).all(), { initialValue: [] });
+  private readonly allCategories = toSignal(inject(CATEGORY_REPOSITORY).all(), {
+    initialValue: [],
+  });
+  /** The bar's own order: packaging comes before MONIN here. */
+  readonly categories = computed(() =>
+    BAR_ORDER.flatMap((id) => this.allCategories().filter((category) => category.id === id)),
+  );
   readonly slides = HERO_SLIDES;
 
   /** Null for a slug the catalogue no longer has; empty until the lookups answer. */
@@ -171,10 +177,15 @@ export class HeroSection implements OnDestroy {
   }
 }
 
-/** Stroke paths for the division links, drawn on a 24-unit grid. */
+const BAR_ORDER: readonly CategoryId[] = ['food', 'packaging', 'monin', 'hygiene'];
+
+/** Line drawings for the division bar, on a 24-unit grid. */
 const HERO_CATEGORY_ICONS: Readonly<Record<CategoryId, string>> = {
-  food: 'M4 10h16l-1.6 9.5H5.6L4 10Zm3 0 3.5-6M17 10l-3.5-6M9.5 13.5v3M14.5 13.5v3',
-  monin: 'M10 2.5h4v3l1.5 3V21h-7V8.5L10 5.5v-3ZM8.5 13h7',
-  packaging: 'M12 3 20.5 7.5v9L12 21l-8.5-4.5v-9L12 3Zm0 9 8.5-4.5M12 12 3.5 7.5M12 12v9',
-  hygiene: 'M12 3s6.5 7 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10 12 3 12 3Z',
+  food: 'M3 20.5h18M5 20.5v-8a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v8M6 10.5V8h4v2.5M5 15h6M14 20.5v-6.5l1.5-2V9h3v3l1.5 2v6.5M15.5 9V7h3v2M14 16h6',
+  packaging:
+    'M7 3.5h10l2 3v14H5v-14l2-3ZM5 6.5h14M12 10.5c-2.2 1.2-2.2 4.6 0 6 2.2-1.4 2.2-4.8 0-6ZM12 10.5v6',
+  monin:
+    'M7 3h5M9 3v3M7 6h4a2 2 0 0 1 2 2v12.5H5V8a2 2 0 0 1 2-2ZM5 12h8M16 13h4l.5 7.5h-5L16 13ZM15.7 16h4.6',
+  hygiene:
+    'M6 13V7.5a1.2 1.2 0 0 1 2.4 0V12M8.4 12V5.5a1.2 1.2 0 0 1 2.4 0V12M10.8 12V6.5a1.2 1.2 0 0 1 2.4 0V13M13.2 13V9a1.2 1.2 0 0 1 2.4 0v6.5c0 3-2.2 5-5 5-2.4 0-3.7-1-5-3L3.4 14a1.2 1.2 0 0 1 1.9-1.4L6 13.5M18.5 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM20 9.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z',
 };

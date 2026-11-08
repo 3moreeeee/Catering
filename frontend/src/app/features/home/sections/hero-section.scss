@@ -232,22 +232,18 @@
 }
 
 // -----------------------------------------------------------------------------
-// DIVISION LINKS: straddle the bottom edge of the banner on desktop.
+// DIVISION BAR: four solid cells, straddling the banner's lower edge on desktop.
 // -----------------------------------------------------------------------------
 .hero__categories {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-2);
-  max-inline-size: 60rem;
+  max-inline-size: 68rem;
   margin-inline: auto;
-  padding: var(--sp-3) var(--gutter) 0;
 
   @include bp(lg) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--sp-4);
-    margin-block-start: -1.625rem;
-    padding-block-start: 0;
+    margin-block-start: -2.75rem;
   }
 }
 
@@ -255,24 +251,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-2);
-  min-block-size: 52px;
+  gap: var(--sp-3);
+  min-block-size: 4.5rem;
   padding-inline: var(--sp-3);
-  border: 1px solid var(--tone);
-  border-radius: var(--r-sm);
-  background-color: color-mix(in oklab, var(--tone) 5%, var(--c-white));
-  color: var(--c-teal-900);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
+  color: var(--c-white);
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 0.85rem + 0.4vw, 1.25rem);
+  font-weight: var(--fw-bold);
   text-decoration: none;
-  transition:
-    background-color var(--d-fast) var(--ease-out),
-    transform var(--d-fast) var(--ease-out);
+  transition: filter var(--d-fast) var(--ease-out);
 
-  @include focusable;
+  &:focus-visible {
+    outline: 3px solid var(--c-teal-900);
+    outline-offset: -3px;
+  }
 
   &:hover {
-    background-color: color-mix(in oklab, var(--tone) 12%, var(--c-white));
+    filter: brightness(0.94);
+  }
+
+  &[data-tone='food'] {
+    background-color: var(--c-bar-food);
+  }
+
+  &[data-tone='packaging'] {
+    background-color: var(--c-bar-packaging);
+  }
+
+  &[data-tone='monin'] {
+    background-color: var(--c-bar-monin);
+  }
+
+  &[data-tone='hygiene'] {
+    background-color: var(--c-bar-hygiene);
   }
 
   span {
@@ -283,22 +294,18 @@
     flex: none;
   }
 
-  @include bp-down(sm) {
-    gap: var(--sp-1);
+  // Keeps "Agro-alimentaire" on one line in half a phone's width.
+  @include bp-down(lg) {
+    gap: var(--sp-2);
     padding-inline: var(--sp-2);
-    font-size: 0.875rem;
+
+    svg {
+      inline-size: 26px;
+      block-size: 26px;
+    }
   }
-}
 
-.hero__category-icon {
-  color: var(--tone);
-}
-
-// Two columns on a phone leave no room for it beside "Agro-alimentaire".
-.hero__category-arrow {
-  display: none;
-
-  @include bp(sm) {
-    display: block;
+  @include bp(lg) {
+    min-block-size: 5.5rem;
   }
 }

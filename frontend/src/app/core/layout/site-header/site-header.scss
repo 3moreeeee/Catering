@@ -15,54 +15,6 @@
     border-color var(--d-base) var(--ease-out);
 }
 
-// Over a dark hero, before any scroll.
-:host(.is-transparent) .header__bar {
-  background-color: transparent;
-  border-bottom-color: transparent;
-
-  .header__nav-link,
-  .header__lang,
-  .header__search-link,
-  .header__account,
-  .header__cart,
-  .header__burger {
-    color: var(--c-ivory-50);
-  }
-
-  // The bars are painted from currentColor rather than a token so they follow
-  // the button, whichever ground it is on.
-  .header__burger-lines span {
-    background-color: currentcolor;
-  }
-
-  // Over the dark hero the field is a tinted well rather than a light box, so
-  // it reads as part of the photograph instead of a control pasted onto it.
-  .header__search {
-    border-color: rgb(255 255 255 / 0.28);
-    background-color: rgb(255 255 255 / 0.08);
-    color: var(--c-ivory-50);
-
-    &:focus-within {
-      border-color: var(--c-ivory-50);
-      background-color: rgb(255 255 255 / 0.14);
-    }
-  }
-  .header__search-input::placeholder {
-    color: rgb(255 255 255 / 0.66);
-  }
-  // Over the hero the ivory wordmark shows and the dark one steps back. The
-  // coloured mark is identical in both files, so only the name cross-fades.
-  .header__logo-mark {
-    opacity: 0;
-  }
-  .header__logo-mark--dark {
-    opacity: 1;
-  }
-  .header__lang {
-    border-color: rgb(255 255 255 / 0.32);
-  }
-}
-
 :host(.is-scrolled) .header__bar {
   box-shadow: var(--e-2);
 }
@@ -82,17 +34,13 @@
   }
 }
 
-// Default (solid bar): the dark wordmark shows, the ivory one is hidden.
-.header__logo-mark--dark {
-  opacity: 0;
-}
-
 .header__logo {
   // The search field is the flexible element in this row: a text input is
   // designed to be resized and a wordmark is not.
   flex: 0 0 auto;
   display: grid;
   align-items: center;
+  min-block-size: var(--tap-min);
 
   img {
     grid-area: 1 / 1;
@@ -124,10 +72,6 @@
     min-block-size: var(--header-nav);
     border-block-start: 1px solid var(--c-ivory-200);
   }
-}
-
-:host(.is-transparent) .header__nav {
-  border-block-start-color: rgb(255 255 255 / 0.18);
 }
 
 .header__nav-list {
@@ -212,7 +156,7 @@
 
 .header__cart {
   position: relative;
-  color: var(--c-teal-900);
+  color: var(--c-orange-600);
 
   // Below 480px the bar cannot carry another 44px target without pushing the
   // burger off the edge, and the drawer already links to the panier.
@@ -232,7 +176,7 @@
   min-inline-size: 17px;
   padding: 0 4px;
   border-radius: var(--r-pill);
-  background-color: var(--c-teal-900);
+  background-color: var(--c-orange-600);
   color: var(--c-white);
   font-size: 10px;
   font-weight: var(--fw-bold);
@@ -247,7 +191,7 @@
   min-block-size: var(--tap-min);
   min-inline-size: var(--tap-min);
   justify-content: center;
-  color: var(--c-teal-900);
+  color: var(--c-orange-600);
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
   text-decoration: none;
@@ -284,7 +228,7 @@
   padding-inline: var(--sp-3);
   border: 1px solid transparent;
   border-radius: var(--r-pill);
-  color: var(--c-teal-900);
+  color: var(--c-orange-600);
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.06em;
@@ -355,7 +299,7 @@
 }
 
 .header__search-link {
-  color: var(--c-teal-900);
+  color: var(--c-orange-600);
 
   @include bp(md) {
     display: none;
@@ -363,7 +307,7 @@
 }
 
 .header__burger {
-  color: var(--c-teal-900);
+  color: var(--c-orange-600);
 
   @include bp(lg) {
     display: none;

@@ -225,36 +225,20 @@ test.describe('header', () => {
     });
   }
 
-  test('the wordmark and the burger are legible over the dark hero', async ({ page }) => {
+  test('the bar stays solid over the coloured hero, so the logo keeps its colours', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/fr/about');
     await page.waitForTimeout(300);
 
-    // The supplied logo's wordmark is dark grey; over the hero the ivory
-    // variant is the one shown.
-    const shown = await page.evaluate(() => {
-      const marks = [...document.querySelectorAll<HTMLImageElement>('.header__logo-mark')];
-      return marks
-        .filter((m) => Number(getComputedStyle(m).opacity) > 0.5)
-        .map((m) => m.getAttribute('src'));
-    });
-    expect(shown).toEqual(['/img/logo-on-dark.png']);
+    const shown = await page
+      .locator('.header__logo-mark')
+      .evaluateAll((marks) => marks.map((m) => m.getAttribute('src')));
+    expect(shown).toEqual(['/img/logo-on-light.png']);
 
-    // The burger was being drawn in near-black on the near-black hero.
-    const bars = await page.evaluate(
-      () => getComputedStyle(document.querySelector('.header__burger-lines span')!).backgroundColor,
-    );
-    expect(bars).toBe('rgb(255, 255, 255)');
-
-    await page.evaluate(() => window.scrollTo(0, 700));
-    await page.waitForTimeout(400);
-    const afterScroll = await page.evaluate(() => {
-      const marks = [...document.querySelectorAll<HTMLImageElement>('.header__logo-mark')];
-      return marks
-        .filter((m) => Number(getComputedStyle(m).opacity) > 0.5)
-        .map((m) => m.getAttribute('src'));
-    });
-    expect(afterScroll).toEqual(['/img/logo-on-light.png']);
+    const bar = await page
+      .locator('.header__bar')
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bar).toBe('rgb(255, 255, 255)');
   });
 });
 

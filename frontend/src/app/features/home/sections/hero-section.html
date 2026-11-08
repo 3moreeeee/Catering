@@ -166,8 +166,8 @@
         >
           <svg
             class="hero__category-icon"
-            width="22"
-            height="22"
+            width="34"
+            height="34"
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
@@ -175,28 +175,12 @@
               [attr.d]="icon(category.id)"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.7"
+              stroke-width="1.15"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
           <span>{{ category.shortName | localized }}</span>
-          <svg
-            class="hero__category-arrow"
-            width="7"
-            height="11"
-            viewBox="0 0 8 12"
-            aria-hidden="true"
-          >
-            <path
-              d="m1.5 1 5 5-5 5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
         </a>
       }
     </nav>

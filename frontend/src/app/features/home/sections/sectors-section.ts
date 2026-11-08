@@ -32,7 +32,7 @@ interface Scene {
   readonly copy: string;
   /** Catalogue URL parameters of this trade's selection. */
   readonly params: Readonly<Record<string, string>>;
-  /** File stem under /img/home/vitrine: 1800px `.webp` and `-1000.webp`. */
+  /** File stem under /img/home/vitrine/v3: 1800px `.webp` and `-1000.webp`. */
   readonly image: string;
   readonly hotspots: readonly Hotspot[];
 }

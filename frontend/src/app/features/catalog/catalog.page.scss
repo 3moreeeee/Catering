@@ -7,18 +7,28 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background-color: var(--c-teal-900);
+  background-color: var(--c-orange-600);
   color: var(--c-white);
 
-  // Legibility over the photograph, strongest where the text sits.
-  &::after {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: color-mix(in oklab, var(--c-teal-900) 78%, transparent);
+  // On a phone there is no room to set text over the scene without hiding its
+  // products, so the two stack: text on the section's colour, then the scene.
+  @include bp-down(md) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'crumbs'
+      'text'
+      'scene'
+      'aisles';
+  }
 
-    @include bp(md) {
+  // Grounds the aisles at the foot of the photograph.
+  @include bp(md) {
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      inset: 0;
       background: linear-gradient(to top, rgb(var(--c-dark-rgb) / 0.5), transparent 34%);
     }
   }
@@ -43,6 +53,20 @@
     transition: none;
   }
 
+  // Every scene shares one grid cell, so they can still cross-fade.
+  @include bp-down(md) {
+    position: relative;
+    inset: auto;
+    grid-area: scene;
+    block-size: auto;
+    aspect-ratio: 2200 / 1228;
+    // Enlarged from the right edge and trimmed to the frame, past the empty wall
+    // that holds the text on a wide screen, so the products fill a small one.
+    clip-path: inset(calc(var(--fade) * 0.62) 0 calc(var(--fade) * 0.38) var(--fade));
+    transform: scale(var(--zoom));
+    transform-origin: 100% 62%;
+  }
+
   // From tablet up the scene's left side dissolves into the section's colour,
   // leaving the text its own calm column and the products untouched.
   @include bp(md) {
@@ -52,13 +76,16 @@
 
   // Where each scene's wall ends, so the fade hides that edge exactly.
   --fade: 30%;
+  --zoom: 1.4286; // 1 / (1 - fade)
 
   &[data-scene='monin'] {
     --fade: 39.6%;
+    --zoom: 1.6556;
   }
 
   &[data-scene='hygiene'] {
     --fade: 37.6%;
+    --zoom: 1.6026;
   }
 }
 
@@ -67,9 +94,19 @@
   flex-direction: column;
   min-block-size: clamp(25rem, 36vw, 34rem);
   padding-block: var(--sp-5);
+
+  // Lets the text and the aisles take their places around the scene.
+  @include bp-down(md) {
+    display: contents;
+  }
 }
 
 .hero__crumbs {
+  @include bp-down(md) {
+    grid-area: crumbs;
+    padding: var(--sp-4) var(--gutter) 0;
+  }
+
   ol {
     display: flex;
     flex-wrap: wrap;
@@ -107,8 +144,14 @@
   margin-block: auto;
   padding-block: var(--sp-8);
 
+  @include bp-down(md) {
+    grid-area: text;
+    margin-block: 0;
+    padding: var(--sp-4) var(--gutter) var(--sp-5);
+  }
+
   @include bp(md) {
-    max-inline-size: min(38vw, 36rem);
+    max-inline-size: min(38vw, 30rem);
   }
 }
 
@@ -126,23 +169,41 @@
   line-height: var(--lh-snug);
 }
 
+.aisles {
+  @include bp-down(md) {
+    grid-area: aisles;
+    padding: var(--sp-3) var(--gutter) var(--sp-4);
+  }
+}
+
 .aisles ul {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(10.5rem, 1fr);
-  gap: 2px;
   margin: 0;
-  padding: 3px;
-  overflow-x: auto;
-  border-radius: var(--r-md);
-  background-color: rgb(var(--c-dark-rgb) / 0.72);
-  backdrop-filter: blur(14px);
+  padding: 0;
   list-style: none;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
 
-  &::-webkit-scrollbar {
-    display: none;
+  // Two rows on a phone, so every aisle, and the current one, is always in view:
+  // the two long names share the first row, the three short ones the second.
+  @include bp-down(md) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--sp-2);
+  }
+
+  @include bp(md) {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(10.5rem, 1fr);
+    gap: 2px;
+    padding: 3px;
+    overflow-x: auto;
+    border-radius: var(--r-md);
+    background-color: rgb(var(--c-dark-rgb) / 0.72);
+    backdrop-filter: blur(14px);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   @include bp(lg) {
@@ -153,6 +214,14 @@
 .aisles li {
   display: flex;
   scroll-snap-align: start;
+
+  @include bp-down(md) {
+    grid-column: span 2;
+
+    &:nth-child(-n + 2) {
+      grid-column: span 3;
+    }
+  }
 }
 
 .aisle {
@@ -167,6 +236,15 @@
   transition:
     background-color var(--d-fast) var(--ease-out),
     color var(--d-fast) var(--ease-out);
+
+  @include bp-down(md) {
+    justify-items: center;
+    align-content: center;
+    min-block-size: var(--tap-min);
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: var(--r-sm);
+    background-color: rgb(255 255 255 / 0.16);
+  }
 
   &:focus-visible {
     outline: 2px solid var(--c-white);
@@ -202,11 +280,15 @@
   }
 }
 
-.aisle.is-active:not([data-tone]) .aisle__name::before {
+.aisle.is-active .aisle__name::before {
   background-color: var(--c-teal-900);
 }
 
 .aisle__count {
+  @include bp-down(md) {
+    display: none;
+  }
+
   padding-inline-start: 1rem;
   color: rgb(255 255 255 / 0.78);
   font-size: var(--fs-xs);
@@ -355,7 +437,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   margin-block-end: var(--sp-5);
   padding-block: var(--sp-3);
   border-block-end: 1px solid var(--border-hairline);
@@ -364,6 +446,12 @@
 
 .catalog__count {
   flex: none;
+
+  // Beside the two controls, leaving the search its own row above them.
+  @include bp-down(md) {
+    font-size: var(--fs-body);
+  }
+
   min-block-size: 1lh;
   margin: 0;
   color: var(--c-teal-900);
@@ -376,7 +464,8 @@
 // beneath it only competes. Phones have an icon there, so they keep this one.
 .catalog__search {
   position: relative;
-  flex: 1 1 14rem;
+  flex: 1 1 100%;
+  order: -1;
   min-inline-size: 0;
 
   @include bp(md) {
@@ -418,6 +507,10 @@
     border-color: var(--c-teal-900);
   }
 
+  @include bp-down(sm) {
+    padding-inline: var(--sp-3);
+  }
+
   @include bp(md) {
     margin-inline-start: auto;
   }
@@ -433,9 +526,24 @@
   text-align: center;
 }
 
+// On a phone it takes whatever the count and the filter button leave, so a
+// longer count cannot push it onto a row of its own.
+.catalog__sort {
+  @include bp-down(md) {
+    flex: 1 1 6.5rem;
+    min-inline-size: 0;
+  }
+}
+
 .catalog__sort .control {
   inline-size: auto;
   min-inline-size: 11rem;
+
+  @include bp-down(md) {
+    inline-size: 100%;
+    min-inline-size: 0;
+    text-overflow: ellipsis;
+  }
 }
 
 .catalog__view {
@@ -444,6 +552,11 @@
   padding: 2px;
   border: 1px solid var(--border-neutral);
   border-radius: var(--r-sm);
+
+  // Below two columns the grid and the list are the same single column.
+  @include bp-down(sm) {
+    display: none;
+  }
 
   .btn--icon {
     inline-size: 38px;
@@ -514,7 +627,7 @@
   margin-block: clamp(var(--sp-6), 3vw, var(--sp-10));
   overflow: hidden;
   border-radius: var(--r-md);
-  background-color: var(--c-teal-900);
+  background-color: var(--c-orange-600);
   color: var(--c-white);
 
   &::after {
@@ -522,7 +635,7 @@
     position: absolute;
     z-index: -1;
     inset: 0;
-    background: linear-gradient(to right, rgb(var(--c-dark-rgb) / 0.9), transparent 68%);
+    background: linear-gradient(to right, var(--c-orange-600) 28%, transparent 68%);
   }
 }
 

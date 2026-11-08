@@ -89,7 +89,7 @@ const BENEFITS: readonly Benefit[] = [
       gap: var(--sp-5);
       padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.5rem, 4vw, 4rem);
       border-radius: var(--r-md);
-      background-color: var(--c-teal-900);
+      background-color: var(--c-orange-600);
       color: var(--c-white);
 
       @include bp(md) {

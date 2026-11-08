@@ -95,7 +95,7 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
       position: relative;
       display: block;
       overflow: hidden;
-      background-color: var(--c-forest-900);
+      background-color: var(--c-orange-600);
       /* Reserving the ratio is what keeps CLS at zero: the box is the right
          size before either the poster or the film has arrived. */
       aspect-ratio: var(--cm-ratio, 16 / 9);

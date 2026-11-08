@@ -5,9 +5,9 @@
         class="hero__image"
         [class.is-active]="heroScene() === scene"
         [attr.data-scene]="scene"
-        [src]="'/img/catalogue/' + scene + '.webp'"
+        [src]="'/img/catalogue/v3/' + scene + '.webp'"
         [attr.srcset]="
-          '/img/catalogue/' + scene + '-1000.webp 1000w, /img/catalogue/' + scene + '.webp 2200w'
+          '/img/catalogue/v3/' + scene + '-1000.webp 1000w, /img/catalogue/v3/' + scene + '.webp 2200w'
         "
         sizes="100vw"
         width="2200"
@@ -286,8 +286,8 @@
         <aside class="story">
           <img
             class="story__image"
-            src="/img/catalogue/delivery.webp"
-            srcset="/img/catalogue/delivery-1000.webp 1000w, /img/catalogue/delivery.webp 2200w"
+            src="/img/catalogue/v3/delivery.webp"
+            srcset="/img/catalogue/v3/delivery-1000.webp 1000w, /img/catalogue/v3/delivery.webp 2200w"
             sizes="(min-width: 1480px) 1416px, 96vw"
             width="2200"
             height="1228"

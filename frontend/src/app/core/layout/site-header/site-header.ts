@@ -28,8 +28,7 @@ import { CatalogStats } from '../../catalog/catalog-stats.service';
  * Sticky header.
  *
  * A solid white bar: logo, search, account and basket, with the navigation on
- * a second row. On a route with a dark hero it starts transparent and turns
- * solid once the user scrolls past a threshold.
+ * a second row.
  */
 @Component({
   selector: 'fk-site-header',
@@ -42,7 +41,6 @@ import { CatalogStats } from '../../catalog/catalog-stats.service';
     // Custom element hosts carry no implicit landmark role.
     role: 'banner',
     '[class.is-scrolled]': 'scrolled()',
-    '[class.is-transparent]': 'transparent()',
   },
 })
 export class SiteHeader {
@@ -65,11 +63,6 @@ export class SiteHeader {
   /** True once the drawer has been opened at least once in this session. */
   private hasOpened = false;
 
-  /** The header floats over the hero on dark-hero routes until the user scrolls. */
-  readonly transparent = computed(() => this.hasDarkHero() && !this.scrolled());
-
-  private readonly currentUrl = signal(this.router.url);
-
   readonly locale = this.locales.locale;
   readonly alternate = this.locales.alternate;
 
@@ -79,7 +72,6 @@ export class SiteHeader {
     void this.cart.refresh();
 
     this.router.events.subscribe(() => {
-      this.currentUrl.set(this.router.url);
       this.megaOpen.set(false);
       this.mobileOpen.set(false);
     });
@@ -100,15 +92,6 @@ export class SiteHeader {
       }
       this.burger()?.nativeElement.focus({ preventScroll: true });
     });
-  }
-
-  /**
-   * Routes whose first section is a dark full-bleed hero the header floats over.
-   * Everything else gets the solid white bar from the first pixel.
-   */
-  private hasDarkHero(): boolean {
-    const path = this.currentUrl().split('?')[0] ?? '';
-    return /^\/(en|fr)\/about\/?$/.test(path);
   }
 
   @HostListener('document:scroll')
