@@ -84,6 +84,18 @@ const FAMILY_PHOTOS: Readonly<Record<string, FamilyPhoto>> = {
     src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/vinto/158-surchaussure-en-non-tisse-bleue-les-100-pieces.v2.webp',
     metrics: { occupancy: 0.7312, width: 0.6531, bottom: 0.8656, reliable: true },
   },
+  balsamic: {
+    src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/ai-import/vinaigre-balsamique-de-modena-varvello-250ml_3gUS0kAOX.png',
+  },
+  'kitchen-utensils': {
+    src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/ai-import/planche_-_d-couper_E3jinADDn.png',
+  },
+  'food-packaging': {
+    src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/ai-import/bol-salade-kraft_WmdhYqTka.png',
+  },
+  'pastry-supplies': {
+    src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/ai-import/ruban_patisserie_y6jPtqTVA.png',
+  },
   masks: {
     src: 'https://ik.imagekit.io/0ygikjead/fk-catering/img/products/vinto/144-masque-de-protection-3-plis-type-1-les-50-pieces.v2.webp',
     metrics: { occupancy: 0.3344, width: 0.3937, bottom: 0.6844, reliable: true },
