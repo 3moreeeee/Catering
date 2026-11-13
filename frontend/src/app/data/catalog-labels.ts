@@ -1,7 +1,7 @@
 import { FacetValue } from '../shared/models/catalog.model';
 import { LocalizedText } from '../shared/models/localized-text.model';
 import { BRANDS } from './brands.data';
-import { CATEGORIES } from './categories.data';
+import { ALL_SUBCATEGORIES, CATEGORIES } from './categories.data';
 import { INDUSTRIES } from './industries.data';
 
 /**
@@ -23,13 +23,8 @@ export function facetLabel(kind: FacetKind, id: string): LocalizedText {
   switch (kind) {
     case 'categories':
       return CATEGORIES.find((category) => category.id === id)?.name ?? { en: id, fr: id };
-    case 'subcategories': {
-      for (const category of CATEGORIES) {
-        const sub = category.subcategories.find((s) => s.id === id);
-        if (sub) return sub.name;
-      }
-      return { en: id, fr: id };
-    }
+    case 'subcategories':
+      return ALL_SUBCATEGORIES.find((sub) => sub.id === id)?.name ?? { en: id, fr: id };
     case 'brands': {
       const name = BRANDS.find((brand) => brand.id === id)?.name ?? id;
       return { en: name, fr: name };

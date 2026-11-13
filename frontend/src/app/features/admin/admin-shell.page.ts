@@ -40,6 +40,11 @@ import { LocalizedRouter } from '../../core/i18n/localized-router.service';
                           d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 2.3L7 8l5 2.7L17 8l-5-2.7Zm-6 4.4v5.6l5 2.8v-5.7L6 9.7Zm7 8.4 5-2.8V9.7l-5 2.7v5.7Z"
                         />
                       }
+                      @case ('ai') {
+                        <path
+                          d="M10 3l1.9 5.1L17 10l-5.1 1.9L10 17l-1.9-5.1L3 10l5.1-1.9L10 3Zm8 10 .9 2.1L21 16l-2.1.9L18 19l-.9-2.1L15 16l2.1-.9L18 13Z"
+                        />
+                      }
                       @case ('offers') {
                         <path
                           d="M21 12 12 3H5a2 2 0 0 0-2 2v7l9 9 9-9ZM7.5 9A1.5 1.5 0 1 1 7.5 6a1.5 1.5 0 0 1 0 3Z"
@@ -102,6 +107,7 @@ export class AdminShellPage {
   readonly tabs = [
     { path: 'admin', label: 'dashboard.tabs.overview', icon: 'dashboard', exact: true },
     { path: 'admin/products', label: 'dashboard.tabs.products', icon: 'products', exact: false },
+    { path: 'admin/import', label: 'dashboard.tabs.aiImport', icon: 'ai', exact: false },
     { path: 'admin/offers', label: 'dashboard.tabs.offers', icon: 'offers', exact: false },
     { path: 'admin/quotes', label: 'dashboard.tabs.quotes', icon: 'quotes', exact: false },
     { path: 'admin/users', label: 'dashboard.tabs.users', icon: 'users', exact: false },

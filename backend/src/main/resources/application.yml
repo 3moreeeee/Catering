@@ -71,6 +71,20 @@ app:
     # Applies classpath:seed/catalog-reconciliation.json to an existing catalogue
     # (additions, corrections, deactivations), once. See CatalogReconciliationRunner.
     reconcile-on-startup: ${APP_CATALOG_RECONCILE:true}
+    # Makes the categories table match classpath:catalog/taxonomy.json at start.
+    sync-taxonomy: ${APP_CATALOG_SYNC_TAXONOMY:true}
+  # AI product importer (admin "Import IA"). Any OpenAI-compatible
+  # /chat/completions endpoint with a vision model. Left empty, the importer
+  # reports itself as not configured and nothing is sent anywhere.
+  ai:
+    base-url: ${AI_BASE_URL:}
+    api-key: ${AI_API_KEY:}
+    model: ${AI_MODEL:}
+    concurrency: ${AI_CONCURRENCY:2}
+    requests-per-minute: ${AI_REQUESTS_PER_MINUTE:10}
+    # ImageKit transformation stored on imported images; "none" keeps the original.
+    background-removal: ${AI_BACKGROUND_REMOVAL:e-bgremove}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:90}
 
 logging:
   level:

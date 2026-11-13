@@ -9,7 +9,7 @@ import {
   ProductQuery,
 } from '../../shared/models/catalog.model';
 import { PRODUCTS } from '../products.data';
-import { CATEGORIES } from '../categories.data';
+import { CATEGORIES, parentSubcategory } from '../categories.data';
 import { facetLabel, FacetKind } from '../catalog-labels';
 import { normalize } from './in-memory.repository';
 
@@ -168,9 +168,14 @@ export class InMemoryProductRepository {
       if (query.categories?.length && !query.categories.includes(product.categoryId)) {
         return false;
       }
+      // As in the API, a category also covers its sub-categories.
       if (
         query.subcategories?.length &&
-        (!product.subcategoryId || !query.subcategories.includes(product.subcategoryId))
+        (!product.subcategoryId ||
+          !query.subcategories.some(
+            (id) =>
+              id === product.subcategoryId || parentSubcategory(product.subcategoryId!)?.id === id,
+          ))
       ) {
         return false;
       }

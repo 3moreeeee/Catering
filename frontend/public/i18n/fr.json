@@ -848,7 +848,88 @@
       "products": "Produits",
       "offers": "Offres",
       "quotes": "Demandes de devis",
-      "users": "Utilisateurs"
+      "users": "Utilisateurs",
+      "aiImport": "Import IA"
+    },
+    "aiImport": {
+      "title": "Import de produits par IA",
+      "lead": "Déposez les photos des produits : l'IA rédige chaque fiche à partir de l'image et du nom du fichier. Vous vérifiez, saisissez le prix, puis publiez. Rien n'est mis en ligne sans votre validation.",
+      "model": "Modèle : {{model}}",
+      "notConfigured": "IA non configurée",
+      "dropTitle": "Glissez les images ici ou cliquez pour choisir",
+      "dropHint": "JPG, PNG, WebP ou AVIF, 10 Mo maximum par image. Le nom du fichier sert de titre au produit.",
+      "uploadProgress": "Envoi : {{done}} / {{total}}",
+      "upload": {
+        "waiting": "En attente",
+        "uploading": "Envoi…",
+        "done": "Envoyée",
+        "error": "Échec de l'envoi"
+      },
+      "views": {
+        "ACTIVE": "À traiter",
+        "PUBLISHED": "Publiés",
+        "DISCARDED": "Écartés"
+      },
+      "status": {
+        "QUEUED": "En file",
+        "PROCESSING": "En cours",
+        "READY": "À vérifier",
+        "FAILED": "Échec",
+        "PUBLISHED": "Publié",
+        "DISCARDED": "Écarté"
+      },
+      "loading": "Chargement…",
+      "empty": "Aucune image dans cette liste.",
+      "original": "Original",
+      "cleaned": "Fond retiré",
+      "queuedHint": "En attente de l'IA.",
+      "processingHint": "L'IA analyse l'image…",
+      "failedHint": "L'IA n'a pas pu produire de fiche.",
+      "publishedCreate": "Produit créé et publié dans le catalogue.",
+      "publishedReplace": "Image du produit existant remplacée.",
+      "discardedHint": "Image écartée, rien n'a été publié.",
+      "actionLabel": "Ce produit existe peut-être déjà",
+      "actionReplace": "Remplacer l'image de « {{name}} »",
+      "actionCreate": "Créer un nouveau produit",
+      "replaceHint": "L'image du produit existant est remplacée ; son nom, sa fiche et son lot restent inchangés. Videz le prix pour garder le prix actuel.",
+      "priceFound": "Prix trouvé dans la liste :",
+      "priceLists": {
+        "title": "Listes de prix",
+        "lead": "Chargez une fois les listes de prix en PDF : l'IA y retrouve le prix de chaque photo. Une nouvelle édition remplace l'ancienne.",
+        "add": "Ajouter des PDF",
+        "rows": "{{count}} lignes",
+        "empty": "Aucune liste de prix chargée : les prix devront être saisis à la main."
+      },
+      "fields": {
+        "nameFr": "Nom (français)",
+        "nameEn": "Nom (anglais)",
+        "shortDescriptionFr": "Accroche (français)",
+        "shortDescriptionEn": "Accroche (anglais)",
+        "descriptionFr": "Description (français)",
+        "descriptionEn": "Description (anglais)",
+        "category": "Division",
+        "subcategory": "Sous-catégorie",
+        "brand": "Marque",
+        "format": "Format",
+        "industries": "Secteurs",
+        "saleMode": "Mode de vente",
+        "price": "Prix (TND)",
+        "unitPrice": "Prix unitaire (TND)",
+        "newUnitPrice": "Nouveau prix unitaire (TND)",
+        "newPrice": "Nouveau prix (TND)",
+        "packQuantity": "Pièces par lot",
+        "unitLabel": "Unité"
+      },
+      "saleMode": {
+        "UNIT": "À l'unité",
+        "PACK_ONLY": "Par lot uniquement"
+      },
+      "publish": "Publier",
+      "replace": "Remplacer l'image",
+      "working": "Enregistrement…",
+      "regenerate": "Relancer l'IA",
+      "retry": "Réessayer",
+      "discard": "Écarter"
     },
     "stats": {
       "newQuotes": "Nouvelles demandes",

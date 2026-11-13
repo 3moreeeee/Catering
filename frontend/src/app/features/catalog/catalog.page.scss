@@ -423,6 +423,61 @@
   font-size: var(--fs-xs);
 }
 
+// A category of the tree that has no product yet stays listed, but recedes.
+.family.is-empty {
+  opacity: 0.55;
+}
+
+// -----------------------------------------------------------------------------
+// SUB-CATEGORIES: the third level of the category being browsed.
+// -----------------------------------------------------------------------------
+.subfamilies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-block: calc(var(--sp-2) * -1) var(--sp-4);
+}
+
+.subfamily {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: 2.5rem;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border-neutral, var(--c-teal-900));
+  border-radius: 999px;
+  background: var(--surface, #fff);
+  color: var(--c-teal-900);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+
+  @include focusable;
+
+  &:hover {
+    border-color: var(--c-teal-900);
+  }
+
+  &.is-active {
+    border-color: var(--c-teal-900);
+    background: var(--c-teal-900);
+    color: var(--c-ivory-100);
+
+    .subfamily__count {
+      color: inherit;
+    }
+  }
+
+  &.is-empty:not(.is-active) {
+    opacity: 0.55;
+  }
+}
+
+.subfamily__count {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
 // -----------------------------------------------------------------------------
 // TOOLBAR: stays reachable while scrolling a long list.
 // -----------------------------------------------------------------------------

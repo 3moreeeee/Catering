@@ -848,7 +848,88 @@
       "products": "Products",
       "offers": "Offers",
       "quotes": "Quote requests",
-      "users": "Users"
+      "users": "Users",
+      "aiImport": "AI import"
+    },
+    "aiImport": {
+      "title": "AI product import",
+      "lead": "Drop product photos: the AI writes each product sheet from the image and the file name. You check it, enter the price, then publish. Nothing goes live without your approval.",
+      "model": "Model: {{model}}",
+      "notConfigured": "AI not configured",
+      "dropTitle": "Drag images here or click to choose",
+      "dropHint": "JPG, PNG, WebP or AVIF, 10 MB max per image. The file name is used as the product title.",
+      "uploadProgress": "Uploaded: {{done}} / {{total}}",
+      "upload": {
+        "waiting": "Waiting",
+        "uploading": "Uploading…",
+        "done": "Uploaded",
+        "error": "Upload failed"
+      },
+      "views": {
+        "ACTIVE": "To review",
+        "PUBLISHED": "Published",
+        "DISCARDED": "Discarded"
+      },
+      "status": {
+        "QUEUED": "Queued",
+        "PROCESSING": "Processing",
+        "READY": "To review",
+        "FAILED": "Failed",
+        "PUBLISHED": "Published",
+        "DISCARDED": "Discarded"
+      },
+      "loading": "Loading…",
+      "empty": "No images in this list.",
+      "original": "Original",
+      "cleaned": "Background removed",
+      "queuedHint": "Waiting for the AI.",
+      "processingHint": "The AI is reading the image…",
+      "failedHint": "The AI could not produce a product sheet.",
+      "publishedCreate": "Product created and published to the catalogue.",
+      "publishedReplace": "Image of the existing product replaced.",
+      "discardedHint": "Image discarded; nothing was published.",
+      "actionLabel": "This product may already exist",
+      "actionReplace": "Replace the image of “{{name}}”",
+      "actionCreate": "Create a new product",
+      "replaceHint": "The existing product's image is replaced; its name, sheet and lot stay as they are. Clear the price to keep the current one.",
+      "priceFound": "Price found in the list:",
+      "priceLists": {
+        "title": "Price lists",
+        "lead": "Load the PDF price lists once: the AI finds each photo's price in them. A new edition replaces the old one.",
+        "add": "Add PDFs",
+        "rows": "{{count}} rows",
+        "empty": "No price list loaded: prices will have to be typed by hand."
+      },
+      "fields": {
+        "nameFr": "Name (French)",
+        "nameEn": "Name (English)",
+        "shortDescriptionFr": "Tagline (French)",
+        "shortDescriptionEn": "Tagline (English)",
+        "descriptionFr": "Description (French)",
+        "descriptionEn": "Description (English)",
+        "category": "Division",
+        "subcategory": "Subcategory",
+        "brand": "Brand",
+        "format": "Format",
+        "industries": "Industries",
+        "saleMode": "Sale mode",
+        "price": "Price (TND)",
+        "unitPrice": "Unit price (TND)",
+        "newUnitPrice": "New unit price (TND)",
+        "newPrice": "New price (TND)",
+        "packQuantity": "Pieces per pack",
+        "unitLabel": "Unit"
+      },
+      "saleMode": {
+        "UNIT": "By the unit",
+        "PACK_ONLY": "By the pack only"
+      },
+      "publish": "Publish",
+      "replace": "Replace image",
+      "working": "Saving…",
+      "regenerate": "Run the AI again",
+      "retry": "Retry",
+      "discard": "Discard"
     },
     "stats": {
       "newQuotes": "New requests",

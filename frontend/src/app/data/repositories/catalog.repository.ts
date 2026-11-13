@@ -11,10 +11,12 @@ import {
   ProductQuery,
 } from '../../shared/models/catalog.model';
 
-/** Catalogue sizes for counters: in total, per division and per brand. */
+/** Catalogue sizes for counters: in total, per division, per filed sub-category id and per brand. */
 export interface CatalogStats {
   readonly total: number;
   readonly categories: Readonly<Partial<Record<CategoryId, number>>>;
+  /** Products per category or sub-category id they are filed under (not rolled up). */
+  readonly subcategories: Readonly<Record<string, number>>;
   readonly brands: Readonly<Record<string, number>>;
 }
 

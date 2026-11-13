@@ -19,13 +19,28 @@ import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { SeoService } from '../../core/seo/seo.service';
 import { StructuredDataService } from '../../core/seo/structured-data.service';
-import { ProductImage, SORT_OPTIONS, SortOption } from '../../shared/models/catalog.model';
+import {
+  ProductImage,
+  SORT_OPTIONS,
+  SortOption,
+  Subcategory,
+} from '../../shared/models/catalog.model';
+import { LocalizedText } from '../../shared/models/localized-text.model';
 import { uniformImageFit } from '../../shared/utils/product-image-fit';
 import { LocalizedTextPipe } from '../../shared/pipes/localized-text.pipe';
-import { CATEGORIES } from '../../data/categories.data';
+import { CATEGORIES, parentSubcategory } from '../../data/categories.data';
 
 /** Products shown before the banner: two rows of four. */
 const STORY_AFTER = 8;
+
+/** One category of the shelf above the grid. */
+interface FamilyChip {
+  readonly id: string;
+  readonly label: LocalizedText;
+  /** Products in the category and its sub-categories, for the current filters. */
+  readonly count: number;
+  readonly photo: ProductImage | null;
+}
 
 /**
  * Catalogue listing.
@@ -64,8 +79,52 @@ export class CatalogPage {
   readonly aisles = CATEGORIES;
   readonly heroScenes = ['all', ...CATEGORIES.map((category) => category.id)];
   readonly heroScene = computed(() => this.category()?.id ?? 'all');
-  readonly families = computed(() => this.store.facets().subcategories);
-  readonly familyImageOf = familyImage;
+  /**
+   * The categories of the division on screen (all divisions on "All products"),
+   * in the tree's order, each counted with its sub-categories. A category with
+   * no product is left out until it receives one, unless it is the one being
+   * browsed — a menu or shared link to it must not land on a missing shelf.
+   */
+  readonly families = computed<readonly FamilyChip[]>(() => {
+    const counts = this.facetCounts();
+    const scope = this.category() ? [this.category()!] : CATEGORIES;
+    return scope
+      .flatMap((division) => division.subcategories)
+      .map((sub) => this.chip(sub, counts))
+      .filter((chip) => chip.count > 0 || this.isFamilyActive(chip.id));
+  });
+
+  /** The second-level category being browsed, whether it or one of its sub-categories is selected. */
+  readonly activeFamily = computed<Subcategory | null>(() => {
+    const selected = this.store.query().subcategories ?? [];
+    return selected.length === 1 ? parentSubcategory(selected[0]!) : null;
+  });
+
+  /** The third level of the category being browsed ("Gobelets en PET", "Gobelets en carton"…). */
+  readonly subFamilies = computed<readonly FamilyChip[]>(() => {
+    const counts = this.facetCounts();
+    return (this.activeFamily()?.children ?? [])
+      .map((sub) => this.chip(sub, counts))
+      .filter((chip) => chip.count > 0 || this.isSubFamilyActive(chip.id));
+  });
+
+  private readonly facetCounts = computed(
+    () => new Map(this.store.facets().subcategories.map((facet) => [facet.id, facet.count])),
+  );
+
+  private chip(sub: Subcategory, counts: ReadonlyMap<string, number>): FamilyChip {
+    const children = sub.children ?? [];
+    return {
+      id: sub.id,
+      label: sub.name,
+      count:
+        (counts.get(sub.id) ?? 0) +
+        children.reduce((sum, child) => sum + (counts.get(child.id) ?? 0), 0),
+      // A category without a photograph of its own borrows its first sub-category's.
+      photo:
+        familyImage(sub.id) ?? children.map((child) => familyImage(child.id)).find(Boolean) ?? null,
+    };
+  }
 
   readonly activeFilterCount = computed(() => {
     const query = this.store.query();
@@ -91,7 +150,21 @@ export class CatalogPage {
   }
 
   isFamilyActive(id: string): boolean {
-    return this.store.query().subcategories?.includes(id) ?? false;
+    return this.activeFamily()?.id === id;
+  }
+
+  isSubFamilyActive(id: string): boolean {
+    return this.store.query().subcategories?.[0] === id;
+  }
+
+  /** A category toggles between itself and the whole division. */
+  selectFamily(id: string): void {
+    this.store.selectSub(this.isFamilyActive(id) ? null : id);
+  }
+
+  /** A sub-category toggles between itself and its parent category. */
+  selectSubFamily(id: string): void {
+    this.store.selectSub(this.isSubFamilyActive(id) ? (this.activeFamily()?.id ?? null) : id);
   }
   readonly filtersOpen = signal(false);
   searchTerm = '';

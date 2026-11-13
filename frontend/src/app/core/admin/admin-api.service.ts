@@ -122,6 +122,25 @@ export interface AdminCategory {
   readonly subcategories: readonly AdminCategory[];
 }
 
+/**
+ * A division's categories and their sub-categories as one list for a select,
+ * each sub-category named "Verres et gobelets › Gobelets en PET".
+ */
+export function flattenSubcategories(
+  division: AdminCategory | undefined,
+): readonly AdminCategory[] {
+  return (division?.subcategories ?? []).flatMap((category) => [
+    category,
+    ...category.subcategories.map((sub) => ({
+      ...sub,
+      name: {
+        fr: `${category.name.fr} › ${sub.name.fr}`,
+        en: `${category.name.en} › ${sub.name.en}`,
+      },
+    })),
+  ]);
+}
+
 export interface AdminBrand {
   readonly id: string;
   readonly externalId: string;
@@ -186,6 +205,93 @@ export interface UploadedMedia {
   readonly url: string;
   readonly width: number | null;
   readonly height: number | null;
+}
+
+export type ImportStatus = 'QUEUED' | 'PROCESSING' | 'READY' | 'FAILED' | 'PUBLISHED' | 'DISCARDED';
+export type ImportAction = 'CREATE' | 'REPLACE_IMAGE';
+
+/** One photograph in the AI importer and the product the model proposed for it. */
+export interface ImportItem {
+  readonly id: string;
+  readonly status: ImportStatus;
+  readonly action: ImportAction | null;
+  readonly originalFilename: string;
+  readonly imageUrl: string;
+  readonly displayUrl: string;
+  readonly imageWidth: number | null;
+  readonly imageHeight: number | null;
+  readonly nameFr: string | null;
+  readonly nameEn: string | null;
+  readonly shortDescriptionFr: string | null;
+  readonly shortDescriptionEn: string | null;
+  readonly descriptionFr: string | null;
+  readonly descriptionEn: string | null;
+  readonly categoryId: string | null;
+  readonly subcategoryId: string | null;
+  readonly brandId: string | null;
+  readonly industries: readonly string[];
+  readonly formatValue: string | null;
+  readonly packQuantity: number | null;
+  readonly unitLabel: string | null;
+  readonly matchedProductId: string | null;
+  readonly matchedProductName: string | null;
+  readonly matchScore: number | null;
+  readonly publishedProductId: string | null;
+  readonly model: string | null;
+  readonly error: string | null;
+  /** Set when the file name contradicts the label the model read on the photo. */
+  readonly warning: string | null;
+  /** The price-list row the price was taken from ("Liste des Couverts — FOURCHETTE EN BOIS — 0,090 …"). */
+  readonly priceSource: string | null;
+  /** How the price was derived, or why none was found. */
+  readonly priceNote: string | null;
+  readonly suggestedSaleMode: 'UNIT' | 'PACK_ONLY' | null;
+  /** Unit price for PACK_ONLY, price of one lot for UNIT; copied from the price list. */
+  readonly suggestedPrice: number | null;
+  readonly attempts: number;
+  readonly createdAt: string;
+}
+
+/** One loaded company price list. */
+export interface PriceList {
+  readonly listName: string;
+  readonly sourceFile: string;
+  readonly rows: number;
+  readonly uploadedAt: string;
+}
+
+export interface ImportList {
+  readonly configured: boolean;
+  readonly model: string | null;
+  readonly counts: Readonly<Record<ImportStatus, number>>;
+  readonly items: readonly ImportItem[];
+}
+
+/** Mirrors ProductImportDtos.UpdateRequest field for field. */
+export interface ImportUpdatePayload {
+  readonly action: ImportAction;
+  readonly matchedProductId: string | null;
+  readonly nameFr: string;
+  readonly nameEn: string | null;
+  readonly shortDescriptionFr: string | null;
+  readonly shortDescriptionEn: string | null;
+  readonly descriptionFr: string | null;
+  readonly descriptionEn: string | null;
+  readonly categoryId: string;
+  readonly subcategoryId: string | null;
+  readonly brandId: string | null;
+  readonly industries: readonly string[];
+  readonly formatValue: string | null;
+  readonly packQuantity: number | null;
+  readonly unitLabel: string | null;
+}
+
+/** The price is typed by the administrator; the model never proposes one. */
+export interface ImportPublishPayload {
+  /** Null keeps an existing product's price when only its photo is replaced. */
+  readonly saleMode: 'UNIT' | 'PACK_ONLY' | null;
+  readonly price: number | null;
+  readonly unitPrice: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -286,6 +392,67 @@ export class AdminApiService {
     body.append('file', file, file.name);
     return firstValueFrom(
       this.http.put<UploadedMedia>(`${this.apiUrl}/admin/media/product-image`, body, this.options),
+    );
+  }
+
+  imports(status: 'ACTIVE' | 'ALL' | ImportStatus = 'ACTIVE'): Promise<ImportList> {
+    return firstValueFrom(
+      this.http.get<ImportList>(`${this.apiUrl}/admin/imports`, {
+        ...this.options,
+        params: new HttpParams().set('status', status),
+      }),
+    );
+  }
+
+  /** One file per request: the API caps a request at 11 MB. */
+  uploadImport(file: File): Promise<readonly ImportItem[]> {
+    const body = new FormData();
+    body.append('files', file, file.name);
+    return firstValueFrom(
+      this.http.post<ImportItem[]>(`${this.apiUrl}/admin/imports`, body, this.options),
+    );
+  }
+
+  updateImport(id: string, payload: ImportUpdatePayload): Promise<ImportItem> {
+    return firstValueFrom(
+      this.http.put<ImportItem>(`${this.apiUrl}/admin/imports/${id}`, payload, this.options),
+    );
+  }
+
+  publishImport(id: string, payload: ImportPublishPayload): Promise<ImportItem> {
+    return firstValueFrom(
+      this.http.post<ImportItem>(
+        `${this.apiUrl}/admin/imports/${id}/publish`,
+        payload,
+        this.options,
+      ),
+    );
+  }
+
+  retryImport(id: string): Promise<ImportItem> {
+    return firstValueFrom(
+      this.http.post<ImportItem>(`${this.apiUrl}/admin/imports/${id}/retry`, {}, this.options),
+    );
+  }
+
+  priceLists(): Promise<readonly PriceList[]> {
+    return firstValueFrom(
+      this.http.get<PriceList[]>(`${this.apiUrl}/admin/imports/price-lists`, this.options),
+    );
+  }
+
+  /** A list replaces the earlier edition of the same name. */
+  uploadPriceList(file: File): Promise<readonly PriceList[]> {
+    const body = new FormData();
+    body.append('files', file, file.name);
+    return firstValueFrom(
+      this.http.post<PriceList[]>(`${this.apiUrl}/admin/imports/price-lists`, body, this.options),
+    );
+  }
+
+  discardImport(id: string): Promise<void> {
+    return firstValueFrom(
+      this.http.delete<void>(`${this.apiUrl}/admin/imports/${id}`, this.options),
     );
   }
 

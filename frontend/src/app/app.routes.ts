@@ -93,6 +93,11 @@ export const routes: Routes = [
               import('./features/admin/products-admin.page').then((m) => m.ProductsAdminPage),
           },
           {
+            path: 'import',
+            loadComponent: () =>
+              import('./features/admin/ai-import-admin.page').then((m) => m.AiImportAdminPage),
+          },
+          {
             path: 'quotes',
             loadComponent: () =>
               import('./features/admin/quotes-admin.page').then((m) => m.QuotesAdminPage),

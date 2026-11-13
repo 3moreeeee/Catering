@@ -193,12 +193,16 @@ public class CatalogueQueryService {
         for (FacetValueResponse value : facet(all, visibility, product -> product.get("categoryId"))) {
             categories.put(value.id(), value.count());
         }
+        Map<String, Long> subcategories = new LinkedHashMap<>();
+        for (FacetValueResponse value : facet(all, visibility, product -> product.get("subcategoryId"))) {
+            subcategories.put(value.id(), value.count());
+        }
         Map<String, Long> brands = new LinkedHashMap<>();
         for (FacetValueResponse value : facet(all, visibility, product -> product.get("brandId"))) {
             brands.put(value.id(), value.count());
         }
         long total = categories.values().stream().mapToLong(Long::longValue).sum();
-        return new CatalogStatsResponse(total, categories, brands);
+        return new CatalogStatsResponse(total, categories, subcategories, brands);
     }
 
     public ProductResponse bySlug(String slug) {
@@ -312,7 +316,17 @@ public class CatalogueQueryService {
         List<Predicate> where = new ArrayList<>();
         where.add(visible(cb, product, visibility));
         if (!catalog.categories().isEmpty()) where.add(product.get("categoryId").in(catalog.categories()));
-        if (!catalog.subcategories().isEmpty()) where.add(product.get("subcategoryId").in(catalog.subcategories()));
+        if (!catalog.subcategories().isEmpty()) {
+            // A category also covers its sub-categories: "Verres et gobelets"
+            // lists the products filed under "Gobelets en PET" as well.
+            Subquery<String> children = query.subquery(String.class);
+            Root<tn.com.catering.identity.entities.Category> child =
+                    children.from(tn.com.catering.identity.entities.Category.class);
+            children.select(child.get("externalId")).where(child.get("parentExternalId").in(catalog.subcategories()));
+            where.add(cb.or(
+                    product.get("subcategoryId").in(catalog.subcategories()),
+                    product.get("subcategoryId").in(children)));
+        }
         if (!catalog.brands().isEmpty()) where.add(product.get("brandId").in(catalog.brands()));
         if (!catalog.industries().isEmpty()) {
             Subquery<UUID> tagged = query.subquery(UUID.class);

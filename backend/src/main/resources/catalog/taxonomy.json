@@ -1,0 +1,124 @@
+{
+  "_comment": "The catalogue category tree: division > category > sub-category, modelled on vinto.tn (same families, same order) with its duplicates and typos removed. Ids are stable and unique across the whole tree; several reuse earlier ids so existing products keep their place. TaxonomySynchronizer applies this file to the database at startup. frontend/src/app/data/categories.data.ts must list the same tree.",
+  "divisions": [
+    {
+      "id": "food", "nameFr": "Agro-alimentaire", "nameEn": "Food",
+      "children": [
+        { "id": "balsamic", "nameFr": "Vinaigre & crème de balsamique", "nameEn": "Balsamic vinegar & glaze",
+          "children": [
+            { "id": "balsamic-vinegar", "nameFr": "Vinaigre de balsamique", "nameEn": "Balsamic vinegar" },
+            { "id": "balsamic-cream", "nameFr": "Crème de vinaigre balsamique", "nameEn": "Balsamic glaze" }
+          ] },
+        { "id": "sauces-dressings", "nameFr": "Sauces et condiments", "nameEn": "Sauces & condiments",
+          "children": [
+            { "id": "ketchup", "nameFr": "Ketchup", "nameEn": "Ketchup" },
+            { "id": "mayonnaise", "nameFr": "Mayonnaise", "nameEn": "Mayonnaise" },
+            { "id": "mustard", "nameFr": "Moutarde", "nameEn": "Mustard" },
+            { "id": "barbecue", "nameFr": "Barbecue", "nameEn": "Barbecue" },
+            { "id": "asian-sauces", "nameFr": "Sauces asiatiques", "nameEn": "Asian sauces" }
+          ] },
+        { "id": "canned", "nameFr": "Conserves", "nameEn": "Canned goods",
+          "children": [
+            { "id": "sweet-corn", "nameFr": "Maïs doux", "nameEn": "Sweet corn" },
+            { "id": "sliced-mushrooms", "nameFr": "Champignons en tranches", "nameEn": "Sliced mushrooms" },
+            { "id": "red-beans", "nameFr": "Haricots rouges", "nameEn": "Red kidney beans" },
+            { "id": "white-beans", "nameFr": "Haricots blancs", "nameEn": "White beans" },
+            { "id": "green-peas", "nameFr": "Petits pois", "nameEn": "Green peas" }
+          ] }
+      ]
+    },
+    {
+      "id": "packaging", "nameFr": "Emballage", "nameEn": "Packaging",
+      "children": [
+        { "id": "verrines-picks", "nameFr": "Verrines et piques", "nameEn": "Verrines & picks",
+          "children": [
+            { "id": "verrines", "nameFr": "Verrines", "nameEn": "Verrines" },
+            { "id": "picks", "nameFr": "Piques", "nameEn": "Picks" }
+          ] },
+        { "id": "cups-glasses", "nameFr": "Verres et gobelets", "nameEn": "Cups & glasses",
+          "children": [
+            { "id": "pet-cups", "nameFr": "Gobelets en PET", "nameEn": "PET cups" },
+            { "id": "paper-cups", "nameFr": "Gobelets en carton", "nameEn": "Paper cups" },
+            { "id": "eps-cups", "nameFr": "Gobelets en EPS", "nameEn": "EPS cups" },
+            { "id": "glassware", "nameFr": "Verres en polycarbonate", "nameEn": "Polycarbonate glasses" }
+          ] },
+        { "id": "kitchen-utensils", "nameFr": "Ustensiles de cuisine", "nameEn": "Kitchen utensils",
+          "children": [
+            { "id": "serving-trays", "nameFr": "Plateaux de service", "nameEn": "Serving trays" },
+            { "id": "polycarbonate-containers", "nameFr": "Bacs en polycarbonate", "nameEn": "Polycarbonate containers" },
+            { "id": "polypropylene-containers", "nameFr": "Bacs en polypropylène", "nameEn": "Polypropylene containers" },
+            { "id": "cutting-boards", "nameFr": "Planches à découper", "nameEn": "Cutting boards" },
+            { "id": "ice-scoops", "nameFr": "Pelles à glaçons", "nameEn": "Ice scoops" }
+          ] },
+        { "id": "straws", "nameFr": "Pailles", "nameEn": "Straws",
+          "children": [
+            { "id": "plastic-straws", "nameFr": "Pailles en plastique", "nameEn": "Plastic straws" },
+            { "id": "paper-straws", "nameFr": "Pailles en papier", "nameEn": "Paper straws" }
+          ] },
+        { "id": "food-packaging", "nameFr": "Emballages alimentaires", "nameEn": "Food packaging",
+          "children": [
+            { "id": "food-containers", "nameFr": "Contenants alimentaires", "nameEn": "Food containers" },
+            { "id": "kraft-packaging", "nameFr": "Emballages en kraft", "nameEn": "Kraft packaging" },
+            { "id": "cardboard-packaging", "nameFr": "Emballages en carton", "nameEn": "Cardboard packaging" },
+            { "id": "eps-packaging", "nameFr": "Emballages en EPS", "nameEn": "EPS packaging" },
+            { "id": "microwave-trays", "nameFr": "Barquettes micro-ondables", "nameEn": "Microwavable trays" },
+            { "id": "sauce-pots", "nameFr": "Pots à sauce", "nameEn": "Sauce pots" },
+            { "id": "cling-film", "nameFr": "Film étirable", "nameEn": "Cling film" },
+            { "id": "aluminium-foil", "nameFr": "Papier aluminium", "nameEn": "Aluminium foil" }
+          ] },
+        { "id": "cutlery-serving", "nameFr": "Couverts", "nameEn": "Cutlery",
+          "children": [
+            { "id": "plastic-cutlery", "nameFr": "Couverts en plastique", "nameEn": "Plastic cutlery" },
+            { "id": "wooden-cutlery", "nameFr": "Couverts en bois", "nameEn": "Wooden cutlery" },
+            { "id": "coffee-stirrers", "nameFr": "Agitateurs à café", "nameEn": "Coffee stirrers" }
+          ] },
+        { "id": "pastry-supplies", "nameFr": "Consommables pâtisserie", "nameEn": "Pastry supplies",
+          "children": [
+            { "id": "pastry-ribbon", "nameFr": "Ruban pâtissier", "nameEn": "Pastry ribbon" },
+            { "id": "piping-bags", "nameFr": "Poches à douille", "nameEn": "Piping bags" },
+            { "id": "baking-paper", "nameFr": "Papier cuisson", "nameEn": "Baking paper" },
+            { "id": "doilies", "nameFr": "Papier dentelle", "nameEn": "Paper doilies" },
+            { "id": "baking-cups", "nameFr": "Caissettes à pâtisserie", "nameEn": "Baking cups" }
+          ] }
+      ]
+    },
+    {
+      "id": "monin", "nameFr": "MONIN", "nameEn": "MONIN",
+      "children": [
+        { "id": "syrups", "nameFr": "Sirops", "nameEn": "Syrups" },
+        { "id": "sauces", "nameFr": "Sauces", "nameEn": "Sauces" },
+        { "id": "fruit-purees", "nameFr": "Purées", "nameEn": "Purées" },
+        { "id": "frappe-bases", "nameFr": "Frappés", "nameEn": "Frappés" },
+        { "id": "bar-tools", "nameFr": "Accessoires barista", "nameEn": "Barista accessories" }
+      ]
+    },
+    {
+      "id": "hygiene", "nameFr": "Hygiène", "nameEn": "Hygiene",
+      "children": [
+        { "id": "paper-wiping", "nameFr": "Papier cellulose", "nameEn": "Cellulose paper",
+          "children": [
+            { "id": "paper-napkins", "nameFr": "Serviettes en papier", "nameEn": "Paper napkins" },
+            { "id": "toilet-paper", "nameFr": "Papier hygiénique", "nameEn": "Toilet paper" },
+            { "id": "paper-towels", "nameFr": "Essuie-tout", "nameEn": "Paper towels" }
+          ] },
+        { "id": "gloves", "nameFr": "Gants", "nameEn": "Gloves",
+          "children": [
+            { "id": "latex-gloves", "nameFr": "Gants en latex", "nameEn": "Latex gloves" },
+            { "id": "vinyl-gloves", "nameFr": "Gants en vinyle", "nameEn": "Vinyl gloves" },
+            { "id": "nitrile-gloves", "nameFr": "Gants en nitrile", "nameEn": "Nitrile gloves" },
+            { "id": "polyethylene-gloves", "nameFr": "Gants en polyéthylène", "nameEn": "Polyethylene gloves" }
+          ] },
+        { "id": "kitchen-wear", "nameFr": "Consommables pour cuisine et restauration", "nameEn": "Kitchen & catering wear",
+          "children": [
+            { "id": "masks", "nameFr": "Masques de protection", "nameEn": "Face masks" },
+            { "id": "headwear", "nameFr": "Coiffes", "nameEn": "Hair nets & caps" },
+            { "id": "chef-hats", "nameFr": "Toques et calots", "nameEn": "Chef hats & forage caps" },
+            { "id": "footwear", "nameFr": "Surchaussures", "nameEn": "Overshoes" },
+            { "id": "aprons-coats", "nameFr": "Tabliers et blouses", "nameEn": "Aprons & coats" },
+            { "id": "sleeves", "nameFr": "Manchettes", "nameEn": "Sleeve covers" }
+          ] },
+        { "id": "cleaning-chemicals", "nameFr": "Détergents", "nameEn": "Detergents" }
+      ]
+    }
+  ]
+}

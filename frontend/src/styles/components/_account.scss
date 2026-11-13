@@ -1309,3 +1309,251 @@ $dash-grid: var(--border-neutral);
   background: var(--surface-inset);
   font-size: var(--fs-h4);
 }
+
+/* ---------------------------------------------------------------------------
+   AI product import (admin > Import IA)
+   ------------------------------------------------------------------------ */
+
+.ai-drop {
+  position: relative;
+  display: grid;
+  gap: var(--sp-2);
+  place-items: center;
+  padding: var(--sp-6, 32px) var(--sp-4);
+  border: 2px dashed var(--border-neutral);
+  border-radius: 14px;
+  background: var(--surface-inset);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  span {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+  }
+
+  &.is-over {
+    border-color: var(--c-copper-500);
+    background: color-mix(in oklab, var(--c-copper-500) 8%, var(--surface-inset));
+  }
+
+  &.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    input {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.ai-uploads {
+  display: grid;
+  gap: var(--sp-1, 4px);
+  max-block-size: 220px;
+  margin: var(--sp-3, 12px) 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  font-size: var(--fs-xs);
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3, 12px);
+    padding: var(--sp-1, 4px) var(--sp-2);
+    border-radius: 8px;
+    background: var(--surface-alt);
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  li[data-state='error'] {
+    color: var(--c-error);
+  }
+}
+
+.ai-views,
+.ai-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.ai-items {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.ai-item {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+
+  &[data-status='FAILED'] {
+    border-color: color-mix(in srgb, var(--c-error) 35%, var(--border-neutral));
+  }
+
+  &[data-status='PUBLISHED'],
+  &[data-status='DISCARDED'] {
+    opacity: 0.8;
+  }
+}
+
+.ai-item__images {
+  display: grid;
+  gap: var(--sp-2);
+  align-content: start;
+
+  figure {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 10px;
+    background: var(--surface-inset);
+  }
+
+  figcaption {
+    margin-block-start: var(--sp-1, 4px);
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+  }
+}
+
+/* A checkerboard shows that the background really is transparent. */
+.ai-item__clean img {
+  background: repeating-conic-gradient(var(--surface-alt) 0 25%, var(--surface-inset) 0 50%) 0 0 /
+    16px 16px;
+}
+
+.ai-item__body {
+  display: grid;
+  gap: var(--sp-3, 12px);
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.ai-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3, 12px);
+}
+
+.ai-action,
+.ai-industries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    inline-size: 100%;
+    margin-block-end: var(--sp-1, 4px);
+  }
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+}
+
+.ai-price {
+  padding-block-start: var(--sp-3, 12px);
+  border-block-start: 1px solid var(--border-hairline);
+}
+
+@media (max-width: 720px) {
+  .ai-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ai-item__images {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ai-warning {
+  margin: 0;
+  border: 1px solid color-mix(in oklab, var(--c-copper-500) 45%, transparent);
+  background: color-mix(in oklab, var(--c-copper-500) 12%, transparent);
+  color: var(--c-copper-600, inherit);
+  font-weight: var(--fw-semibold);
+}
+
+.ai-pdf-button {
+  position: relative;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.ai-pricelists {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--border-hairline);
+    border-radius: 10px;
+    font-size: var(--fs-sm);
+  }
+
+  small {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.ai-price-source {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--c-cat-food) 12%, transparent);
+  font-size: var(--fs-sm);
+
+  small {
+    color: var(--text-muted);
+  }
+}

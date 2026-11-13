@@ -19,6 +19,7 @@ import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { CATEGORIES } from '../../data/categories.data';
+import { facetLabel } from '../../data/catalog-labels';
 import { CATALOG_PAGE_SIZE } from '../../data/repositories/api-product.repository';
 
 const CSV = (value: string | null): string[] =>
@@ -142,7 +143,11 @@ export class CatalogStore {
     ];
     for (const [key, values, facet] of groups) {
       for (const id of values ?? []) {
-        const label = facet.find((f) => f.id === id)?.label;
+        // A category with no product of its own (only in its sub-categories)
+        // has no facet entry, so its name comes from the category tree.
+        const label =
+          facet.find((f) => f.id === id)?.label ??
+          (key === 'sub' ? facetLabel('subcategories', id) : undefined);
         chips.push({ key, id, label: label ? this.locales.text(label) : id });
       }
     }
@@ -163,6 +168,15 @@ export class CatalogStore {
     const current = CSV(this.params().get(key));
     const next = current.includes(id) ? current.filter((value) => value !== id) : [...current, id];
     this.patch({ [key]: next.length ? next.join(',') : null, page: null });
+  }
+
+  /**
+   * Shows one category (or sub-category) at a time. The API includes a
+   * category's sub-categories, so the tree is browsed by replacing the
+   * selection, not by adding to it; null shows the whole division again.
+   */
+  selectSub(id: string | null): void {
+    this.patch({ sub: id, page: null });
   }
 
   setSearch(value: string): void {

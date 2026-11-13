@@ -104,6 +104,8 @@ interface ApiProduct {
 interface ApiStats {
   readonly total: number;
   readonly categories: Readonly<Record<string, number>>;
+  /** Absent from an API older than the three-level tree. */
+  readonly subcategories?: Readonly<Record<string, number>>;
   readonly brands: Readonly<Record<string, number>>;
 }
 
@@ -217,7 +219,12 @@ export class ApiProductRepository implements ProductRepository {
   stats(): Observable<CatalogStats | null> {
     if (this.prerendering) return of(null);
     return this.get<ApiStats>('/products/stats').pipe(
-      map((stats) => ({ total: stats.total, categories: stats.categories, brands: stats.brands })),
+      map((stats) => ({
+        total: stats.total,
+        categories: stats.categories,
+        subcategories: stats.subcategories ?? {},
+        brands: stats.brands,
+      })),
       catchError(() => of(null)),
     );
   }

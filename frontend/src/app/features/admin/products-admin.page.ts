@@ -28,6 +28,7 @@ import {
   Page,
   ProductPayload,
   UploadedMedia,
+  flattenSubcategories,
 } from '../../core/admin/admin-api.service';
 import { packMillimes, parseMillimes } from '../../shared/utils/money';
 import { PackText, SaleMode, UNIT_LABELS } from '../../shared/utils/pack-text.service';
@@ -204,9 +205,9 @@ export class ProductsAdminPage {
   );
 
   readonly selectedCategory = signal('');
-  readonly subcategories = computed(
-    () =>
-      this.categories().find((c) => c.externalId === this.selectedCategory())?.subcategories ?? [],
+  /** Categories and sub-categories of the chosen division, both levels selectable. */
+  readonly subcategories = computed(() =>
+    flattenSubcategories(this.categories().find((c) => c.externalId === this.selectedCategory())),
   );
 
   constructor() {

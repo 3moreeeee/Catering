@@ -38,6 +38,10 @@ public class ImageKitUploadService {
     }
 
     public MediaUploadResponse uploadProductImage(MultipartFile file) {
+        return uploadProductImage(file, "/fk-catering/img/products/admin");
+    }
+
+    public MediaUploadResponse uploadProductImage(MultipartFile file, String folder) {
         validate(file);
         String filename = safeFilename(file.getOriginalFilename());
 
@@ -54,7 +58,7 @@ public class ImageKitUploadService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_read_failed", exception);
         }
         body.add("fileName", filename);
-        body.add("folder", "/fk-catering/img/products/admin");
+        body.add("folder", folder);
         body.add("useUniqueFileName", "true");
 
         MediaUploadResponse uploaded;

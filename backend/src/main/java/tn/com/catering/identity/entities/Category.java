@@ -52,6 +52,10 @@ public class Category {
     @Column(length = 255)
     private String icon;
 
+    /** Position among its siblings, as in the taxonomy file; null sorts last. */
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
     protected Category() {}
 
     public Category(String externalId, String slug, String nameFr) {
@@ -77,4 +81,6 @@ public class Category {
     public void setImage(String image) { this.image = image; }
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
+    public Integer getSortOrder() { return sortOrder; }
+    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
 }

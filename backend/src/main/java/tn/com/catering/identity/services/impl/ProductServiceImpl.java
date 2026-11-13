@@ -155,13 +155,24 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.groupingBy(Category::getParentExternalId));
         return all.stream()
                 .filter(category -> category.getParentExternalId() == null)
-                .sorted((a, b) -> a.getNameFr().compareToIgnoreCase(b.getNameFr()))
-                .map(parent -> mapper.toResponse(parent, children
-                        .getOrDefault(parent.getExternalId(), List.of()).stream()
-                        .sorted((a, b) -> a.getNameFr().compareToIgnoreCase(b.getNameFr()))
-                        .map(child -> mapper.toResponse(child, List.of()))
-                        .toList()))
+                .sorted(TAXONOMY_ORDER)
+                .map(division -> tree(division, children, 0))
                 .toList();
+    }
+
+    /** Taxonomy order (sortOrder), then name, so the API lists categories as the storefront does. */
+    private static final java.util.Comparator<Category> TAXONOMY_ORDER = java.util.Comparator
+            .comparing(Category::getSortOrder, java.util.Comparator.nullsLast(Integer::compare))
+            .thenComparing(Category::getNameFr, String.CASE_INSENSITIVE_ORDER);
+
+    /** Division > category > sub-category; the depth guard only protects against a corrupt parent cycle. */
+    private CategoryResponse tree(Category category, Map<String, List<Category>> children, int depth) {
+        List<CategoryResponse> nested = depth >= 3 ? List.of() : children
+                .getOrDefault(category.getExternalId(), List.of()).stream()
+                .sorted(TAXONOMY_ORDER)
+                .map(child -> tree(child, children, depth + 1))
+                .toList();
+        return mapper.toResponse(category, nested);
     }
 
     @Override

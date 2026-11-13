@@ -23,17 +23,39 @@
               </span>
             </a>
 
-            <!-- Featured subcategories: real links, always present in the DOM. -->
+            <!-- The tree as on vinto.tn: each category, then its sub-categories.
+                 A category or sub-category appears once it holds a product.
+                 Real links, always present in the DOM. -->
             <ul class="mega__subs">
-              @for (sub of category.subcategories.slice(0, 5); track sub.id) {
-                <li>
-                  <a
-                    class="mega__sub"
-                    [routerLink]="to('products/' + category.slug)"
-                    [queryParams]="{ sub: sub.id }"
-                    >{{ sub.name | localized }}</a
-                  >
-                </li>
+              @for (sub of category.subcategories; track sub.id) {
+                @if (stats.hasProducts(sub)) {
+                  <li>
+                    <a
+                      class="mega__sub"
+                      [routerLink]="to('products/' + category.slug)"
+                      [queryParams]="{ sub: sub.id }"
+                      (click)="dismiss.emit()"
+                      >{{ sub.name | localized }}</a
+                    >
+                    @if (sub.children?.length) {
+                      <ul class="mega__leaves">
+                        @for (leaf of sub.children; track leaf.id) {
+                          @if (stats.hasProducts(leaf)) {
+                            <li>
+                              <a
+                                class="mega__leaf"
+                                [routerLink]="to('products/' + category.slug)"
+                                [queryParams]="{ sub: leaf.id }"
+                                (click)="dismiss.emit()"
+                                >{{ leaf.name | localized }}</a
+                              >
+                            </li>
+                          }
+                        }
+                      </ul>
+                    }
+                  </li>
+                }
               }
             </ul>
           </li>

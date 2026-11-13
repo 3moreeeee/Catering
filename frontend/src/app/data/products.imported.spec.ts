@@ -6,6 +6,7 @@ import { IMPORTED_PRODUCTS } from './products.imported.data';
 import { MONIN_PRODUCTS } from './products.monin.data';
 import { BRANDS } from './brands.data';
 import { CATEGORIES } from './categories.data';
+import { RETIRED_SUBCATEGORY_IDS } from './retired-subcategories';
 import { INDUSTRY_IDS } from '../shared/models/catalog.model';
 import {
   CATALOG_ADDITIONS,
@@ -24,9 +25,16 @@ import {
  */
 describe('reconciled catalogue import', () => {
   const categoryIds = new Set(CATEGORIES.map((c) => c.id));
-  const familyIds = new Set(
-    CATEGORIES.flatMap((c) => c.subcategories.map((s) => `${c.id}/${s.id}`)),
-  );
+  // Both levels below a division, plus the old ids still awaiting re-filing.
+  const familyIds = new Set([
+    ...CATEGORIES.flatMap((c) =>
+      c.subcategories.flatMap((s) => [
+        `${c.id}/${s.id}`,
+        ...(s.children ?? []).map((leaf) => `${c.id}/${leaf.id}`),
+      ]),
+    ),
+    ...CATEGORIES.flatMap((c) => [...RETIRED_SUBCATEGORY_IDS].map((id) => `${c.id}/${id}`)),
+  ]);
   const brandIds = new Set(BRANDS.map((b) => b.id));
   const industryIds = new Set<string>(INDUSTRY_IDS);
 
@@ -191,9 +199,10 @@ describe('reconciled catalogue import', () => {
     for (const product of [...IMPORTED_PRODUCTS, ...MONIN_PRODUCTS]) {
       expect(categoryIds.has(product.categoryId), product.id).toBe(true);
       expect(product.subcategoryId, product.id).toBeTruthy();
-      expect(familyIds.has(`${product.categoryId}/${product.subcategoryId}`), product.id).toBe(
-        true,
-      );
+      expect(
+        familyIds.has(`${product.categoryId}/${product.subcategoryId}`),
+        `${product.id} → ${product.categoryId}/${product.subcategoryId}`,
+      ).toBe(true);
     }
   });
 

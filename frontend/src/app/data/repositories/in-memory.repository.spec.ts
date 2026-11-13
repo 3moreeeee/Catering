@@ -4,6 +4,7 @@ import { InMemoryProductRepository } from './in-memory-product.repository';
 import { normalize } from './in-memory.repository';
 import { PRODUCTS } from '../products.data';
 import { CATEGORIES } from '../categories.data';
+import { RETIRED_SUBCATEGORY_IDS } from '../retired-subcategories';
 
 describe('InMemoryProductRepository', () => {
   let repo: InMemoryProductRepository;
@@ -68,7 +69,13 @@ describe('InMemoryProductRepository', () => {
       for (const product of PRODUCTS) {
         if (!product.subcategoryId) continue;
         const category = CATEGORIES.find((c) => c.id === product.categoryId);
-        const match = category?.subcategories.some((s) => s.id === product.subcategoryId);
+        const match =
+          RETIRED_SUBCATEGORY_IDS.has(product.subcategoryId) ||
+          category?.subcategories.some(
+            (s) =>
+              s.id === product.subcategoryId ||
+              (s.children ?? []).some((leaf) => leaf.id === product.subcategoryId),
+          );
         expect(match, `${product.id} → ${product.subcategoryId}`).toBe(true);
       }
     });

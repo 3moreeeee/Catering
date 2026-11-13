@@ -131,6 +131,8 @@ export interface Subcategory {
   readonly slug: string;
   readonly categoryId: CategoryId;
   readonly name: LocalizedText;
+  /** Third level ("Verres et gobelets" > "Gobelets en PET"); absent on a leaf. */
+  readonly children?: readonly Subcategory[];
 }
 
 export interface Category {

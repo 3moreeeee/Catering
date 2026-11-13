@@ -1,7 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
-import { CategoryId } from '../../shared/models/catalog.model';
+import { CategoryId, Subcategory } from '../../shared/models/catalog.model';
 
 /**
  * Catalogue counters (total, per division, per brand) from one aggregate API
@@ -18,6 +18,26 @@ export class CatalogStats {
   category(id: CategoryId): number | null {
     const stats = this.stats();
     return stats ? (stats.categories[id] ?? 0) : null;
+  }
+
+  /** Products in a category and its sub-categories; null while unknown. */
+  subcategory(sub: Subcategory): number | null {
+    const counts = this.stats()?.subcategories;
+    if (!counts) return null;
+    return (
+      (counts[sub.id] ?? 0) +
+      (sub.children ?? []).reduce((sum, child) => sum + (counts[child.id] ?? 0), 0)
+    );
+  }
+
+  /**
+   * Whether the menu should list a category: yes when it holds a product, and
+   * also while counts are unknown, so a prerendered or offline menu is never
+   * emptied.
+   */
+  hasProducts(sub: Subcategory): boolean {
+    const count = this.subcategory(sub);
+    return count === null || count > 0;
   }
 
   brand(id: string): number | null {

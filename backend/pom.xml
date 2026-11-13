@@ -56,6 +56,12 @@
       <version>${jjwt.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Reads the company's price-list PDFs for the AI importer. -->
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>2.0.29</version>
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
