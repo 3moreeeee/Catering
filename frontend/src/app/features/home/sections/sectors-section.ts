@@ -44,9 +44,9 @@ const SCENES: readonly Scene[] = [
     params: { industry: 'restaurants' },
     image: 'restaurants',
     hotspots: [
-      { slug: 'vinto-mayonnaise-mayor-350-ml-384', x: 38, y: 49 },
-      { slug: 'vinto-moutarde-forte-de-dijon-dijona-200gr-27', x: 70.9, y: 61 },
-      { slug: 'monin-sirop-de-fraise-monin-1l-326', x: 88.2, y: 44 },
+      { slug: 'mayonnaise-mayor-riche-cremeuse-350-ml', x: 38, y: 49 },
+      { slug: 'moutarde-de-dijon-dijona-200g', x: 70.9, y: 61 },
+      { slug: 'sirop-de-fraise-monin-25cl', x: 88.2, y: 44 },
     ],
   },
   {
@@ -56,12 +56,12 @@ const SCENES: readonly Scene[] = [
     image: 'hotels',
     hotspots: [
       {
-        slug: 'vinto-bol-a-salade-500ml-en-kraft-brun-avec-couvercle-en-pet-les-50-pieces-82',
+        slug: 'bol-a-salade-kraft-avec-couvercle',
         x: 41.2,
         y: 49,
       },
-      { slug: 'vinto-gobelet-et-couvercle-en-pet-12oz-350-ml-les-50-pieces-48', x: 64.1, y: 44 },
-      { slug: 'monin-sirop-fruit-de-la-passion-1l', x: 73.9, y: 37 },
+      { slug: 'gobelet-et-couvercle-en-pet-350ml', x: 64.1, y: 44 },
+      { slug: 'puree-de-fruit-de-la-passion-monin', x: 73.9, y: 37 },
     ],
   },
   {
@@ -70,9 +70,9 @@ const SCENES: readonly Scene[] = [
     params: { industry: 'food-production' },
     image: 'industry',
     hotspots: [
-      { slug: 'vinto-gant-nitrile-les-100-pieces-355-64', x: 49, y: 57 },
-      { slug: 'vinto-coiffe-bouffant-en-non-tisse-les-100-pieces-146', x: 65.5, y: 54 },
-      { slug: 'vinto-barquette-a-sushi-224x142x30mm-les-100-pieces-485', x: 87.3, y: 56 },
+      { slug: 'gants-en-nitrile-bleus-boite-de-100', x: 49, y: 57 },
+      { slug: 'coiffe-de-protection', x: 65.5, y: 54 },
+      { slug: 'barquette-a-sushi-224x142x30mm', x: 87.3, y: 56 },
     ],
   },
   {
@@ -81,9 +81,9 @@ const SCENES: readonly Scene[] = [
     params: { q: 'verrine' },
     image: 'dessert',
     hotspots: [
-      { slug: 'monin-puree-fraise-1l-268', x: 55.7, y: 27 },
-      { slug: 'vinto-verrine-cube-100ml-les-50-pieces-188', x: 65.5, y: 63 },
-      { slug: 'vinto-cuillere-pour-verrine-les-250-pieces-196', x: 88.4, y: 84.5 },
+      { slug: 'puree-de-fraise-monin-1-32-kg', x: 55.7, y: 27 },
+      { slug: 'verrine-cube-100-ml', x: 65.5, y: 63 },
+      { slug: 'cuillere-chinoise-transparente-ds02', x: 88.4, y: 84.5 },
     ],
   },
 ];
