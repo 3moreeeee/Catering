@@ -22,7 +22,8 @@ import { CategoryId, Product } from '../../../shared/models/catalog.model';
 import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 import { HERO_SLIDES, HeroSlide } from './hero-slides';
 
-const AUTOPLAY_MS = 6000;
+/** Each banner holds 3.5 s: quick enough to show the whole range in one visit. */
+const AUTOPLAY_MS = 3500;
 const SWIPE_THRESHOLD_PX = 48;
 
 /**

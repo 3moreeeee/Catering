@@ -110,13 +110,16 @@ test.describe('accessibility guarantees', () => {
     await page.goto('/fr');
     await page.waitForLoadState('networkidle');
 
+    // It moves on from the first banner without any click.
     const heading = page.locator('.slide.is-active h2');
-    await expect(heading).toContainText('L’essentiel des pauses', { timeout: 9_000 });
+    await expect(heading).not.toContainText('Le goût qui relève', { timeout: 9_000 });
 
+    // Paused, it stays on whichever banner is showing.
     await page.getByRole('button', { name: 'Mettre le défilement en pause' }).click();
     await page.mouse.move(0, 0);
+    const paused = (await heading.innerText()).trim();
     await page.waitForTimeout(7_000);
-    await expect(heading).toContainText('L’essentiel des pauses');
+    await expect(heading).toHaveText(paused);
   });
 
   test('the showcase links real products and switches trade from the keyboard', async ({
