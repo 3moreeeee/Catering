@@ -11,6 +11,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { SHOW_PRICES } from '../../core/config/catalogue-display';
 import { map, shareReplay, switchMap } from 'rxjs';
 import { PRODUCT_REPOSITORY } from '../../data/repositories/catalog.repository';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
@@ -90,6 +91,9 @@ export class ProductDetailsPage {
   );
 
   readonly product = computed(() => this.lookup().product);
+  /** True until the lookup answers: the page waits rather than calling the product missing. */
+  readonly loading = computed(() => !this.lookup().done);
+  readonly showPrices = SHOW_PRICES;
   /** Set during server rendering only: lets a missing product answer 404. */
   private readonly responseInit = inject(RESPONSE_INIT, { optional: true });
 

@@ -164,6 +164,101 @@
   min-block-size: 6rem;
 }
 
+// --- Without prices ------------------------------------------------------------
+// The product's defining figure stands where the price stood, in the same
+// display type, under a hairline; a round arrow beside it opens the product.
+// Held at the bottom of the body at one height, so every card of a row lines up.
+.card__spec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-block-start: auto;
+  padding-block-start: var(--sp-3);
+  border-block-start: 1px solid var(--border-hairline);
+  min-block-size: 4.5rem;
+}
+
+.card__spec-text {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.card__spec-label {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.card__spec-value {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  overflow-wrap: anywhere;
+}
+
+// Holds the figure's place while the pack terms load.
+.card__spec-pending {
+  display: block;
+  inline-size: 5.5em;
+  block-size: 1.3em;
+  border-radius: var(--r-xs);
+  background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--surface-card) 70%, white),
+      transparent
+    )
+    var(--surface-alt);
+  background-size: 200% 100%;
+
+  @include motion-safe {
+    animation: card-price-pending 1.4s ease-in-out infinite;
+  }
+}
+
+// Decorative: the whole card is already the link to the product.
+.card__spec-go {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border: 1.5px solid color-mix(in oklab, var(--tone) 55%, transparent);
+  border-radius: 50%;
+  color: var(--tone);
+  transition:
+    background-color var(--d-fast) var(--ease-out),
+    border-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out);
+
+  svg {
+    inline-size: 1.2rem;
+    block-size: 1.2rem;
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  .card:hover & {
+    border-color: var(--tone);
+    background-color: var(--tone);
+    color: var(--c-white);
+
+    svg {
+      transform: translateX(2px);
+    }
+  }
+}
+
 .card__price {
   margin: 0;
   font-family: var(--font-display);
@@ -342,6 +437,19 @@ $list-row-min: 40rem;
 
   .card__buy {
     min-block-size: 0;
+  }
+
+  // Beside the photograph the figure is smaller and needs no arrow.
+  .card__spec {
+    min-block-size: 0;
+  }
+
+  .card__spec-value {
+    font-size: var(--fs-body);
+  }
+
+  .card__spec-go {
+    display: none;
   }
 
   .card__actions {

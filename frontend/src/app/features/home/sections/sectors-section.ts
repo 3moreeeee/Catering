@@ -1,3 +1,4 @@
+import { SHOW_PRICES } from '../../../core/config/catalogue-display';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -169,6 +170,7 @@ export class SectorsSection {
 
   /** The product's price as displayed, or null when none is published. */
   priceLabel(product: Product): string | null {
+    if (!SHOW_PRICES) return null;
     const point = this.pricing.priceOf(product.id);
     return point ? this.pack.price(point.price, point.currency) : null;
   }

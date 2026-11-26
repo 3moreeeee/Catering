@@ -10,6 +10,7 @@ import { HeroSection } from './sections/hero-section';
 import { OffersSection } from './sections/offers-section';
 import { QuoteSection } from './sections/quote-section';
 import { SectorsSection } from './sections/sectors-section';
+import { SHOW_PRICES } from '../../core/config/catalogue-display';
 
 /**
  * Commercial showcase homepage: campaign banners and divisions, the trades
@@ -45,10 +46,13 @@ import { SectorsSection } from './sections/sectors-section';
         <div class="defer-ph defer-ph--lg"></div>
       }
 
-      @defer (on viewport; hydrate on viewport) {
-        <fk-offers-section />
-      } @placeholder {
-        <div class="defer-ph"></div>
+      <!-- The offers are promotional prices: shown only while prices are published. -->
+      @if (showPrices) {
+        @defer (on viewport; hydrate on viewport) {
+          <fk-offers-section />
+        } @placeholder {
+          <div class="defer-ph"></div>
+        }
       }
 
       @defer (on viewport; hydrate on viewport) {
@@ -79,6 +83,7 @@ import { SectorsSection } from './sections/sectors-section';
   `,
 })
 export class HomePage {
+  readonly showPrices = SHOW_PRICES;
   private readonly seo = inject(SeoService);
   private readonly jsonLd = inject(StructuredDataService);
   private readonly transloco = inject(TranslocoService);

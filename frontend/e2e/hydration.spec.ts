@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { SHOW_PRICES } from '../src/app/core/config/catalogue-display';
 
 /**
  * Live data must reach the home page's deferred sections with no interaction.
@@ -15,6 +16,7 @@ for (const lang of ['fr', 'en'] as const) {
   test(`/${lang}: featured prices are shown without any click or price request`, async ({
     page,
   }) => {
+    test.skip(!SHOW_PRICES, 'Prices are hidden on the storefront.');
     let priceRequests = 0;
     await page.route('**/api/products/prices**', async (route) => {
       priceRequests++;

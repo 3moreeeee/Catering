@@ -7,47 +7,66 @@
       </a>
     </header>
 
-    <div class="selection__row">
-      <button
-        type="button"
-        class="selection__arrow"
-        [attr.aria-label]="t('home.featured.previous')"
-        (click)="goTo(page() - 1)"
+    @if (current(); as family) {
+      <div
+        class="selection__families"
+        role="group"
+        [attr.aria-label]="t('home.featured.familiesLabel')"
       >
-        <span aria-hidden="true">‹</span>
-      </button>
-
-      <ul #track class="selection__track" (scrollend)="measure()" (scroll)="measure()">
-        @for (product of products(); track product.id) {
-          <li class="selection__item"><fk-product-card [product]="product" /></li>
+        @for (item of families(); track item.id; let i = $index) {
+          <button
+            type="button"
+            class="selection__family"
+            [attr.data-tone]="item.category"
+            [class.is-active]="i === active()"
+            [attr.aria-pressed]="i === active()"
+            (click)="select(i)"
+          >
+            {{ item.label | localized }}
+          </button>
         }
-      </ul>
+      </div>
 
-      <button
-        type="button"
-        class="selection__arrow"
-        [attr.aria-label]="t('home.featured.next')"
-        (click)="goTo(page() + 1)"
-      >
-        <span aria-hidden="true">›</span>
-      </button>
-    </div>
+      <div class="selection__row">
+        <button
+          type="button"
+          class="selection__arrow"
+          [attr.aria-label]="t('home.featured.previous')"
+          (click)="select(active() - 1)"
+        >
+          <span aria-hidden="true">‹</span>
+        </button>
 
-    @if (pageCount() > 1) {
-      <ul class="selection__dots">
-        @for (index of pages(); track index) {
-          <li>
-            <button
-              type="button"
-              class="selection__dot"
-              [class.is-active]="page() === index"
-              [attr.aria-current]="page() === index ? 'true' : null"
-              [attr.aria-label]="t('home.featured.goToPage', { page: index + 1 })"
-              (click)="goTo(index)"
-            ></button>
-          </li>
-        }
-      </ul>
+        <ul class="selection__track" aria-live="polite">
+          @for (product of family.products; track product.id; let i = $index) {
+            <li class="selection__item" [style.--i]="i">
+              <fk-product-card [product]="product" />
+            </li>
+          }
+        </ul>
+
+        <button
+          type="button"
+          class="selection__arrow"
+          [attr.aria-label]="t('home.featured.next')"
+          (click)="select(active() + 1)"
+        >
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
+
+      <p class="selection__foot">
+        <a
+          class="selection__family-link"
+          [attr.data-tone]="family.category"
+          [routerLink]="familyLink(family)"
+          [queryParams]="{ sub: familySub(family) }"
+        >
+          {{ t('home.featured.viewFamily', { count: family.total }) }}
+          <strong>{{ family.label | localized }}</strong>
+          <span aria-hidden="true">→</span>
+        </a>
+      </p>
     }
   </section>
 </ng-container>

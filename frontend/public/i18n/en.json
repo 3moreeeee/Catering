@@ -145,9 +145,11 @@
       "heading": "Discover in the catalogue",
       "viewCatalogue": "View the full catalogue",
       "promo": "Promo",
-      "previous": "Previous products",
-      "next": "Next products",
-      "goToPage": "Go to page {{page}}"
+      "previous": "Previous family",
+      "next": "Next family",
+      "goToPage": "Go to page {{page}}",
+      "familiesLabel": "Choose a product family",
+      "viewFamily": "See all {{count}} products"
     },
     "offers": {
       "eyebrow": "Promotional prices",
@@ -408,7 +410,10 @@
     "subtotal": "Subtotal for {{quantity}} units: {{price}}",
     "factsTitle": "Product details",
     "formatLabel": "Format",
-    "reference": "Reference"
+    "reference": "Reference",
+    "quoteTitle": "Price on request",
+    "quoteLead": "Add this product to your basket and send your request: the sales team replies with the price.",
+    "perUnitSale": "Per unit"
   },
   "brands": {
     "title": "Brands",

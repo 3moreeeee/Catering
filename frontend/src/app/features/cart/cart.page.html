@@ -87,7 +87,9 @@
                       @if (packOf(line); as terms) {
                         <!-- Pack line: quantity counts packs, unitPrice is the pack price. -->
                         <span class="cart-line__unit" data-testid="cart-pack">
-                          @if (line.piecePrice !== null && line.piecePrice !== undefined) {
+                          @if (
+                            showPrices && line.piecePrice !== null && line.piecePrice !== undefined
+                          ) {
                             {{ t('pack.unitPrice') }} : {{ pack.perUnit(terms) }} ·
                           }
                           {{
@@ -95,10 +97,12 @@
                               pieces: pack.pieces(terms.packQuantity, terms.unitLabel),
                             })
                           }}
-                          · {{ t('pack.packPrice') }} :
-                          {{ price(line.unitPrice, line.currency ?? 'TND') }}
+                          @if (showPrices) {
+                            · {{ t('pack.packPrice') }} :
+                            {{ price(line.unitPrice, line.currency ?? 'TND') }}
+                          }
                         </span>
-                      } @else {
+                      } @else if (showPrices) {
                         <span class="cart-line__unit">{{
                           t('cart.unitPrice', {
                             price: price(line.unitPrice, line.currency ?? 'TND'),
@@ -125,7 +129,9 @@
                     </div>
 
                     <div class="cart-line__total u-nums">
-                      {{ price(line.lineTotal, line.currency ?? 'TND') }}
+                      @if (showPrices) {
+                        {{ price(line.lineTotal, line.currency ?? 'TND') }}
+                      }
                     </div>
 
                     <button
@@ -158,25 +164,30 @@
                     <dt>{{ t('cart.units') }}</dt>
                     <dd>{{ cart()!.totalQuantity }}</dd>
                   </div>
-                  <div class="cart-totals__grand">
-                    <dt>{{ t('cart.total') }}</dt>
-                    <dd>{{ price(cart()!.total, cart()!.currency) }}</dd>
-                  </div>
+                  @if (showPrices) {
+                    <div class="cart-totals__grand">
+                      <dt>{{ t('cart.total') }}</dt>
+                      <dd>{{ price(cart()!.total, cart()!.currency) }}</dd>
+                    </div>
+                  }
                 </dl>
-                @if (cart()!.hasUnpricedItems) {
+                @if (showPrices && cart()!.hasUnpricedItems) {
                   <p class="cart-note">{{ t('cart.partialTotal') }}</p>
                 }
 
-                <button
-                  type="button"
-                  class="btn btn--primary btn--lg btn--block"
-                  [disabled]="busy() || cart()!.hasUnpricedItems"
-                  (click)="choose('ORDER')"
-                >
-                  {{ t('cart.order.cta') }}
-                </button>
-                @if (cart()!.hasUnpricedItems) {
-                  <p class="cart-note">{{ t('cart.order.unpriced') }}</p>
+                <!-- Buying outright needs a price; without one, the quote is the path. -->
+                @if (showPrices) {
+                  <button
+                    type="button"
+                    class="btn btn--primary btn--lg btn--block"
+                    [disabled]="busy() || cart()!.hasUnpricedItems"
+                    (click)="choose('ORDER')"
+                  >
+                    {{ t('cart.order.cta') }}
+                  </button>
+                  @if (cart()!.hasUnpricedItems) {
+                    <p class="cart-note">{{ t('cart.order.unpriced') }}</p>
+                  }
                 }
 
                 <div class="cart-bulk">

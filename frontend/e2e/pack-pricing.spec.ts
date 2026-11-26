@@ -1,4 +1,5 @@
 import { APIRequestContext, expect, Page, test } from '@playwright/test';
+import { SHOW_PRICES } from '../src/app/core/config/catalogue-display';
 
 /**
  * Pack-only sales end to end, against a live backend (not mocks): the supplier
@@ -8,6 +9,9 @@ import { APIRequestContext, expect, Page, test } from '@playwright/test';
  * E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD. Without them they are skipped.
  */
 
+// Every scenario here reads displayed prices; the storefront publishes none for now.
+test.skip(!SHOW_PRICES, 'Prices are hidden on the storefront (SHOW_PRICES = false).');
+
 const ADMIN_EMAIL = process.env['E2E_ADMIN_EMAIL'];
 const ADMIN_PASSWORD = process.env['E2E_ADMIN_PASSWORD'];
 const BONNET = '/fr/products/hygiene/catalogue-bonnet-de-douche';
@@ -15,26 +19,38 @@ const BONNET = '/fr/products/hygiene/catalogue-bonnet-de-douche';
 async function signUpBuyer(request: APIRequestContext): Promise<string> {
   const email = `pack-${Date.now()}-${Math.round(Math.random() * 1e6)}@example.test`;
   const response = await request.post('/api/auth/register', {
-    data: { clientType: 'PHYSIQUE', firstName: 'Test', lastName: 'Lot', email, password: 'StrongPassword123!' },
+    data: {
+      clientType: 'PHYSIQUE',
+      firstName: 'Test',
+      lastName: 'Lot',
+      email,
+      password: 'StrongPassword123!',
+    },
   });
   expect(response.ok()).toBe(true);
   return email;
 }
 
 async function signInAdmin(page: Page): Promise<void> {
-  const response = await page.request.post('/api/auth/login', { data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD } });
+  const response = await page.request.post('/api/auth/login', {
+    data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
+  });
   expect(response.ok()).toBe(true);
 }
 
 /** Withdraws the products a test created, so catalogue counts elsewhere are not skewed. */
 async function withdraw(page: Page, name: string): Promise<void> {
-  const found = await page.request.get('/api/admin/products', { params: { q: name, page: 0, pageSize: 25 } });
+  const found = await page.request.get('/api/admin/products', {
+    params: { q: name, page: 0, pageSize: 25 },
+  });
   const { items } = (await found.json()) as { items: { id: string }[] };
   for (const item of items) await page.request.delete(`/api/products/${item.id}`);
 }
 
 test.describe('pack pricing — storefront', () => {
-  test('the card leads with the pack price, then the pack and the piece price (FR)', async ({ page }) => {
+  test('the card leads with the pack price, then the pack and the piece price (FR)', async ({
+    page,
+  }) => {
     await page.goto('/fr/products?q=Bonnet%20de%20douche');
     const card = page.locator('fk-product-card').filter({ hasText: 'Bonnet de douche' });
     await expect(card).toContainText('12,000 TND / lot');
@@ -51,10 +67,14 @@ test.describe('pack pricing — storefront', () => {
 
   test('a supplier size family shows its official formats and prices', async ({ page }) => {
     await page.goto('/fr/products?q=Champignons');
-    const cards = page.locator('fk-product-card').filter({ hasText: 'Champignons en tranches Emporium' });
+    const cards = page
+      .locator('fk-product-card')
+      .filter({ hasText: 'Champignons en tranches Emporium' });
     await expect(cards).toHaveCount(3);
     await expect(cards.filter({ hasText: '184g' })).toContainText('68,400 TND / lot');
-    await expect(cards.filter({ hasText: '184g' }).getByTestId('card-pack')).toContainText('Vendu par lot de 24 boîtes');
+    await expect(cards.filter({ hasText: '184g' }).getByTestId('card-pack')).toContainText(
+      'Vendu par lot de 24 boîtes',
+    );
     await expect(cards.filter({ hasText: '850g' })).toContainText('80,400 TND / lot');
   });
 
@@ -91,7 +111,10 @@ test.describe('pack pricing — storefront', () => {
     await expect(line.getByTestId('cart-pieces')).toHaveText('5 lots = 500 pièces');
     await expect(line.locator('.cart-line__total')).toContainText('60,000 TND');
 
-    await page.getByRole('button', { name: /Demander un devis/i }).first().click();
+    await page
+      .getByRole('button', { name: /Demander un devis/i })
+      .first()
+      .click();
     await page.locator('.cart-form button[type="submit"]').click();
     await expect(page.locator('.cart-confirmation')).toBeVisible();
 
@@ -108,7 +131,9 @@ test.describe('pack pricing — storefront', () => {
 test.describe('pack pricing — back office', () => {
   test.skip(!ADMIN_EMAIL || !ADMIN_PASSWORD, 'administrator credentials not provided');
 
-  test('adds a pack product with a live preview, then edits its pack size and unit price', async ({ page }) => {
+  test('adds a pack product with a live preview, then edits its pack size and unit price', async ({
+    page,
+  }) => {
     const name = `Produit lot e2e ${Date.now()}`;
     await signInAdmin(page);
     await page.goto('/fr/admin/products');
@@ -141,7 +166,9 @@ test.describe('pack pricing — back office', () => {
     await expect(page.getByTestId('pack-price')).toHaveText('6,250 TND');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Produit mis à jour.' })).toBeVisible();
-    await expect(page.locator('tr').filter({ hasText: name }).getByTestId('list-pack-price')).toContainText('6,250 TND');
+    await expect(
+      page.locator('tr').filter({ hasText: name }).getByTestId('list-pack-price'),
+    ).toContainText('6,250 TND');
     await withdraw(page, name);
   });
 
@@ -180,7 +207,9 @@ test.describe('pack pricing — back office', () => {
     await page.locator('#p-price').fill('13');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Produit mis à jour.' })).toBeVisible();
-    await expect(page.locator('tr').filter({ hasText: name }).locator('input.admin-price__input')).toHaveValue('13.000');
+    await expect(
+      page.locator('tr').filter({ hasText: name }).locator('input.admin-price__input'),
+    ).toHaveValue('13.000');
     await withdraw(page, name);
   });
 });

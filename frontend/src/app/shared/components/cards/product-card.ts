@@ -22,6 +22,7 @@ import { imageKitMediaUrl } from '../../../core/config/imagekit.generated';
 import { uniformImageFit } from '../../utils/product-image-fit';
 import { ProductFormatService } from '../../utils/product-format.service';
 import { PackText, packTermsOf } from '../../utils/pack-text.service';
+import { SHOW_PRICES } from '../../../core/config/catalogue-display';
 
 /**
  * Product card.
@@ -85,7 +86,7 @@ import { PackText, packTermsOf } from '../../utils/pack-text.service';
 
           <h3 class="card__name">{{ product().name | localized | frenchType }}</h3>
 
-          @if (formatVisual(); as format) {
+          @if (showPrices ? formatVisual() : null; as format) {
             <p
               class="card__format u-xs u-nums"
               [class.card__format--packaging]="product().categoryId === 'packaging'"
@@ -105,7 +106,7 @@ import { PackText, packTermsOf } from '../../utils/pack-text.service';
                 <strong>{{ format.value | frenchType }}</strong></span
               >
             </p>
-          } @else if (formatLabel(); as formats) {
+          } @else if (showPrices ? formatLabel() : null; as formats) {
             <p class="card__format-fallback u-xs u-nums">{{ formats | frenchType }}</p>
           }
 
@@ -113,33 +114,66 @@ import { PackText, packTermsOf } from '../../utils/pack-text.service';
             <p class="card__desc u-sm">{{ product().shortDescription | localized }}</p>
           }
 
-          <div class="card__buy">
-            @if (pricePoint(); as point) {
-              <p class="card__price u-nums">
-                @if (point.offerActive && point.originalPrice !== null) {
-                  <span class="card__offer">{{ t('product.offer') }}</span>
-                  <del>{{ displayPrice(point.originalPrice, point.currency) }}</del>
+          @if (!showPrices) {
+            <!-- No published prices: the product's defining figure (its volume,
+                 weight, size or pack) takes the price's place, in the same
+                 type, so every card of a family reads the same way. -->
+            <div class="card__spec">
+              <span class="card__spec-text">
+                @if (formatVisual(); as format) {
+                  <span class="card__spec-label">{{ t('product.formatLabel') }}</span>
+                  <strong class="card__spec-value u-nums">{{ format.value | frenchType }}</strong>
+                } @else if (packTerms(); as terms) {
+                  <span class="card__spec-label">{{ t('pack.packaging') }}</span>
+                  <strong class="card__spec-value u-nums">{{
+                    pack.pieces(terms.packQuantity, terms.unitLabel)
+                  }}</strong>
+                } @else if (pricePending()) {
+                  <span class="card__spec-label">&nbsp;</span>
+                  <span class="card__spec-pending"></span>
+                } @else if (formatLabel(); as formats) {
+                  <span class="card__spec-label">{{ t('product.formatLabel') }}</span>
+                  <strong class="card__spec-value u-nums">{{ formats | frenchType }}</strong>
+                } @else {
+                  <span class="card__spec-label">{{ t('pack.packaging') }}</span>
+                  <strong class="card__spec-value">{{ t('product.perUnitSale') }}</strong>
                 }
-                <strong
-                  ><span class="card__amount">{{ displayPrice(point.price, point.currency) }}</span>
-                  @if (packTerms() && point.price !== null) {
-                    &ngsp;<span class="card__per-pack">/ {{ t('pack.packs.one') }}</span>
+              </span>
+              <span class="card__spec-go" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6.5 18.5 12 13 17.5" /></svg>
+              </span>
+            </div>
+          } @else {
+            <div class="card__buy">
+              @if (pricePoint(); as point) {
+                <p class="card__price u-nums">
+                  @if (point.offerActive && point.originalPrice !== null) {
+                    <span class="card__offer">{{ t('product.offer') }}</span>
+                    <del>{{ displayPrice(point.originalPrice, point.currency) }}</del>
                   }
-                </strong>
-              </p>
-              @if (packTerms(); as terms) {
-                <!-- Pack price first; what a pack holds and the piece price are secondary. -->
-                <p class="card__pack u-xs u-nums" data-testid="card-pack">
-                  <span>{{ pack.soldBy(terms) }}</span>
-                  @if (!point.offerActive) {
-                    <span>{{ pack.perUnit(terms) }}</span>
-                  }
+                  <strong
+                    ><span class="card__amount">{{
+                      displayPrice(point.price, point.currency)
+                    }}</span>
+                    @if (packTerms() && point.price !== null) {
+                      &ngsp;<span class="card__per-pack">/ {{ t('pack.packs.one') }}</span>
+                    }
+                  </strong>
                 </p>
+                @if (packTerms(); as terms) {
+                  <!-- Pack price first; what a pack holds and the piece price are secondary. -->
+                  <p class="card__pack u-xs u-nums" data-testid="card-pack">
+                    <span>{{ pack.soldBy(terms) }}</span>
+                    @if (!point.offerActive) {
+                      <span>{{ pack.perUnit(terms) }}</span>
+                    }
+                  </p>
+                }
+              } @else if (pricePending()) {
+                <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
               }
-            } @else if (pricePending()) {
-              <p class="card__price card__price--pending" aria-hidden="true"><span></span></p>
-            }
-          </div>
+            </div>
+          }
         </div>
 
         <div class="card__actions">
@@ -192,6 +226,7 @@ export class ProductCard {
   private readonly formats = inject(ProductFormatService);
   readonly auth = inject(AuthService);
 
+  readonly showPrices = SHOW_PRICES;
   readonly addState = signal<'idle' | 'adding' | 'added' | 'error'>('idle');
   readonly pack = inject(PackText);
   readonly pricePoint = computed(() => this.pricing.priceOf(this.product().id));

@@ -1,39 +1,65 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  afterNextRender,
-  computed,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { forkJoin, map } from 'rxjs';
 import { LocalizedRouter } from '../../../core/i18n/localized-router.service';
+import { CATEGORIES } from '../../../data/categories.data';
 import { PRODUCT_REPOSITORY } from '../../../data/repositories/catalog.repository';
-import { CATEGORY_IDS, Product } from '../../../shared/models/catalog.model';
+import { CategoryId, Product } from '../../../shared/models/catalog.model';
+import { LocalizedText } from '../../../shared/models/localized-text.model';
 import { ProductCard } from '../../../shared/components/cards/product-card';
+import { LocalizedTextPipe } from '../../../shared/pipes/localized-text.pipe';
 import { CAMPAIGN_EXCLUDED_BRANDS } from './hero-slides';
 
-const PER_DIVISION = 3;
-/** Fetched per division so the selection still fills after the exclusions above. */
-const FETCH_PER_DIVISION = 8;
-/** Pages at desktop width: twelve products, four per view. */
-const DEFAULT_PAGES = 3;
+/** Products shown per family: one row at desktop width. */
+const PER_FAMILY = 4;
+
+interface FamilyChoice {
+  readonly id: string;
+  readonly category: CategoryId;
+  readonly label: LocalizedText;
+}
 
 /**
- * "À découvrir dans le catalogue": a scrolling row of real products, drawn in
- * turn from each division. Native scroll-snap does the moving; the arrows and
- * dots only drive and report it.
+ * One family per division, each chosen because its products share one shape
+ * (bottles of sauce, bottles of syrup, cups, workwear), so the four cards on
+ * screen read alike instead of a ketchup beside a gastronorm tray.
+ */
+const FAMILIES: readonly FamilyChoice[] = [
+  {
+    id: 'sauces-dressings',
+    category: 'food',
+    label: { fr: 'Sauces et condiments', en: 'Sauces & condiments' },
+  },
+  { id: 'syrups', category: 'monin', label: { fr: 'Sirops MONIN', en: 'MONIN syrups' } },
+  {
+    id: 'cups-glasses',
+    category: 'packaging',
+    label: { fr: 'Verres et gobelets', en: 'Cups & glasses' },
+  },
+  {
+    id: 'kitchen-wear',
+    category: 'hygiene',
+    label: { fr: 'Tenues et protection', en: 'Workwear & protection' },
+  },
+];
+
+interface Family extends FamilyChoice {
+  readonly products: readonly Product[];
+  readonly total: number;
+}
+
+/**
+ * "À découvrir dans le catalogue": one product family at a time, four of its
+ * products side by side. The family chips and the arrows move between
+ * families; the link under the row opens the whole family in the catalogue.
  */
 @Component({
   selector: 'fk-featured-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslocoDirective, ProductCard],
+  imports: [RouterLink, TranslocoDirective, ProductCard, LocalizedTextPipe],
   templateUrl: './featured-section.html',
   styleUrl: './featured-section.scss',
 })
@@ -41,36 +67,51 @@ export class FeaturedSection {
   private readonly links = inject(LocalizedRouter);
   private readonly productRepo = inject(PRODUCT_REPOSITORY);
 
-  private readonly track = viewChild<ElementRef<HTMLElement>>('track');
-
-  readonly products = toSignal(
-    forkJoin(CATEGORY_IDS.map((id) => this.productRepo.featured(FETCH_PER_DIVISION, id))).pipe(
-      map((divisions) => interleave(divisions.map(selectForCampaign))),
-    ),
-    { initialValue: [] as readonly Product[] },
+  /** Families that came back with enough photographed products to fill a row. */
+  readonly families = toSignal(
+    forkJoin(
+      FAMILIES.map((family) =>
+        this.productRepo
+          .list({
+            categories: [family.category],
+            subcategories: familyLeaves(family),
+            sort: 'relevance',
+            page: 1,
+          })
+          .pipe(
+            map((page): Family => ({
+              ...family,
+              products: page.items
+                .filter(
+                  (p) =>
+                    p.images.length > 0 && !(p.brandId && CAMPAIGN_EXCLUDED_BRANDS.has(p.brandId)),
+                )
+                .slice(0, PER_FAMILY),
+              total: page.total,
+            })),
+          ),
+      ),
+    ).pipe(map((families): readonly Family[] => families.filter((f) => f.products.length > 0))),
+    { initialValue: [] as readonly Family[] },
   );
 
-  readonly page = signal(0);
-  readonly pageCount = signal(DEFAULT_PAGES);
-  readonly pages = computed(() => Array.from({ length: this.pageCount() }, (_, i) => i));
+  readonly active = signal(0);
+  readonly current = computed(() => this.families()[this.active()] ?? null);
 
-  constructor() {
-    afterNextRender(() => this.measure());
+  select(index: number): void {
+    const count = this.families().length;
+    if (!count) return;
+    this.active.set(((index % count) + count) % count);
   }
 
-  measure(): void {
-    const el = this.track()?.nativeElement;
-    if (!el || el.clientWidth === 0) return;
-    this.pageCount.set(Math.max(1, Math.ceil(el.scrollWidth / el.clientWidth - 0.02)));
-    this.page.set(Math.min(this.pageCount() - 1, Math.round(el.scrollLeft / el.clientWidth)));
+  familyLink(family: Family): string[] {
+    const slug = CATEGORIES.find((c) => c.id === family.category)?.slug ?? family.category;
+    return this.links.path(`products/${slug}`);
   }
 
-  goTo(page: number): void {
-    const el = this.track()?.nativeElement;
-    if (!el) return;
-    const last = this.pageCount() - 1;
-    const target = page < 0 ? last : page > last ? 0 : page;
-    el.scrollTo({ left: target * el.clientWidth });
+  /** The catalogue's own filter, as its URL carries it. */
+  familySub(family: Family): string {
+    return familyLeaves(family).join(',');
   }
 
   to(path: string): string[] {
@@ -78,20 +119,10 @@ export class FeaturedSection {
   }
 }
 
-function selectForCampaign(products: readonly Product[]): readonly Product[] {
-  return products
-    .filter((p) => p.images.length > 0 && !(p.brandId && CAMPAIGN_EXCLUDED_BRANDS.has(p.brandId)))
-    .slice(0, PER_DIVISION);
-}
-
-/** First of each division, then second of each, so neighbouring cards differ. */
-function interleave(divisions: readonly (readonly Product[])[]): readonly Product[] {
-  const result: Product[] = [];
-  for (let round = 0; round < PER_DIVISION; round++) {
-    for (const division of divisions) {
-      const product = division[round];
-      if (product) result.push(product);
-    }
-  }
-  return result;
+/** The API filters on leaf families: a family with children is asked for as its children. */
+function familyLeaves(family: FamilyChoice): readonly string[] {
+  const node = CATEGORIES.find((c) => c.id === family.category)?.subcategories.find(
+    (s) => s.id === family.id,
+  );
+  return node?.children?.length ? node.children.map((c) => c.id) : [family.id];
 }

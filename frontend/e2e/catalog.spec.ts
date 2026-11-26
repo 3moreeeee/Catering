@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { SHOW_PRICES } from '../src/app/core/config/catalogue-display';
 
 /**
  * Flow A from docs/02 — the primary revenue flow:
@@ -152,9 +153,47 @@ test.describe('catalogue discovery', () => {
   });
 });
 
+test.describe('home selection', () => {
+  test('shows one family at a time and the arrows move to the next family', async ({ page }) => {
+    await page.goto('/fr');
+    const section = page.locator('fk-featured-section');
+    await section.scrollIntoViewIfNeeded();
+    const chips = section.locator('.selection__family');
+    await expect(chips).toHaveCount(4);
+    await expect(section.locator('fk-product-card')).toHaveCount(4);
+    await expect(chips.first()).toHaveAttribute('aria-pressed', 'true');
+    const first = await section.locator('.card__name').allInnerTexts();
+
+    await chips.nth(1).click();
+    await expect(chips.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(section.locator('.card__name').first()).not.toHaveText(first[0]!);
+    await expect(section.locator('.selection__family-link')).toHaveAttribute('href', /sub=/);
+  });
+});
+
+test.describe('without published prices', () => {
+  test.skip(SHOW_PRICES, 'Prices are published.');
+
+  for (const path of ['/fr', '/fr/products', '/fr/products/food/moutarde-de-dijon-dijona-200g']) {
+    test(`${path} shows no amount anywhere`, async ({ page }) => {
+      await page.goto(path);
+      await page.waitForTimeout(2500);
+      await expect(page.locator('main')).not.toContainText(/\d+[.,]\d{3}\s*TND/);
+      await expect(page.locator('.card__price, .pdp__price')).toHaveCount(0);
+    });
+  }
+
+  test('a card shows its defining figure where the price stood', async ({ page }) => {
+    await page.goto('/fr/products/hygiene');
+    const card = page.locator('fk-product-card').first();
+    await expect(card.locator('.card__spec-value')).not.toBeEmpty();
+  });
+});
+
 test.describe('product detail', () => {
   // Every product is priced from the supplier price lists since the 2026-09 reconciliation.
   test('displays the price as an amount and currency only', async ({ page }) => {
+    test.skip(!SHOW_PRICES, 'Prices are hidden on the storefront.');
     await page.goto('/fr/products/food');
     await page.locator('fk-product-card .card__link').first().click();
 

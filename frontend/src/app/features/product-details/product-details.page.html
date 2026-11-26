@@ -125,7 +125,31 @@
           <div class="pdp__panel">
             <!-- The price arrives from the API after hydration, so the block
                stays empty rather than flashing a stale figure during SSR. -->
-            @if (pricePoint(); as point) {
+            @if (!showPrices) {
+              <!-- No published prices: the packing, and how the price reaches the buyer. -->
+              <div class="pdp__offer pdp__offer--quote">
+                <div class="pdp__quote-head">
+                  <span class="pdp__quote-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M7 3.5h7l4 4V20.5H7z" />
+                      <path d="M14 3.5v4h4M10 12h5M10 15.5h5" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="pdp__quote-title">{{ t('product.quoteTitle') }}</p>
+                    <p class="pdp__quote-lead">{{ t('product.quoteLead') }}</p>
+                  </div>
+                </div>
+                @if (packTerms(); as terms) {
+                  <dl class="pdp__pack u-nums" data-testid="pdp-pack">
+                    <div class="pdp__fact">
+                      <dt>{{ t('pack.packaging') }}</dt>
+                      <dd>{{ pack.pieces(terms.packQuantity, terms.unitLabel) }}</dd>
+                    </div>
+                  </dl>
+                }
+              </div>
+            } @else if (pricePoint(); as point) {
               <div class="pdp__offer">
                 @if (packTerms() || point.offerActive) {
                   <div class="pdp__offer-head">
@@ -218,13 +242,13 @@
                     aria-live="polite"
                   >
                     <span>{{ pack.packsEqual(quantity(), terms) }}</span>
-                    @if (subtotal(); as total) {
+                    @if (showPrices && subtotal(); as total) {
                       <span
                         >{{ t('pack.total') }} : <strong>{{ total }}</strong></span
                       >
                     }
                   </p>
-                } @else if (subtotal(); as total) {
+                } @else if (showPrices && subtotal(); as total) {
                   <p class="pdp__subtotal u-nums">
                     {{ t('product.subtotal', { quantity: quantity(), price: total }) }}
                   </p>
@@ -363,6 +387,22 @@
     </article>
 
     <fk-quote-section />
+  } @else if (loading()) {
+    <!-- The shape of the product page while its data arrives, so a slow answer
+         never reads as "this product does not exist". -->
+    <div class="container pdp pdp--loading" role="status" aria-busy="true">
+      <span class="u-visually-hidden">{{ t('common.loading') }}</span>
+      <div class="skeleton pdp__skeleton-crumbs" aria-hidden="true"></div>
+      <div class="pdp__layout" aria-hidden="true">
+        <div class="skeleton pdp__skeleton-stage"></div>
+        <div class="pdp__skeleton-info">
+          <div class="skeleton pdp__skeleton-line pdp__skeleton-line--short"></div>
+          <div class="skeleton pdp__skeleton-title"></div>
+          <div class="skeleton pdp__skeleton-line"></div>
+          <div class="skeleton pdp__skeleton-panel"></div>
+        </div>
+      </div>
+    </div>
   } @else {
     <div class="container pdp__missing">
       <h1 class="h2">{{ t('notFound.title') }}</h1>

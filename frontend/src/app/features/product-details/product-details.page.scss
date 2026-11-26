@@ -259,6 +259,55 @@
   align-items: center;
 }
 
+// Without published prices: how the price reaches the buyer, in the place the
+// headline price held, tinted with the product's division colour.
+.pdp__quote-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid color-mix(in oklab, var(--tone, var(--c-teal-900)) 22%, transparent);
+  border-radius: var(--r-md);
+  background-color: color-mix(in oklab, var(--tone, var(--c-teal-900)) 7%, var(--c-white));
+}
+
+.pdp__quote-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  background-color: var(--c-white);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--tone, var(--c-teal-900)) 18%, transparent);
+
+  svg {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    fill: none;
+    stroke: var(--tone, var(--c-teal-900));
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+}
+
+.pdp__quote-title {
+  margin: 0 0 var(--sp-1);
+  color: var(--c-teal-900);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+}
+
+.pdp__quote-lead {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal, 1.5);
+}
+
 .pdp__offer-badge {
   margin-inline-start: auto;
 }
@@ -582,6 +631,44 @@
   @include bp-down(sm) {
     gap: var(--sp-3);
   }
+}
+
+// Loading: the page's own proportions, so nothing jumps when the product lands.
+.pdp__skeleton-crumbs {
+  inline-size: 16rem;
+  max-inline-size: 70%;
+  block-size: 0.875rem;
+  margin-bottom: var(--sp-6);
+}
+
+.pdp__skeleton-stage {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-md);
+}
+
+.pdp__skeleton-info {
+  display: grid;
+  gap: var(--sp-4);
+  align-content: start;
+}
+
+.pdp__skeleton-line {
+  inline-size: 80%;
+  block-size: 1rem;
+
+  &--short {
+    inline-size: 6rem;
+  }
+}
+
+.pdp__skeleton-title {
+  inline-size: 70%;
+  block-size: 2.5rem;
+}
+
+.pdp__skeleton-panel {
+  block-size: 16rem;
+  border-radius: var(--r-md);
 }
 
 .pdp__missing {

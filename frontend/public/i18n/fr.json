@@ -145,9 +145,11 @@
       "heading": "À découvrir dans le catalogue",
       "viewCatalogue": "Voir tout le catalogue",
       "promo": "Promo",
-      "previous": "Produits précédents",
-      "next": "Produits suivants",
-      "goToPage": "Aller à la page {{page}}"
+      "previous": "Famille précédente",
+      "next": "Famille suivante",
+      "goToPage": "Aller à la page {{page}}",
+      "familiesLabel": "Choisir une famille de produits",
+      "viewFamily": "Voir les {{count}} produits"
     },
     "offers": {
       "eyebrow": "Prix promotionnels",
@@ -408,7 +410,10 @@
     "subtotal": "Sous-total pour {{quantity}} unités : {{price}}",
     "factsTitle": "Informations produit",
     "formatLabel": "Format",
-    "reference": "Référence"
+    "reference": "Référence",
+    "quoteTitle": "Tarif sur devis",
+    "quoteLead": "Ajoutez ce produit à votre panier et envoyez votre demande : l'équipe commerciale vous répond avec le tarif.",
+    "perUnitSale": "À l'unité"
   },
   "brands": {
     "title": "Marques",

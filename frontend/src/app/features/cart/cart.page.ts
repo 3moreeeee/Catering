@@ -17,6 +17,7 @@ import { PackTerms, PackText } from '../../shared/utils/pack-text.service';
 import { imageKitMediaUrl } from '../../core/config/imagekit.generated';
 import { LocalizedRouter } from '../../core/i18n/localized-router.service';
 import { QuantityStepper } from '../../shared/components/quantity-stepper/quantity-stepper';
+import { SHOW_PRICES } from '../../core/config/catalogue-display';
 
 const PHONE_PATTERN = /^$|^[+0-9][0-9 .()/-]{5,28}$/;
 
@@ -38,6 +39,7 @@ const PHONE_PATTERN = /^$|^[+0-9][0-9 .()/-]{5,28}$/;
   styleUrl: './cart.page.scss',
 })
 export class CartPage {
+  readonly showPrices = SHOW_PRICES;
   private readonly fb = inject(FormBuilder);
   private readonly links = inject(LocalizedRouter);
   private readonly transloco = inject(TranslocoService);

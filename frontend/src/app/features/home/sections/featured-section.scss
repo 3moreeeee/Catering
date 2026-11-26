@@ -15,7 +15,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-2) var(--sp-6);
-  margin-block-end: clamp(1.25rem, 2.5vw, 2rem);
+  margin-block-end: clamp(1rem, 2vw, 1.5rem);
 }
 
 .selection__title {
@@ -35,6 +35,64 @@
   text-underline-offset: 0.25em;
 
   @include focusable;
+}
+
+// --- Families: one chip each, the current one filled with its division's tint.
+.selection__families {
+  display: flex;
+  gap: var(--sp-2);
+  margin-block-end: clamp(1.25rem, 2.5vw, 1.75rem);
+  padding-block: var(--sp-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.selection__family {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--r-pill);
+  background-color: var(--c-white);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--d-fast) var(--ease-out),
+    border-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out);
+
+  @include focusable;
+
+  &::before {
+    content: '';
+    flex: none;
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background-color: var(--tone);
+  }
+
+  &:hover {
+    border-color: var(--tone);
+    color: var(--text-primary);
+  }
+
+  &.is-active {
+    border-color: var(--tone);
+    background-color: color-mix(in oklab, var(--tone) 12%, var(--c-white));
+    color: var(--text-primary);
+  }
 }
 
 .selection__row {
@@ -81,65 +139,82 @@
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;
   }
 
-  @include motion-reduce {
-    scroll-behavior: auto;
-  }
-
   @include bp(sm) {
     grid-auto-columns: calc((100% - var(--sp-4)) / 2);
   }
 
+  // The whole family on one row: four cards, no scrolling.
   @include bp(lg) {
     grid-auto-columns: calc((100% - 3 * var(--sp-4)) / 4);
+    overflow: visible;
   }
 }
 
+// A new family arrives card by card, from the left.
 .selection__item {
   scroll-snap-align: start;
-}
 
-.selection__dots {
-  display: none;
-
-  @include bp(md) {
-    display: flex;
-    justify-content: center;
-    margin: var(--sp-2) 0 0;
-    padding: 0;
-    list-style: none;
+  @include motion-safe {
+    animation: selection-in 0.45s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
   }
 }
 
-.selection__dot {
-  display: grid;
-  place-items: center;
-  inline-size: 22px;
-  block-size: var(--tap-min);
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
+@keyframes selection-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.selection__foot {
+  display: flex;
+  justify-content: center;
+  margin: clamp(1rem, 2vw, 1.5rem) 0 0;
+}
+
+.selection__family-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 var(--sp-2);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--sp-5);
+  border-radius: var(--r-pill);
+  background-color: color-mix(in oklab, var(--tone) 10%, var(--c-white));
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  transition: background-color var(--d-fast) var(--ease-out);
 
   @include focusable;
 
-  &::before {
-    content: '';
-    inline-size: 8px;
-    block-size: 8px;
-    border-radius: 50%;
-    background-color: var(--c-ivory-200);
-    transition: background-color var(--d-fast) var(--ease-out);
+  strong {
+    font-weight: var(--fw-semibold);
   }
 
-  &.is-active::before,
-  &:hover::before {
-    background-color: var(--c-teal-900);
+  span {
+    color: var(--tone);
+    font-weight: var(--fw-bold);
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  &:hover {
+    background-color: color-mix(in oklab, var(--tone) 18%, var(--c-white));
+
+    span {
+      transform: translateX(3px);
+    }
   }
 }
