@@ -412,8 +412,10 @@
     "formatLabel": "Format",
     "reference": "Référence",
     "quoteTitle": "Tarif sur devis",
-    "quoteLead": "Ajoutez ce produit à votre panier et envoyez votre demande : l'équipe commerciale vous répond avec le tarif.",
-    "perUnitSale": "À l'unité"
+    "quoteLead": "Envoyez votre demande de devis : l'équipe commerciale vous répond avec le tarif adapté à vos quantités.",
+    "perUnitSale": "À l'unité",
+    "requestQuote": "Demander un devis",
+    "requestQuoteAbout": "Demander un devis pour {{name}}"
   },
   "brands": {
     "title": "Marques",

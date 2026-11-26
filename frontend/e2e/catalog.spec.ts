@@ -144,7 +144,7 @@ test.describe('catalogue discovery', () => {
     // differently-named contact link.
     await page
       .locator('.pdp__actions')
-      .getByRole('link', { name: /Demander une information/i })
+      .getByRole('link', { name: /Demander une information|Demander un devis/i })
       .click();
 
     // The enquiry arrives with the product attached.

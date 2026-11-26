@@ -83,13 +83,19 @@
               }}
             </a>
           </li>
-            <!-- The header hides the basket icon on the narrowest screens, so the
+          <!-- The header hides the basket icon on the narrowest screens, so the
                  drawer is where it stays reachable there. -->
+          @if (showPrices) {
             <li>
               <a class="mnav__link" [routerLink]="to('cart')">
-                {{ cart.itemCount() > 0 ? t('nav.cartCount', { count: cart.itemCount() }) : t('nav.cart') }}
+                {{
+                  cart.itemCount() > 0
+                    ? t('nav.cartCount', { count: cart.itemCount() })
+                    : t('nav.cart')
+                }}
               </a>
             </li>
+          }
         </ul>
       </nav>
 

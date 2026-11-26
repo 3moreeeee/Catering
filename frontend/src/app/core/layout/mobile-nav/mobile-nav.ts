@@ -1,3 +1,4 @@
+import { SHOW_PRICES } from '../../config/catalogue-display';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -43,6 +44,7 @@ import { CartService } from '../../cart/cart.service';
   },
 })
 export class MobileNav {
+  readonly showPrices = SHOW_PRICES;
   readonly open = input.required<boolean>();
   readonly categories = input.required<readonly Category[]>();
   readonly dismiss = output<void>();

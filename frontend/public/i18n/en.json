@@ -412,8 +412,10 @@
     "formatLabel": "Format",
     "reference": "Reference",
     "quoteTitle": "Price on request",
-    "quoteLead": "Add this product to your basket and send your request: the sales team replies with the price.",
-    "perUnitSale": "Per unit"
+    "quoteLead": "Send a quote request: the sales team replies with the price for your quantities.",
+    "perUnitSale": "Per unit",
+    "requestQuote": "Request a quote",
+    "requestQuoteAbout": "Request a quote for {{name}}"
   },
   "brands": {
     "title": "Brands",

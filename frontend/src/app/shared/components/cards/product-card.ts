@@ -177,39 +177,58 @@ import { SHOW_PRICES } from '../../../core/config/catalogue-display';
         </div>
 
         <div class="card__actions">
-          @if (product().colorVariants?.length) {
-            <a class="btn btn--primary btn--sm card__action" [routerLink]="detailLink()">
-              {{ t('product.chooseColor') }}
-            </a>
-          } @else if (!auth.authenticated()) {
-            <a class="btn btn--primary btn--sm card__action" [routerLink]="loginLink()">
-              {{ t('product.addToCart') }}
-            </a>
-          } @else if (pricePoint()) {
-            <button
-              type="button"
+          @if (!showPrices) {
+            <!-- No prices, no basket: the one action is a quote request, opened
+                 on the contact page with this product already named. -->
+            <a
               class="btn btn--primary btn--sm card__action"
-              [disabled]="addState() === 'adding'"
-              [attr.aria-label]="t('product.addToCartAbout', { name: product().name | localized })"
-              (click)="addToCart()"
+              [routerLink]="contactLink()"
+              [queryParams]="{ product: product().slug }"
+              [attr.aria-label]="
+                t('product.requestQuoteAbout', { name: product().name | localized })
+              "
             >
-              {{
-                addState() === 'added'
-                  ? t('product.added')
-                  : addState() === 'error'
-                    ? t('product.addFailed')
-                    : t('product.addToCart')
-              }}
-            </button>
+              {{ t('product.requestQuote') }}
+            </a>
+          } @else {
+            @if (product().colorVariants?.length) {
+              <a class="btn btn--primary btn--sm card__action" [routerLink]="detailLink()">
+                {{ t('product.chooseColor') }}
+              </a>
+            } @else if (!auth.authenticated()) {
+              <a class="btn btn--primary btn--sm card__action" [routerLink]="loginLink()">
+                {{ t('product.addToCart') }}
+              </a>
+            } @else if (pricePoint()) {
+              <button
+                type="button"
+                class="btn btn--primary btn--sm card__action"
+                [disabled]="addState() === 'adding'"
+                [attr.aria-label]="
+                  t('product.addToCartAbout', { name: product().name | localized })
+                "
+                (click)="addToCart()"
+              >
+                {{
+                  addState() === 'added'
+                    ? t('product.added')
+                    : addState() === 'error'
+                      ? t('product.addFailed')
+                      : t('product.addToCart')
+                }}
+              </button>
+            }
+            <a
+              class="btn btn--secondary btn--sm card__action"
+              [routerLink]="contactLink()"
+              [queryParams]="{ product: product().slug }"
+              [attr.aria-label]="
+                t('product.requestInfoAbout', { name: product().name | localized })
+              "
+            >
+              {{ t('product.requestInfo') }}
+            </a>
           }
-          <a
-            class="btn btn--secondary btn--sm card__action"
-            [routerLink]="contactLink()"
-            [queryParams]="{ product: product().slug }"
-            [attr.aria-label]="t('product.requestInfoAbout', { name: product().name | localized })"
-          >
-            {{ t('product.requestInfo') }}
-          </a>
         </div>
       </article>
     </ng-container>

@@ -208,7 +208,7 @@
               </div>
             }
 
-            @if (auth.authenticated() && pricePoint()) {
+            @if (showPrices && auth.authenticated() && pricePoint()) {
               <div class="pdp__purchase">
                 <label for="pdp-qty" class="u-label pdp__qty-label">{{
                   packTerms() ? t('pack.quantity') : t('cart.quantity')
@@ -267,21 +267,23 @@
             }
 
             <div class="pdp__actions">
-              @if (!auth.authenticated()) {
+              @if (showPrices && !auth.authenticated()) {
                 <a class="btn btn--primary btn--lg" [routerLink]="to('login')">
                   {{ t('product.signInToOrder') }}
                 </a>
               }
 
               <a
-                class="btn btn--secondary btn--lg"
+                class="btn btn--lg"
+                [class.btn--primary]="!showPrices"
+                [class.btn--secondary]="showPrices"
                 [routerLink]="to('contact')"
                 [queryParams]="{
                   product: selectedColor()?.slug ?? p.slug,
                   color: selectedColorLabel(),
                 }"
               >
-                {{ t('product.requestInfo') }}
+                {{ showPrices ? t('product.requestInfo') : t('product.requestQuote') }}
               </a>
               <button type="button" class="btn btn--ghost btn--lg pdp__share" (click)="share()">
                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">

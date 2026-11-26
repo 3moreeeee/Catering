@@ -22,6 +22,7 @@ import { MegaMenu } from '../mega-menu/mega-menu';
 import { MobileNav } from '../mobile-nav/mobile-nav';
 import { AuthService } from '../../auth/auth.service';
 import { CartService } from '../../cart/cart.service';
+import { SHOW_PRICES } from '../../config/catalogue-display';
 import { CatalogStats } from '../../catalog/catalog-stats.service';
 
 /**
@@ -44,6 +45,7 @@ import { CatalogStats } from '../../catalog/catalog-stats.service';
   },
 })
 export class SiteHeader {
+  readonly showPrices = SHOW_PRICES;
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly locales = inject(LocaleService);
